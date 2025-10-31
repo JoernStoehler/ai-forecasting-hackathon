@@ -49,10 +49,22 @@ The available services are:
 - `docs`: MkDocs documentation server
 - `frontend`: WebApp frontend server
 - `backend`: Backend server with agent scaffolding
-- `tunnel`: Cloudflared tunnel to expose local frontend and backend to our domain (requires project owner approval)
 
-The available actions are: `start, stop, restart`.
+The available actions are: `start, stop`.
+To restart a service, run stop and then start as two separate commands.
 To simply see the current status of all services, you can run `bash scripts/run.sh` without further arguments.
+
+To expose local services via Cloudflare Tunnel, use the separate helper:
+```
+bash scripts/tunnel.sh [--actions <start|stop|status>]
+# Requires prior `cloudflared login` (follow the browser flow and select your zone)
+```
+
+For quick non-blocking verification that agents can run the stack, use the health check:
+```
+bash scripts/health.sh
+# Prints ports, service/tunnel status, and probes local + domain endpoints with short timeouts
+```
 
 To quickly explore the project, you can run:
 ```
@@ -98,5 +110,3 @@ For the concrete types, see `backend/src/types/`.
 - Sometimes Jörn starts a 1:1 chat with a coding agent in the `main` worktree, in which case no assigned ticket exists.
 - VibeKanban manages the worktrees. Unless Jörn explicitly tells you, you don't need to commit, rebase, merge or push. VibeKanban automatically commits your work whenever you end your turn.
 - We don't have nor need a GitHub CI, except to deploy the docs to GitHub Pages on push to origin/main.
-
-

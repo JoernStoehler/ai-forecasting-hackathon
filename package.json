@@ -1,0 +1,24 @@
+{
+  "name": "ai-forecasting-hackathon",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm -ws run build",
+    "dev": "bash scripts/run.sh --actions start --services frontend backend docs",
+    "start": "bash scripts/run.sh --actions start --services frontend backend",
+    "stop": "bash scripts/run.sh --actions stop --services frontend backend docs",
+    "status": "bash scripts/run.sh",
+    "lint": "bash scripts/lint.sh",
+    "test": "bash scripts/test.sh"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3",
+    "typescript-eslint": "^8.45.0"
+  }
+}

@@ -41,6 +41,15 @@ We use a frontend server and a separate backend server, so that the backend can 
   * **i18n:** react-i18next
   * **Error tracking:** none
 
+  Versions (pinned where useful for stability):
+  - react 18.3.1, react-dom 18.3.1
+  - vite ^7.1.7, @vitejs/plugin-react ^5.0.4, typescript ~5.9.3
+  - tailwindcss 3.4.13, postcss 8.4.49, autoprefixer 10.4.20
+  - react-router-dom 6.30.1, @tanstack/react-query 5.90.5
+  - @headlessui/react 1.7.19, clsx 2.1.1, tailwind-merge 2.6.0
+  - vitest 2.1.9, @testing-library/react 16.3.0, @testing-library/user-event 14.6.1, @testing-library/jest-dom 6.9.1
+  - @playwright/test 1.56.1 (browsers installed on demand)
+
 * **Backend:**
 
   * **Framework:** Node 20+ with Express
@@ -50,12 +59,18 @@ We use a frontend server and a separate backend server, so that the backend can 
   * **Background work:** Node worker_threads
   * **Security:** CORS tight, Markdown sanitized server-side too
 
+  Versions:
+  - node >= 20
+  - express 4.21.2, cors 2.8.5, zod 3.25.76
+  - typescript 5.9.3, tsx 4.20.6, vitest 2.1.9
+
 * **Tooling:**
 
   * **Packages:** npm workspaces
   * **Lint/format:** typescript-eslint + Prettier
   * **Tests:** Vitest + @testing-library/react + Playwright
   * **CSS helpers:** clsx + tailwind-merge
+  * **Format/Lint:** prettier 3.x, typescript-eslint 8.x (flat config, shared at repo root)
 
 * **Agents**
   

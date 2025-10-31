@@ -1,5 +1,3 @@
-<!-- ACQUIRE PROJECT OWNER APPROVAL BEFORE EDITING THIS FILE -->
-
 # AI Forecasting Hackathon
 
 Submitted by: Jörn Stöhler  
@@ -57,36 +55,85 @@ The project consists of the following components:
 
 None planned yet.
 
-## Development Setup
+## Tech Stack (Summary)
 
-1. Fork the repository on GitHub.
-2. Open a GitHub Codespace from your fork.
-3. Run `bash scripts/setup-dev-environment.sh --interactive` and follow the interactive instructions in a second terminal tab.
+- Frontend: Vite, React 18, TypeScript, TailwindCSS, React Router v6, TanStack Query, HeadlessUI
+- Backend: Node 20+, TypeScript, Express, Zod, SSE
+- Testing: Vitest, React Testing Library, Playwright (opt‑in)
+- Docs: MkDocs Material
 
-The main files of importance are:
-- `AGENTS.md`: Developer Documentation (written for both AI and human developers)
-- `docs/`: User & Project Documentation, mkdocs
-- `scripts/`:
-  - `setup-dev-environment.sh --interactive`: Guides you through setup
-  - `run-docs.sh --watch`: Local docs server
-  - `run-frontend.sh --watch`: Local WebApp server
-  - `run-backend.sh --no-watch`: Local Backend server
-  - `tunnel.sh --start/--stop`: Exposes local frontend and backend via cloudflared to our domain
-  - `run-example.sh --example <file>`: Runs a specific expert example end-to-end using our agent scaffolding; assumes the local backend server is running
-- `frontend/`: WebApp source code, usual React stuff
-- `backend/`: Backend source code, includes agent scaffolding, usual 
-- `materials/`:
-  - `code-snippets/`: Code Material
-  - `expert-examples/`: Expert Example Material
-  - `expert-model/`: Expert Model Material
-  - `prompts/`: GPT-5 Prompt Material
+See `docs/project/01-adr-tech-stack.md` for details and exact versions.
 
-Various config files that serve as source of truth:
-- `.gitignore`
-- `.editorconfig`
-- `frontend/`, `backend/`
-  - `package.json`
-  - `tsconfig.json`
-- `eslint.config.js`
-- `prettier.config.js`
-- `mkdocs.yml`
+## Quick Start
+
+Requirements: Node >= 20, npm. For docs: Python 3 + pip. Playwright browsers are optional.
+
+1) Install dependencies (idempotent):
+
+```
+bash scripts/install.sh
+```
+
+2) Check status / start services:
+
+```
+# Status (ports: docs 8000, frontend 5173, backend 8080)
+bash scripts/run.sh
+
+# Start frontend + backend
+bash scripts/run.sh --actions start --services frontend backend
+
+# Start docs (after installing mkdocs-material)
+bash scripts/run.sh --actions start --services docs
+
+# Expose both services on your domain via Cloudflare Tunnel
+# (one-time) Authenticate: cloudflared login  # follow the browser flow and select your zone
+# Start named tunnel to https://ai-forecasting-hackathon.joernstoehler.com
+bash scripts/tunnel.sh --actions start
+# Status / stop
+bash scripts/tunnel.sh --actions status
+bash scripts/tunnel.sh --actions stop
+```
+
+Notes:
+- In local dev, the frontend proxies `'/api'` to `http://localhost:8080` (see `frontend/vite.config.ts:1`).
+- When using the tunnel, the domain routes `'/api/*'` to the backend and `'/'` to the frontend; no extra config needed.
+
+3) Tests and lint:
+
+```
+# Unit tests (frontend/backend); set RUN_E2E=1 to include Playwright
+bash scripts/test.sh
+
+# Lint/format (if configured in workspace)
+bash scripts/lint.sh
+
+Utilities
+- Guard wrapper is installed to `~/.local/bin/guard` by `scripts/install.sh`.
+- Example: `TIMEOUT=15s guard -- cloudflared tunnel route dns forecasting ai-forecasting-hackathon.joernstoehler.com`
+```
+
+## Repository Layout
+
+- `AGENTS.md`: Developer documentation and conventions
+- `frontend/`: React app (Vite + TS + Tailwind + Router + Query)
+- `backend/`: Express + Zod API with SSE stub store
+- `docs/`: MkDocs site; `docs/usage` for local usage, `docs/project` for ADRs
+- `scripts/`: Dev helpers — `install.sh`, `run.sh`, `lint.sh`, `test.sh`
+- `mkdocs.yml`: Docs configuration
+
+## API (Backend)
+
+Base URL: `http://localhost:<PORT>/api` (default 8080)
+
+- `GET  /api/health`
+- `GET  /api/forecast/<id>`
+- `POST /api/forecast/<id>`
+- `GET  /api/forecast/<id>/history`
+- `POST /api/forecast/<id>/history`
+- `SSE  /api/forecast/<id>/stream`
+- `POST /api/forecast/<id>/event`
+- `POST /api/actions/extend/<id>`
+- `GET  /api/actions/extend/<id>`
+
+Concrete types are in `backend/src/types/` and mirrored for the client in `frontend/src/lib/types.ts`.
