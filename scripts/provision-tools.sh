@@ -85,7 +85,22 @@ sync_codex_files() {
   local codex_dir="$HOME/.codex"
   mkdir -p "$codex_dir"
 
-  write_from_secret "$codex_dir/config" "CODEX_CONFIG_B64" "# Populate via CODEX_CONFIG_B64 secret." "false"
+  cat >"$codex_dir/config.toml" <<'EOF'
+model = "gpt-5"
+model_reasoning_effort = "high"
+
+[mcp_servers.playwright]
+command = "npx"
+args = ["@playwright/mcp@latest"]
+
+[mcp_servers.vibe_kanban]
+command = "npx"
+args = ["-y", "vibe-kanban@latest", "--mcp"]
+
+[projects."/workspaces/ai-forecasting-hackathon"]
+trust_level = "trusted"
+EOF
+  chmod 600 "$codex_dir/config.toml"
   write_from_secret "$codex_dir/auth.json" "CODEX_AUTH_JSON_B64" "" "true"
 }
 

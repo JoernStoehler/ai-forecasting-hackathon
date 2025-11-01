@@ -92,9 +92,9 @@ npm run provision
 ```
 
    - Optional: populate Codespaces secrets so provisioning can restore them automatically:
-     - `CODEX_CONFIG_B64` – base64-encoded `~/.codex/config`
      - `CODEX_AUTH_JSON_B64` – base64-encoded `~/.codex/auth.json`
      - `ENV_LOCAL_B64` – base64-encoded project `.env.local`
+   - Provisioning overwrites `~/.codex/config.toml` with repo defaults; tweak `scripts/provision-tools.sh` if you want to change them.
    - Create each value with `base64 -w0 < file` (or `base64 | tr -d '\n'` on macOS).
 
 3) Authenticate the Codex CLI (browser login + localhost callback):
