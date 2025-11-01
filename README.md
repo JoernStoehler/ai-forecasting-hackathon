@@ -64,91 +64,85 @@ None planned yet.
 
 ## Tech Stack (Summary)
 
-<!-- TODO: update this section to reflect the Gemini, frontend-only stack (Vite + React + @google/genai) and remove backend/docs until reintroduced -->
-
-- Frontend: Vite, React 18, TypeScript, TailwindCSS, React Router v6, TanStack Query, HeadlessUI
-- Backend: Node 20+, TypeScript, Express, Zod, SSE
-- Testing: Vitest, React Testing Library, Playwright (opt‑in)
-- Docs: MkDocs Material
-
-See `docs/project/01-adr-tech-stack.md` for details and exact versions.
+<edit>
+- Frontend: Vite + React 19 + TypeScript, single-page app rooted in `App.tsx` with UI logic under `components/`.
+- AI Runtime: Gemini 2.5 Flash via `@google/genai`; JSON schema enforcement lives in `services/geminiService.ts`.
+- Data & Types: Timeline seed data in `metadata.json`, shared TypeScript contracts in `types.ts` and constants in `constants.ts`.
+- Tooling: Codex CLI for auth, ripgrep for search, Vibe Kanban (`npm run vk`) for worktree orchestration; all provisioned through `npm run provision`.
+- Deployment: Gemini Apps handles hosting and attaches API keys per end-user session—no custom backend in this MVP.
+</edit>
 
 ## Quick Start
 
-<!-- TODO: rewrite Quick Start for the current app: npm install, .env.local with GEMINI_API_KEY, npm run dev (no scripts/* helpers) -->
+<edit>
+Minimal reproduction requires Node >= 20 and npm inside the GitHub Codespace.
 
-Requirements: Node >= 20, npm. For docs: Python 3 + pip. Playwright browsers are optional.
+The `.devcontainer/devcontainer.json` image bootstraps a Codespace and automatically runs `npm run provision`. For manual shells, follow the steps below.
 
-1) Install dependencies (idempotent):
-
-```
-bash scripts/install.sh
-```
-
-2) Check status / start services:
+1) Install JavaScript dependencies:
 
 ```
-# Status (ports: docs 8000, frontend 5173, backend 8080)
-bash scripts/run.sh
-
-# Start frontend + backend
-bash scripts/run.sh --actions start --services frontend backend
-
-# Start docs (after installing mkdocs-material)
-bash scripts/run.sh --actions start --services docs
-
-# Expose both services on your domain via Cloudflare Tunnel
-# (one-time) Authenticate: cloudflared login  # follow the browser flow and select your zone
-# Start named tunnel to https://ai-forecasting-hackathon.joernstoehler.com
-bash scripts/tunnel.sh --actions start
-# Status / stop
-bash scripts/tunnel.sh --actions status
-bash scripts/tunnel.sh --actions stop
+npm install
 ```
 
-Notes:
-- In local dev, the frontend proxies `'/api'` to `http://localhost:8080` (see `frontend/vite.config.ts:1`).
-- When using the tunnel, the domain routes `'/api/*'` to the backend and `'/'` to the frontend; no extra config needed.
-
-3) Tests and lint:
+2) Provision development tooling (installs `ripgrep` via `apt-get` and the `codex` CLI via `npm install -g`; the script will prompt for sudo inside the Codespace):
 
 ```
-# Unit tests (frontend/backend); set RUN_E2E=1 to include Playwright
-bash scripts/test.sh
-
-# Lint/format (if configured in workspace)
-bash scripts/lint.sh
-
-Utilities
-- Guard wrapper is installed to `~/.local/bin/guard` by `scripts/install.sh`.
-- Example: `TIMEOUT=15s guard -- cloudflared tunnel route dns forecasting ai-forecasting-hackathon.joernstoehler.com`
+npm run provision
 ```
+
+   - Optional: populate Codespaces secrets so provisioning can restore them automatically:
+     - `CODEX_CONFIG_B64` – base64-encoded `~/.codex/config`
+     - `CODEX_AUTH_JSON_B64` – base64-encoded `~/.codex/auth.json`
+     - `ENV_LOCAL_B64` – base64-encoded project `.env.local`
+   - Create each value with `base64 -w0 < file` (or `base64 | tr -d '\n'` on macOS).
+
+3) Authenticate the Codex CLI (browser login + localhost callback):
+
+```
+codex
+```
+
+Follow the browser flow, then `curl` the `http://localhost:...` URL you are redirected to in order to finish the handshake.
+
+4) Add credentials for local runs by creating `.env.local` with your Gemini API key:
+
+```
+echo "API_KEY=<your key>" >> .env.local
+```
+
+5) Start the dev server:
+
+```
+npm run dev
+```
+
+Run `npm run vk` if you need the Vibe Kanban harness on port 3000.
+
+Production deploys through Gemini Apps—end users automatically receive managed API access and only need to open the shared app link.
+
+If secrets are absent, provisioning preserves existing credential files and creates `.env.local` with `API_KEY=PLACEHOLDER` so you remember to fill it manually.
+</edit>
 
 ## Repository Layout
 
-<!-- TODO: update repository layout to current files (App.tsx, components/, services/geminiService.ts, constants.ts, types.ts) and remove legacy folders -->
+<edit>
+- `App.tsx`, `index.tsx`, `index.html`: React entrypoints rendered by Vite.
+- `components/`: Presentational + interactive pieces of the timeline UI.
+- `services/geminiService.ts`: Thin client for Gemini 2.5 Flash with JSON schema enforcement.
+- `constants.ts`, `types.ts`, `metadata.json`: Shared configuration, type definitions, and seed timeline data.
+- `scripts/provision-tools.sh`: One-time tooling bootstrap run via `npm run provision`.
+- `dist/`: Generated assets after `npm run build` (ignored in source control if not needed).
+- `README.md`, `AGENTS.md`: Source of truth for onboarding and conventions.
+- `vite.config.ts`, `tsconfig.json`, `package.json`: Build/toolchain configuration.
+</edit>
 
-- `AGENTS.md`: Developer documentation and conventions
-- `frontend/`: React app (Vite + TS + Tailwind + Router + Query)
-- `backend/`: Express + Zod API with SSE stub store
-- `docs/`: MkDocs site; `docs/usage` for local usage, `docs/project` for ADRs
-- `scripts/`: Dev helpers — `install.sh`, `run.sh`, `lint.sh`, `test.sh`
-- `mkdocs.yml`: Docs configuration
+<edit>
+## Gemini Integration
 
-## API (Backend)
+This MVP does not ship a custom backend API. All forecasting data flows directly between the React app and Gemini:
 
-<!-- TODO: mark this section as legacy or replace with a description of the Gemini call flow and JSON schema output -->
-
-Base URL: `http://localhost:<PORT>/api` (default 8080)
-
-- `GET  /api/health`
-- `GET  /api/forecast/<id>`
-- `POST /api/forecast/<id>`
-- `GET  /api/forecast/<id>/history`
-- `POST /api/forecast/<id>/history`
-- `SSE  /api/forecast/<id>/stream`
-- `POST /api/forecast/<id>/event`
-- `POST /api/actions/extend/<id>`
-- `GET  /api/actions/extend/<id>`
-
-Concrete types are in `backend/src/types/` and mirrored for the client in `frontend/src/lib/types.ts`.
+- `services/geminiService.ts` calls `ai.models.generateContent` on Gemini 2.5 Flash with a JSON schema that enforces the event structure returned to the UI.
+- Timeline metadata lives client-side in `metadata.json`; the app merges Gemini responses into local state.
+- If we ever reintroduce a backend (for persistence or key management), document the endpoints here.
+</edit>

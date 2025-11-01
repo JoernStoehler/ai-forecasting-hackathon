@@ -12,96 +12,53 @@ The project vision is documented in README.md.
 
 <!-- EDIT WHENEVER THE TECH STACK CHANGES -->
 
-<!-- TODO: replace the GPT-5 model with our Gemini model; replace the backend agent with a LLM call architecture -->
-
-- Frontend: Vite, React, TypeScript, TanStack Query, React Router v6, TailwindCSS, HeadlessUI
-  - `frontend/`: Source code  
-- Testing: Vitest, React Testing Library, Playwright
-- Backend: Node, TypeScript, Express, Codex SDK
-  - `backend/`: Source code
-- Dev Environment: GitHub Codespaces, bash scripts
-  - `scripts/`: Setup and run scripts
-- Documentation: MkDocs
-  - `AGENTS.md`: Developer Documentation (this file)
-  - `CHANGELOG.md`: High-level project changelog
-  - `docs/usage`: Human End User Documentation
-  - `docs/project/`: Project Documentation (ADRs, roadmaps, etc.)
-  <!-- TODO: verify docs/ and scripts/ exist; if not, update/remove accordingly -->
-- Materials: Expert-written markdown and code snippets used by forecasting agents
-  - `materials/expert-model/`: A Forecasting Model for AI x-risk written by Jörn
-  - `materials/expert-examples/`: Expert-made inferences/forecasts to calibrate our agents against
-  - `materials/prompts/`: Prompts for GPT-5 agents written by Jörn
-  - `materials/code-snippets/`: Code snippets for symbolic calculations that GPT-5 can run
-  <!-- TODO: verify materials/* directories exist in this repo; prune or adapt -->
+<edit>
+- Frontend: Vite + React 19 + TypeScript rendered from `App.tsx`, with UI pieces in `components/` and shared types in `types.ts`.
+- AI Runtime: Gemini 2.5 Flash via `@google/genai`; client wrapper lives in `services/geminiService.ts` with JSON schema enforcement.
+- Data: Timeline seeds stored in `metadata.json`, constants in `constants.ts`.
+- Tooling: Codex CLI + ripgrep provisioned through `npm run provision`; Vibe Kanban launcher exposed as `npm run vk`.
+- Documentation: README.md and this AGENTS.md (MkDocs, backend, and materials directories are no longer part of the MVP).
+</edit>
 
 ## Quick Commands
 
 <!-- EDIT WHENEVER SCRIPTS CHANGE -->
-<!-- TODO: replace scripts/* flow with npm-based quickstart for the Gemini app (npm install, .env.local GEMINI_API_KEY, npm run dev) -->
+<edit>
+You start in a GitHub Codespace worktree. The `.devcontainer/devcontainer.json` image auto-runs `npm run provision` on creation; rerun manually if needed. Use this npm workflow instead of legacy bash scripts:
 
-You are started in a git worktree (or the main worktree) inside a GitHub Codespace.
-You can run the docs, frontend, and backend servers from your worktree using the following commands:
+1. Install dependencies: `npm install`
+2. Provision tools (installs ripgrep via `apt-get` and the Codex CLI globally): `npm run provision`
+   - Provisioning also syncs secrets when the following Codespaces secrets are defined (values should be base64-encoded):
+     - `CODEX_CONFIG_B64` ➝ `~/.codex/config`
+     - `CODEX_AUTH_JSON_B64` ➝ `~/.codex/auth.json` (skipped if file already exists)
+     - `ENV_LOCAL_B64` ➝ project `.env.local` (skipped if file already exists, otherwise placeholder `API_KEY=PLACEHOLDER`)
+3. Authenticate the Codex CLI: run `codex`, complete the browser login, then `curl` the localhost callback URL
+4. Provide local credentials: `echo "API_KEY=<your key>" >> .env.local`
+5. Launch the dev server: `npm run dev` (Vite serves on port 5173 by default)
+6. Spin up Vibe Kanban for ticket management if needed: `npm run vk` (binds to port 3000)
 
-```
-bash scripts/run.sh [--services <service> ...] [--actions <action> ...]
-# returns the status and ports of all services
-```
-
-The available services are:
-- `docs`: MkDocs documentation server
-- `frontend`: WebApp frontend server
-- `backend`: Backend server with agent scaffolding
-
-The available actions are: `start, stop`.
-To restart a service, run stop and then start as two separate commands.
-To simply see the current status of all services, you can run `bash scripts/run.sh` without further arguments.
-
-To expose local services via Cloudflare Tunnel, use the separate helper:
-```
-bash scripts/tunnel.sh [--actions <start|stop|status>]
-# Requires prior `cloudflared login` (follow the browser flow and select your zone)
-```
-
-For quick non-blocking verification that agents can run the stack, use the health check:
-```
-bash scripts/health.sh
-# Prints ports, service/tunnel status, and probes local + domain endpoints with short timeouts
-```
-
-To quickly explore the project, you can run:
-```
-tree -I 'node_modules' frontend backend materials scripts docs
-```
+Provisioning requires sudo in the Codespace; rerun it anytime you suspect the CLI tools are missing.
+</edit>
 
 ## API Reference
 
 <!-- EDIT WHENEVER THE BACKEND API CHANGES -->
-<!-- TODO: mark this as legacy; replace with Gemini LLM call architecture and JSON schema responses -->
+<edit>
+There is no standalone backend service in this MVP. The React app calls Gemini 2.5 Flash directly through `services/geminiService.ts`, which:
 
-The backend exposes a REST API at `http://localhost:<PORT>/api`, obtain the port from the quick commands above.
-The main API endpoints are:
-- `GET  /api/health`
-- `GET  /api/forecast/<id>`: Get forecast metadata
-- `POST /api/forecast/<id>`: Create or update forecast metadata
-- `GET  /api/forecast/<id>/history`: Get all forecast events for a given forecast ID; array of events
-- `POST /api/forecast/<id>/history`: Overwrite all forecast events for a given forecast ID
-- SSE: `/api/forecast/<id>/stream`: Stream forecast events as Server-Sent Events (SSE)
-- `POST /api/forecast/<id>/event`: Post a new forecast event
-- `POST /api/actions/extend/<id>`: Extend a forecast by querying the forecasting agent on said forecast
-- `GET  /api/actions/extend/<id>`: Get the status of the forecast extension action
+- Submits timeline history as JSON via `ai.models.generateContent`.
+- Enforces response shape with `responseSchema` so the UI receives a list of `{ date, icon, title, description }`.
+- Performs light validation (e.g., ensuring generated dates do not regress).
 
-For the concrete types, see `backend/src/types/`.
+If we add persistence or server-side orchestration later, document API endpoints here.
+</edit>
 
 ## Conventions
 
 <!-- EDIT ONLY WITH PROJECT OWNER APPROVAL -->
-<!-- TODO: tsconfig does not currently enable strict; either enable or adjust this line -->
-
 - We prefer functional programming, with a thin imperative shell. Use `React.FC` etc.
-- We use TypeScript strict mode.
-- Before you commit, run `bash scripts/lint.sh` to lint and format your code.
-- Before you push, run `bash scripts/test.sh` to run all tests.
-<!-- TODO: lint/test scripts are not present; update or remove these instructions -->
+- <edit>TypeScript `strict` is currently off; write code defensively (explicit return types, null checks) to avoid regressions.</edit>
+- <edit>No formal lint/test scripts exist yet; run `npm run build` or ad-hoc checks locally before handoff and note any gaps in your update.</edit>
 - Since our project is small, we don't need coverage or tests everywhere.
 - Use playwright MCP to inspect the frontend directly, no need to ask Jörn to take screenshots or test buttons manually.
 - Use jsdoc and comments for major functions and types. Explain the why, not the what.
