@@ -57,8 +57,8 @@ If we add persistence or server-side orchestration later, document API endpoints
 
 <!-- EDIT ONLY WITH PROJECT OWNER APPROVAL -->
 - We prefer functional programming, with a thin imperative shell. Use `React.FC` etc.
-- <edit>TypeScript `strict` is currently off; write code defensively (explicit return types, null checks) to avoid regressions.</edit>
-- <edit>No formal lint/test scripts exist yet; run `npm run build` or ad-hoc checks locally before handoff and note any gaps in your update.</edit>
+- <edit>TypeScript `strict` mode is enabled; keep types precise, and document any intentional `any` escapes when a safer alternative would slow delivery.</edit>
+- <edit>No formal lint/test scripts exist yet; run `npx tsc --noEmit` and `npm run build` before handoff and call out any skipped checks.</edit>
 - Since our project is small, we don't need coverage or tests everywhere.
 - Use playwright MCP to inspect the frontend directly, no need to ask Jörn to take screenshots or test buttons manually.
 - Use jsdoc and comments for major functions and types. Explain the why, not the what.

@@ -15,7 +15,7 @@ const ai = new GoogleGenAI({ apiKey: API_KEY || " " });
 const model = 'gemini-2.5-flash';
 
 // Basic schema validation
-function validateEvents(data: any): data is Event[] {
+function validateEvents(data: unknown): data is Event[] {
   if (!Array.isArray(data)) return false;
   return data.every(item => 
     typeof item === 'object' &&
@@ -54,7 +54,11 @@ export async function getAiForecast(history: Event[], systemPrompt: string): Pro
         }
     });
 
-    const text = response.text.trim();
+    const text = typeof response.text === 'string' ? response.text.trim() : '';
+    
+    if (text.length === 0) {
+      throw new Error("Gemini response did not include text content.");
+    }
     
     // FIX: Removed markdown stripping (`replace`) as `responseMimeType: 'application/json'` ensures clean JSON output.
     const newEventsData = JSON.parse(text);

@@ -119,6 +119,13 @@ npm run dev
 
 Run `npm run vk` if you need the Vibe Kanban harness on port 3000.
 
+Before handing off changes, make sure strict type-checking and the production build pass:
+
+```
+npx tsc --noEmit
+npm run build
+```
+
 Production deploys through Gemini Apps—end users automatically receive managed API access and only need to open the shared app link.
 
 If secrets are absent, provisioning preserves existing credential files and creates `.env.local` with `API_KEY=PLACEHOLDER` so you remember to fill it manually.
