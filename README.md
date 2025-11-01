@@ -1,7 +1,14 @@
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+</div>
+
 # AI Forecasting Hackathon
 
 Submitted by: Jörn Stöhler  
 [Code](https://github.com/JoernStoehler/ai-forecasting-hackathon) | [Documentation](https://joernstoehler.github.io/ai-forecasting-hackathon/) | [WebApp](https://ai-forecasting-hackathon.joernstoehler.com) | [Hackathon](https://apartresearch.com/sprints/the-ai-forecasting-hackathon-2025-10-31-to-2025-11-02)
+
+<!-- TODO: replace the GPT-5 model with our Gemini model; replace the backend agent with a LLM call architecture -->
+<!-- TODO: verify the Documentation link still reflects current stack (we may no longer publish MkDocs) -->
 
 ## Overview
 
@@ -28,7 +35,7 @@ I do think that GPT-5 currently fails a multitude of relevant capabilities that 
 2. GPT-5's world model was built via training, and while in-context learning is a major part of how GPT-5 decompresses its world model, prompting may not interface with GPT-5's cognition in the same way. Worded differently: GPT-5's forecasting abilities may be represented in circuits that load/utilize factual and procedural knowledge from its weights, and prompts are not loaded in the same way. There isn't really a sophisticated way to deal with this potential issue, except empirically testing and iterating on prompt design, to see if we can squeeze our human expert model into GPT-5's cognition.
 3. GPT-5 may be biased in inhuman, hard-to-notice ways when it comes to inferencing and conditioning and intervening. We can check if GPT-5 behaves similarly-enough to a human expert by fuzzing inputs (e.g. creating a layman-written input dataset). We can adjust prompts to reduce irrationality, but there's no established technique for guiding GPT-5 well here, except trial-and-error. Additional tools such as a CAG or prepared code files can help here, similar to how human experts rely on computable models to guide their forecasting reasoning.
 4. GPT-5's coding abilities are less reliable than human experts. We can compensate by providing code snippets for a select array of submodels that GPT-5 may have need for, e.g. by querying what submodels a human expert ever took a look at or would consult for various requests. Whenever we notice that GPT-5 can not provide a correct code snippet without expert feedback, we add a corrected version of said snippet to the library.
-5. GPT-5's prose is not that great. Rumors say Claude series models are better at prose, and prompting may again help. We will do some trial and error until we nail one or more acceptable writing styles for the visualizations.
+5. GPT-5's prose is not that great. Rumors say Claude series models are better at prose, and prompting may again help. We will do some trial and error until we nail one or more 
 
 With these compensations in place, I believe we can get GPT-5 with scaffolding to act as a human expert on AI x-risk forecasting, and leverage its capabilities to achieve all our asks at once.
 
@@ -57,6 +64,8 @@ None planned yet.
 
 ## Tech Stack (Summary)
 
+<!-- TODO: update this section to reflect the Gemini, frontend-only stack (Vite + React + @google/genai) and remove backend/docs until reintroduced -->
+
 - Frontend: Vite, React 18, TypeScript, TailwindCSS, React Router v6, TanStack Query, HeadlessUI
 - Backend: Node 20+, TypeScript, Express, Zod, SSE
 - Testing: Vitest, React Testing Library, Playwright (opt‑in)
@@ -65,6 +74,8 @@ None planned yet.
 See `docs/project/01-adr-tech-stack.md` for details and exact versions.
 
 ## Quick Start
+
+<!-- TODO: rewrite Quick Start for the current app: npm install, .env.local with GEMINI_API_KEY, npm run dev (no scripts/* helpers) -->
 
 Requirements: Node >= 20, npm. For docs: Python 3 + pip. Playwright browsers are optional.
 
@@ -115,6 +126,8 @@ Utilities
 
 ## Repository Layout
 
+<!-- TODO: update repository layout to current files (App.tsx, components/, services/geminiService.ts, constants.ts, types.ts) and remove legacy folders -->
+
 - `AGENTS.md`: Developer documentation and conventions
 - `frontend/`: React app (Vite + TS + Tailwind + Router + Query)
 - `backend/`: Express + Zod API with SSE stub store
@@ -123,6 +136,8 @@ Utilities
 - `mkdocs.yml`: Docs configuration
 
 ## API (Backend)
+
+<!-- TODO: mark this section as legacy or replace with a description of the Gemini call flow and JSON schema output -->
 
 Base URL: `http://localhost:<PORT>/api` (default 8080)
 

@@ -12,6 +12,8 @@ The project vision is documented in README.md.
 
 <!-- EDIT WHENEVER THE TECH STACK CHANGES -->
 
+<!-- TODO: replace the GPT-5 model with our Gemini model; replace the backend agent with a LLM call architecture -->
+
 - Frontend: Vite, React, TypeScript, TanStack Query, React Router v6, TailwindCSS, HeadlessUI
   - `frontend/`: Source code  
 - Testing: Vitest, React Testing Library, Playwright
@@ -24,18 +26,18 @@ The project vision is documented in README.md.
   - `CHANGELOG.md`: High-level project changelog
   - `docs/usage`: Human End User Documentation
   - `docs/project/`: Project Documentation (ADRs, roadmaps, etc.)
+  <!-- TODO: verify docs/ and scripts/ exist; if not, update/remove accordingly -->
 - Materials: Expert-written markdown and code snippets used by forecasting agents
   - `materials/expert-model/`: A Forecasting Model for AI x-risk written by Jörn
   - `materials/expert-examples/`: Expert-made inferences/forecasts to calibrate our agents against
   - `materials/prompts/`: Prompts for GPT-5 agents written by Jörn
   - `materials/code-snippets/`: Code snippets for symbolic calculations that GPT-5 can run
-
-See also:
-- docs/project/01-adr-tech-stack.md for the full, detailed tech stack with rationale.
+  <!-- TODO: verify materials/* directories exist in this repo; prune or adapt -->
 
 ## Quick Commands
 
 <!-- EDIT WHENEVER SCRIPTS CHANGE -->
+<!-- TODO: replace scripts/* flow with npm-based quickstart for the Gemini app (npm install, .env.local GEMINI_API_KEY, npm run dev) -->
 
 You are started in a git worktree (or the main worktree) inside a GitHub Codespace.
 You can run the docs, frontend, and backend servers from your worktree using the following commands:
@@ -74,6 +76,7 @@ tree -I 'node_modules' frontend backend materials scripts docs
 ## API Reference
 
 <!-- EDIT WHENEVER THE BACKEND API CHANGES -->
+<!-- TODO: mark this as legacy; replace with Gemini LLM call architecture and JSON schema responses -->
 
 The backend exposes a REST API at `http://localhost:<PORT>/api`, obtain the port from the quick commands above.
 The main API endpoints are:
@@ -92,11 +95,13 @@ For the concrete types, see `backend/src/types/`.
 ## Conventions
 
 <!-- EDIT ONLY WITH PROJECT OWNER APPROVAL -->
+<!-- TODO: tsconfig does not currently enable strict; either enable or adjust this line -->
 
 - We prefer functional programming, with a thin imperative shell. Use `React.FC` etc.
 - We use TypeScript strict mode.
 - Before you commit, run `bash scripts/lint.sh` to lint and format your code.
 - Before you push, run `bash scripts/test.sh` to run all tests.
+<!-- TODO: lint/test scripts are not present; update or remove these instructions -->
 - Since our project is small, we don't need coverage or tests everywhere.
 - Use playwright MCP to inspect the frontend directly, no need to ask Jörn to take screenshots or test buttons manually.
 - Use jsdoc and comments for major functions and types. Explain the why, not the what.
