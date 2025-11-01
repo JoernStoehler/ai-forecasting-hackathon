@@ -68,7 +68,7 @@ If we add persistence or server-side orchestration later, document API endpoints
 - Push back when Jörn makes a sloppy mistake, ask if he's not being clear enough.
 - When you need to make a decision that affects the project direction, and you're not sure what Jörn would want, ask him.
 - Ask when documentation is missing or is written unclearly. We want the codebase and repo to be self-explanatory and trivial to onboard to.
-- We use Vibe-Kanban for managing tickets and spawning vibecoding agents. The ticket is copied into the agent's first user message. They are started in a provisioned git worktree.
+- We use bloop/vibe-kanban for managing tickets and spawning vibecoding agents. The ticket is copied into the agent's first user message. They are started in a provisioned git worktree.
 - Sometimes Jörn starts a 1:1 chat with a coding agent in the `main` worktree, in which case no assigned ticket exists.
 - VibeKanban manages the worktrees. Unless Jörn explicitly tells you, you don't need to commit, rebase, merge or push. VibeKanban automatically commits your work whenever you end your turn.
 - We don't have nor need a GitHub CI, except to deploy the docs to GitHub Pages on push to origin/main.
