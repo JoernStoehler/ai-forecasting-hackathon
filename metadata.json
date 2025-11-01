@@ -1,0 +1,5 @@
+{
+  "name": "Takeoff Timeline",
+  "description": "A web app that simulates the AI takeoff timeline. The user alternates turns with a GenAI forecaster to build a plausible future history.",
+  "requestFramePermissions": []
+}

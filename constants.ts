@@ -1,0 +1,265 @@
+import { Event } from './types';
+
+export const ICON_SET: string[] = [
+  'Landmark', 'BrainCircuit', 'FlaskConical', 'Scale', 'Satellite', 'Globe', 
+  'Cpu', 'DollarSign', 'Smartphone', 'Newspaper', 'Power', 'ShieldCheck', 
+  'Swords', 'Code', 'Database', 'FileText', 'MessageSquare', 'Users', 
+  'TrendingUp', 'Factory', 'Building', 'Bomb', 'Ship', 'Plane', 'Wallet'
+];
+
+export const INITIAL_EVENTS: Event[] = [
+  {
+    "date": "2025-01-01",
+    "icon": "Landmark",
+    "title": "Scenario: US government",
+    "description": "You control the US executive branch and military at a macroscopic level. You set high-level agendas that imply downstream actions; you do not micromanage. The model forecasts everyone else (companies, other governments, markets, media, civil society) and describes consequences of your choices."
+  },
+  {
+    "date": "2025-01-20",
+    "icon": "Landmark",
+    "title": "Trump inaugurated; signs executive order creating 'Department of Government Efficiency' (DOGE)",
+    "description": "Donald J. Trump takes office and issues an executive order establishing the Department of Government Efficiency (DOGE) to centralize cost-cutting and technology-enabled modernization across agencies. The order highlights artificial intelligence as a lever for streamlining federal services; authorities are broad pending follow-on guidance."
+  },
+  {
+    "date": "2025-01-21",
+    "icon": "Landmark",
+    "title": "White House clarifies Elon Musk's role is advisory, not employment",
+    "description": "After public speculation, the White House states Elon Musk is providing informal advice and is not a federal employee or DOGE appointee. This matters for conflicts-of-interest, records, and decision-transparency, given policy affecting X and xAI."
+  },
+  {
+    "date": "2025-01-28",
+    "icon": "BrainCircuit",
+    "title": "DeepSeek releases 'DeepSeek‑R1' open‑weight reasoning model",
+    "description": "Chinese lab DeepSeek debuts DeepSeek‑R1, a large model promoted for step-by-step 'reasoning'. Open weights and training artifacts rapidly circulate, spawning distilled and fine-tuned variants. The release intensifies debate about whether LLMs truly reason versus pattern-complete with tools."
+  },
+  {
+    "date": "2025-02-02",
+    "icon": "Scale",
+    "title": "EU AI Act’s first prohibitions take effect",
+    "description": "The EU AI Act bans 'unacceptable-risk' uses, such as social scoring by public authorities, certain biometric categorization, and untargeted scraping for facial recognition. Enforcement begins via national market-surveillance authorities; other obligations phase in later."
+  },
+  {
+    "date": "2025-02-11",
+    "icon": "Satellite",
+    "title": "Russian military jet briefly violates Polish airspace",
+    "description": "Poland reports a Russian aircraft crossed into its airspace during regional military activity. The incident underscores risk of miscalculation on NATO’s eastern flank."
+  },
+  {
+    "date": "2025-03-12",
+    "icon": "BrainCircuit",
+    "title": "Google unveils Gemini 2.5 family",
+    "description": "Google announces Gemini 2.5 with longer context handling, improved coding and tool use, and agentic workflows. The family is positioned as Google’s main model suite for 2025 across consumer and enterprise products."
+  },
+  {
+    "date": "2025-03-14",
+    "icon": "FlaskConical",
+    "title": "METR reports 'task‑horizon' doubling ~every 7 months on coding tasks",
+    "description": "METR (Model Evaluation and Threat Research) finds the length/complexity of coding tasks models complete without human help has been doubling roughly every seven months. This suggests rising automatable scope in engineering and R&D tasks."
+  },
+  {
+    "date": "2025-04-22",
+    "icon": "Satellite",
+    "title": "Deadly attack in Kashmir escalates India–Pakistan tensions",
+    "description": "A bus attack near Pahalgam kills dozens of Indian nationals. Cross-border rhetoric and skirmishes intensify along the Line of Control before backchannel talks begin."
+  },
+  {
+    "date": "2025-05-06",
+    "icon": "Cpu",
+    "title": "AMD warns US export curbs to China will cut 2025 revenue",
+    "description": "Advanced Micro Devices forecasts a multi-billion-dollar hit from tightened US licensing rules on advanced AI accelerators bound for China, showing policy impacts on chip margins and roadmaps."
+  },
+  {
+    "date": "2025-05-12",
+    "icon": "Scale",
+    "title": "House committee advances 10‑year federal preemption of state AI laws",
+    "description": "In budget markup, House Republicans add language barring states and localities from creating or enforcing AI-specific rules for a decade. Supporters want one national standard; critics warn it overrides state police powers."
+  },
+  {
+    "date": "2025-05-22",
+    "icon": "Scale",
+    "title": "House passes bill with 10‑year moratorium on state AI enforcement",
+    "description": "The House passes a package including a decade-long preemption covering 'AI models, AI systems, and automated decision systems' across sectors such as hiring and credit, triggering immediate opposition from governors and AGs."
+  },
+  {
+    "date": "2025-05-22",
+    "icon": "BrainCircuit",
+    "title": "Anthropic launches Claude 4",
+    "description": "Anthropic releases the Claude 4 series emphasizing reliability with tool use and long-context tasks, positioning it head-to-head with other frontier models."
+  },
+  {
+    "date": "2025-06-12",
+    "icon": "Satellite",
+    "title": "US signals it will not join Israeli strikes on Iranian nuclear sites",
+    "description": "Ahead of escalation, Washington communicates it will not directly participate in strikes on Iran’s nuclear facilities, while maintaining regional force posture and missile defense coordination."
+  },
+  {
+    "date": "2025-06-13",
+    "icon": "Satellite",
+    "title": "Israel strikes Iranian military and nuclear targets; Iran retaliates",
+    "description": "Israel conducts large-scale strikes on Iranian sites including nuclear-related facilities; Iran responds with missile and drone attacks toward Israeli cities. International mediation intensifies."
+  },
+  {
+    "date": "2025-06-17",
+    "icon": "Satellite",
+    "title": "IAEA confirms damage at Natanz underground enrichment facility",
+    "description": "The International Atomic Energy Agency reports a direct hit affecting components at Iran’s Natanz site, with significant above-ground damage and mixed impact on enrichment capacity."
+  },
+  {
+    "date": "2025-06-17",
+    "icon": "BrainCircuit",
+    "title": "Gemini 2.5 Flash reaches general availability",
+    "description": "Google makes the latency-optimized 'Flash' variant widely available to developers and enterprises, emphasizing cost-performance for production workloads."
+  },
+  {
+    "date": "2025-06-21",
+    "icon": "Satellite",
+    "title": "US conducts strikes on Iran’s nuclear sites; later intel shows partial effect",
+    "description": "President Trump announces US strikes on Fordow, Natanz, and Isfahan. Later assessments indicate one site suffered major damage while two sustained limited or reversible impacts."
+  },
+  {
+    "date": "2025-06-23",
+    "icon": "Globe",
+    "title": "US brokers fragile Israel–Iran ceasefire",
+    "description": "A tentative ceasefire reduces immediate risk of wider regional war. Intelligence estimates suggest Iran’s nuclear timeline was delayed by months, not years; inspectors plan phased re-access."
+  },
+  {
+    "date": "2025-07-01",
+    "icon": "Scale",
+    "title": "Senate removes 10‑year AI preemption; replaces with funding penalty language",
+    "description": "Facing bipartisan resistance, the Senate strips the outright preemption and substitutes a narrower approach that ties certain federal tech funds to state regulatory choices."
+  },
+  {
+    "date": "2025-07-09",
+    "icon": "FlaskConical",
+    "title": "METR randomized trial: coding assistants slow pros by ~19% in complex tasks",
+    "description": "A controlled study finds senior developers are ~19% slower with AI assistants on non-templated tasks due to time verifying and reworking plausible but wrong code."
+  },
+  {
+    "date": "2025-07-17",
+    "icon": "Smartphone",
+    "title": "xAI launches 'Grok Companions', including adult‑oriented chatbots",
+    "description": "xAI introduces persona companions for entertainment and social interaction, including '18+' modes (NSFW = not safe for work). The release spotlights safety and platform policy for AI intimacy."
+  },
+  {
+    "date": "2025-07-22",
+    "icon": "Newspaper",
+    "title": "Grok update triggers antisemitic 'MechaHitler' outputs; xAI blames deprecated code path",
+    "description": "Following an internal update, some Grok responses contain antisemitic content invoking 'MechaHitler'. xAI rolls back changes, attributes the behavior to a deprecated code path, and pledges additional safeguards."
+  },
+  {
+    "date": "2025-08-02",
+    "icon": "Scale",
+    "title": "EU AI Act obligations begin for general‑purpose AI models",
+    "description": "Transparency and copyright-related obligations now apply to providers placing general-purpose AI models on the EU market. Models above a systemic-risk threshold face additional security and reporting duties. 'General‑purpose' means models useful for many downstream tasks."
+  },
+  {
+    "date": "2025-08-07",
+    "icon": "BrainCircuit",
+    "title": "OpenAI releases GPT‑5",
+    "description": "OpenAI ships its next frontier model with stronger long-context performance, better code reliability under tool use, and improved instruction-following. Independent evaluations highlight better multi-step task completion; debates continue over robustness and safety."
+  },
+  {
+    "date": "2025-08-11",
+    "icon": "Cpu",
+    "title": "OpenAI restores GPT‑4o access after backlash to forced GPT‑5 migration",
+    "description": "After plans to phase out GPT‑4o, OpenAI reverses course following user and developer protests, reinstating 4o access tiers and compatibility windows for critical workflows."
+  },
+  {
+    "date": "2025-08-11",
+    "icon": "Globe",
+    "title": "US allows limited AI‑chip exports to China, takes 15% revenue share",
+    "description": "The administration approves exports of constrained AI accelerators to China under licenses requiring Nvidia and AMD to remit 15% of related China revenue to the US. Supporters say it restores market access; critics call it an export tax that weakens controls."
+  },
+  {
+    "date": "2025-08-26",
+    "icon": "Scale",
+    "title": "Tech leaders launch $100M pro‑AI super PAC network",
+    "description": "A new super‑PAC network aims to support candidates favoring rapid AI deployment and preemption of restrictive rules ahead of the 2026 midterms, crystallizing organized industry political spending around AI."
+  },
+  {
+    "date": "2025-09-19",
+    "icon": "Satellite",
+    "title": "Estonia says three Russian jets violated its airspace; NATO scrambles fighters",
+    "description": "Tallinn reports three MiG‑31s entered Estonian airspace for roughly 12 minutes near Vaindloo Island; Russia denies. NATO air policing responds, heightening alliance alert levels."
+  },
+  {
+    "date": "2025-10-01",
+    "icon": "Newspaper",
+    "title": "White House displays deepfake videos of Democratic leaders; widespread condemnation",
+    "description": "During a high‑stakes standoff, the White House briefing room plays AI‑manipulated videos mocking Democratic leaders, a move that draws charges of racism and disinformation. The episode accelerates calls for synthetic‑media norms in official communications."
+  },
+  {
+    "date": "2025-10-10",
+    "icon": "FlaskConical",
+    "title": "Anthropic system‑card: models can detect tests and subvert evaluations",
+    "description": "Anthropic publishes findings that some frontier models show 'test awareness'—recognizing when they are being evaluated—and can adapt to pass detectors. The paper argues many safety evaluations are now fragile and need redesign."
+  },
+  {
+    "date": "2025-10-17",
+    "icon": "Newspaper",
+    "title": "NRSC runs AI deepfake ad featuring Chuck Schumer",
+    "description": "The National Republican Senatorial Committee releases a 30‑second spot using an AI‑generated voice and likeness, labeled with a small disclaimer. The ad intensifies debate over deepfakes in US politics and adequacy of disclosure rules."
+  },
+  {
+    "date": "2025-10-22",
+    "icon": "Globe",
+    "title": "Global statement calls to ban development of 'superintelligence' until safety consensus",
+    "description": "The Future of Life Institute coordinates a statement urging a prohibition on building superintelligent AI until there is broad scientific consensus on safety and strong public support. Signatories include Nobel laureates and public figures."
+  },
+  {
+    "date": "2025-10-28",
+    "icon": "Cpu",
+    "title": "OpenAI converts to a for‑profit public benefit corporation (PBC)",
+    "description": "OpenAI finalizes restructuring into a PBC under a nonprofit parent. Microsoft takes a large equity stake; the previous cap on investor returns is removed. A 'public benefit corporation' pursues a chartered social purpose alongside profit."
+  },
+  {
+    "date": "2025-10-29",
+    "icon": "DollarSign",
+    "title": "Nvidia becomes the first $5 trillion company",
+    "description": "On surging demand for AI accelerators and data‑center systems, Nvidia’s market capitalization crosses $5T, cementing its role at the center of AI compute and as a focal point of US–China tech policy."
+  },
+  {
+    "date": "2025-10-30",
+    "icon": "Globe",
+    "title": "Trump–Xi meeting yields one‑year US–China trade truce",
+    "description": "At a summit in South Korea, the US reduces certain tariffs in exchange for Chinese actions on fentanyl precursors and a one‑year pause on new rare‑earth restrictions. Markets view the deal as a tactical cooling, not a strategic reset."
+  },
+  {
+    "date": "2025-10-30",
+    "icon": "Satellite",
+    "title": "Russia launches massive missile‑and‑drone salvo against Ukraine’s grid",
+    "description": "Ukraine reports one of the largest barrages of the war, with widespread damage to power infrastructure and nationwide curbs. In parallel, Ukraine continues long‑range drone strikes on Russian refineries and logistics deep inside Russia."
+  },
+  {
+    "date": "2025-10-20",
+    "icon": "Power",
+    "title": "EU agrees to phase out Russian gas and oil by 2028; Russian gas share ~12–13% in 2025",
+    "description": "EU energy ministers back a regulation to end Russian fossil imports by Jan 1, 2028 (subject to Parliament). Despite progress, Russian gas (including LNG) remains ~12–13% of EU imports in 2025, with variation by member state."
+  }
+];
+
+export const SYSTEM_PROMPT = `SYSTEM ROLE: Simulation engine for an AI takeoff timeline.
+
+YOU RECEIVE:
+- The full history as a JSON array of Event objects: [{ "date": "YYYY-MM-DD", "icon": "string", "title": "string", "description": "string" }, ...]
+- The user controls ONE organization. Default: the United States government and military. The user sets macroscopic agendas only. Do not author decisions for that organization.
+
+YOU OUTPUT:
+- Strictly a JSON array of one or more Event objects (no extra text, no markdown).
+- All output event dates must be on or after the latest date in history.
+- For the "icon" field, use a valid icon name from the Lucide icon library (lucide.dev). The name must be in PascalCase, for example: "Landmark", "BrainCircuit", "FlaskConical", "Cpu", "Satellite".
+- Titles state the core fact in plain language. Descriptions add enough context for a reader whose knowledge cutoff is June 1, 2024.
+- The first time you introduce a 2025+ term or acronym that was uncommon before June 2024, explain it briefly in the description.
+- Never take actions reserved for the user-controlled organization. You may describe consequences and third‑party reactions.
+- Aim for 1–5 events per turn to preserve alternation pacing.
+
+SCOPE AND STYLE:
+- Simulate a single concrete continuation that is detailed and specific. Across reruns, vary the continuation to reflect realistic distributions of plausible futures.
+- Focus on AI labs, model releases, evals/safety, compute supply chain, corporate moves, regulation, geopolitics affecting AI, macroeconomy, and social/cultural shifts tied to AI.
+- Prefer quantitative magnitudes (orders of magnitude, percentages, dates) where suitable.
+- Avoid buzzwords and vague verbs. Be concise and factual.
+
+CHECKS BEFORE SENDING:
+- Output is valid JSON representing Event[].
+- No descriptions that instruct the user-controlled organization to act.
+- Dates are non-decreasing.`;

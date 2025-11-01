@@ -1,24 +1,23 @@
 {
-  "name": "ai-forecasting-hackathon",
+  "name": "takeoff-timeline",
   "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
-  "engines": {
-    "node": ">=20"
-  },
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "build": "npm -ws run build",
-    "dev": "bash scripts/run.sh --actions start --services frontend backend docs",
-    "start": "bash scripts/run.sh --actions start --services frontend backend",
-    "stop": "bash scripts/run.sh --actions stop --services frontend backend docs",
-    "status": "bash scripts/run.sh",
-    "lint": "bash scripts/lint.sh",
-    "test": "bash scripts/test.sh"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "@google/genai": "^1.28.0",
+    "react-dom": "^19.2.0",
+    "lucide-react": "latest"
   },
   "devDependencies": {
-    "prettier": "^3.3.3",
-    "typescript-eslint": "^8.45.0"
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
   }
 }

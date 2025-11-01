@@ -1,43 +1,24 @@
-# dependencies
-node_modules/
-
-# logs
-logs/
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
-# build outputs
-dist/
-build/
-coverage/
-site/
-
-# test artifacts
-playwright-report/
-test-results/
-blob-report/
-
-# tunnel config (generated, machine-specific)
-tunnel/
-
-# env
-.env
-.env.*
-
-# misc
-.DS_Store
-.pids/
+node_modules
+dist
+dist-ssr
 *.local
 
-# tooling caches
-.eslintcache
-*.tsbuildinfo
-
-# python venvs
-.venv/
-venv/
-
-# local dev artifacts
-.ports.tsv
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
