@@ -1,4 +1,0 @@
-{
-  "name": "AI Forecast",
-  "postCreateCommand": "npm run provision"
-}

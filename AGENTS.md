@@ -24,21 +24,13 @@ The project vision is documented in README.md.
 
 <!-- EDIT WHENEVER SCRIPTS CHANGE -->
 <edit>
-You start in a GitHub Codespace worktree. The `.devcontainer/devcontainer.json` image auto-runs `npm run provision` on creation; rerun manually if needed. Use this npm workflow instead of legacy bash scripts:
+You start in a GitHub Codespace worktree. Keep it simple:
 
 1. Install dependencies: `npm install`
-2. Provision tools (installs ripgrep via `apt-get` and the Codex CLI globally): `npm run provision`
-   - Provisioning also syncs secrets when the following Codespaces secrets are defined (values should be base64-encoded):
-     - `CODEX_AUTH_JSON_B64` ➝ `~/.codex/auth.json` (skipped if file already exists)
-     - `ENV_LOCAL_B64` ➝ project `.env.local` (skipped if file already exists, otherwise placeholder `API_KEY=PLACEHOLDER`)
-   - The script always overwrites `~/.codex/config.toml` with the repo default; edit `scripts/provision-tools.sh` if you need different defaults.
-   - To avoid Codespaces permission issues, provisioning disables Git GPG signing globally (`commit.gpgsign=false`, `tag.gpgsign=false`). If you require signed commits, re-enable after setting up your keys.
-3. Authenticate the Codex CLI: run `codex`, complete the browser login, then `curl` the localhost callback URL
-4. Provide local credentials: `echo "API_KEY=<your key>" >> .env.local`
-5. Launch the dev server: `npm run dev` (Vite serves on port 5173 by default)
-6. Spin up Vibe Kanban for ticket management if needed: `npm run vk` (binds to port 3000)
+2. Launch the dev server: `npm run dev` (Vite on port 5173)
+3. Optional: Vibe Kanban for tickets: `npm run vk`
 
-Provisioning requires sudo in the Codespace; rerun it anytime you suspect the CLI tools are missing.
+No auto-provisioning, no dotfile writes, no signing config. Configure your own tools as needed.
 </edit>
 
 ## API Reference
