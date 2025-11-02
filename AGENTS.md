@@ -7,7 +7,7 @@ This document serves as Developer Documentation.
 It is read by all development codex agents.
 It is not read by the forecasting agents.
 Human developers can read it, or use an AI agent to onboard them faster.
-The project owner is Jörn. His time is scarce, so please only ping him for decisions where you don't confidently know what he'll want, or for decisions that are marked as requiring his approval. Write clearly, don't assume Jörn recalls your earlier messages or work, and provide your pro/con/alternatives for decisions so Jörn can decide faster.
+The project owner has scarce time, so only ping the project owner for decisions where you don't confidently know what they'll want, or for decisions that are marked as requiring their approval. Write clearly, don't assume the project owner recalls your earlier messages or work, and provide your pro/con/alternatives for decisions so the project owner can decide faster.
 The project vision is documented in README.md.
 
 The WebApp is deployed via AI Studio / Gemini App.
@@ -29,7 +29,8 @@ Development Environment:
 - We persist configuration and data for codex cli, vibe-kanban, and use GitHub Codespaces secrets for API keys
 - If you want to use a tool but it's not installed, install it immediately and then extend `provision.sh`
 - We use Codex CLI for vibecoding
-- We use `@bloop/vibe-kanban` (VK) for ticket management and vibecoding agent creation
+- The project owner uses `@bloop/vibe-kanban` (VK) for ticket management and vibecoding agent creation
+- We ship `vibe-kanban-web-companion` (<https://github.com/BloopAI/vibe-kanban-web-companion>) so VK can point-and-click components; keep its setup working in development
 
 Documentation:
 - `docs/hackathon-submission.md` records our approach and results
@@ -42,7 +43,7 @@ Deployment:
 
 ## Quick Commands
 
-VK creates and setups a git worktree for each vibecoding agent. 
+VK (operated by the project owner) creates and setups a git worktree for each vibecoding agent. 
 Only few agents are started 1:1 by the project owner on main.
 
 Container provision steps (already ran):
@@ -58,7 +59,7 @@ Setup Steps (already ran):
 You can directly get to work.
 
 Common Commands:
-- `npm run dev` - starts Vite dev server at the next available port, use a new terminal for this, as the command blocks indefinitely
+- `npm run dev` - starts Vite dev server at the next available port, use a new terminal for this (do not launch it via shell/local_shell tools) because the command blocks indefinitely
 - `npm run build` - builds the production bundle into `dist/`
 - `npx tsc --noEmit` - runs TypeScript type checking only
 - `npx vite lint` - runs Vite's linter (if configured)
@@ -68,18 +69,21 @@ Common Commands:
 ## Conventions
 
 - Since our project is small, we don't need coverage or tests.
-- Use playwright MCP to inspect the frontend directly, no need to ask Jörn to take screenshots or test buttons manually.
+- AI-authored tickets or files must start with `<!-- CREATOR: codex -->` so it's clear the project owner hasn't reviewed them line-by-line yet.
+- Use playwright MCP to inspect the frontend directly, no need to ask the project owner to take screenshots or test buttons manually.
 - Use jsdoc and comments for major functions and types. Explain the why, not the what.
-- Ergonomics is important, report to Jörn if your tools or the repo architecture don't work intuitively or slow you down in any way.
+- Ergonomics is important, report to the project owner if your tools or the repo architecture don't work intuitively or slow you down in any way.
 - When in doubt, prefer simplicity and clarity over cleverness or optimization.
 - Write explicit, clear, unambiguous, non-magic code. Same for messages.
-- Push back when Jörn makes a sloppy mistake, ask if he's not being clear enough.
-- Present pro/con/alternatives when you need Jörn to make a decision or approve of your designated approach.
-- When you need to make a decision that affects the project direction, and you're not sure what Jörn would want, ask him.
+- Push back when the project owner makes a sloppy mistake, ask if they're not being clear enough.
+- Present pro/con/alternatives when you need the project owner to make a decision or approve of your designated approach.
+- When you need to make a decision that affects the project direction, and you're not sure what the project owner would want, ask them.
 - Ask when documentation is missing or is written unclearly. We want the codebase and repo to be self-explanatory and trivial to onboard to.
+- Never launch long-running or blocking commands (e.g. `npm run dev`) via the shell/local_shell tools; use a dedicated terminal instead.
+- Keep `<VibeKanbanWebCompanion />` mounted alongside `<App />` in `src/index.tsx` so the project owner can use VK's point-and-click edits during development.
 - We use bloop/vibe-kanban for managing tickets and spawning vibecoding agents. The ticket is copied into the agent's first user message. They are started in a provisioned git worktree.
-- Sometimes Jörn starts a 1:1 chat with a coding agent in the `main` worktree, in which case no assigned ticket exists.
-- VibeKanban manages the worktrees. Unless Jörn explicitly tells you, you don't need to commit, rebase, merge or push. VibeKanban automatically commits your work whenever you end your turn.
+- Sometimes the project owner starts a 1:1 chat with a coding agent in the `main` worktree, in which case no assigned ticket exists.
+- VibeKanban manages the worktrees. Unless the project owner explicitly tells you, you don't need to commit, rebase, merge or push. VibeKanban automatically commits your work whenever you end your turn.
 - We don't have nor need a GitHub CI.
 
 **Project Philosophy**
@@ -144,4 +148,3 @@ Common Commands:
   - `src/App.tsx` main app component
 - Gemini App: `index.html`, `metadata.json`
 - Dev Tools: `package.json`, `package.lock.json`, `tsconfig.json`, `vite.config.ts`, `.gitignore`
-

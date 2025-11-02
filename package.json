@@ -14,7 +14,8 @@
     "@google/genai": "^1.28.0",
     "lucide-react": "latest",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "vibe-kanban-web-companion": "^0.0.5"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
