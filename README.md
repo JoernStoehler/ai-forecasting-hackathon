@@ -65,12 +65,13 @@ None planned yet.
 
 To immediately use the app, head to the Gemini App Link: TODO.
 
-For local development: 
-- Fork the repo
-- Add a free-tier or paid-tier Gemini API key to the Codespace secrets as `GEMINI_API_KEY`
-- Create a GitHub Codespace from your fork
-- Run `npm run dev` to start the development server. 
-- Click the link in the Codespace terminal to open the app in a browser tab, with automatic port forwarding.
+For local development:
+- Clone or fork this repository.
+- Create a `.env.local` file at the project root and set `GEMINI_API_KEY=<your key>`. A free-tier key works.
+- (Recommended) Open the folder with VS Code and use the **Dev Containers** extension’s “Reopen in Container” command so the devcontainer builds and runs `scripts/provision.sh` automatically. Alternatively, ensure you are on Node 22+ with npm available.
+- Run `npm install`.
+- Run `npm run dev` in a dedicated terminal. Vite will default to `http://localhost:3000/` and pick the next free port if 3000 is taken—check the terminal output for the exact URL.
+- Open the logged URL in your browser to use the app.
 
 For details, your AI agent can read AGENTS.md and answer your questions.
 

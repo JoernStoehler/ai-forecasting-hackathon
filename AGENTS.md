@@ -25,8 +25,8 @@ Gemini App related choices:
 
 Development Environment:
 - `devcontainer.json` with `universal:2` image
-- Various tools such as ripgrep, codex cli are installed automatically by `scripts/provision.sh` during post-create lifecycle event of the codespace
-- We persist configuration and data for codex cli, vibe-kanban, and use GitHub Codespaces secrets for API keys
+- Various tools such as ripgrep, codex cli are installed automatically by `scripts/provision.sh` during the devcontainer post-create lifecycle event
+- We persist configuration and data for codex cli and vibe-kanban inside `.persist/`; provide your own `.env.local` with `GEMINI_API_KEY`
 - If you want to use a tool but it's not installed, install it immediately and then extend `provision.sh`
 - We use Codex CLI for vibecoding
 - The project owner uses `@bloop/vibe-kanban` (VK) for ticket management and vibecoding agent creation
@@ -47,8 +47,8 @@ VK (operated by the project owner) creates and setups a git worktree for each vi
 Only few agents are started 1:1 by the project owner on main.
 
 Container provision steps (already ran):
-1. The usual: Create a GitHub Codespace, which reads `devcontainer.json` and builds the container
-2. The postCreateCommand runs `scripts/provision.sh`, which installs ripgrep, codex cli, and setups persistence for various other dev tools
+1. Build the devcontainer (e.g. VS Code **Dev Containers: Reopen in Container** or `devcontainer up`), which reads `devcontainer.json` and starts the container
+2. The postCreateCommand runs `scripts/provision.sh`, which installs ripgrep, codex cli, and sets up persistence for various other dev tools
 
 Setup Steps (already ran):
 1. `git worktree add -b <agent-branch> <agent-worktree-path> origin/main`
