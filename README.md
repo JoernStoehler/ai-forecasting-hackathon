@@ -108,7 +108,7 @@ Follow the browser flow, then `curl` the `http://localhost:...` URL you are redi
 4) Add credentials for local runs by creating `.env.local` with your Gemini API key:
 
 ```
-echo "API_KEY=<your key>" >> .env.local
+echo "GEMINI_API_KEY=<your key>" >> .env.local
 ```
 
 5) Start the dev server:
@@ -128,7 +128,7 @@ npm run build
 
 Production deploys through Gemini Apps—end users automatically receive managed API access and only need to open the shared app link.
 
-If secrets are absent, provisioning preserves existing credential files and creates `.env.local` with `API_KEY=PLACEHOLDER` so you remember to fill it manually.
+If secrets are absent, provisioning preserves existing credential files and creates `.env.local` with `GEMINI_API_KEY=PLACEHOLDER` so you remember to fill it manually.
 </edit>
 
 ## Repository Layout

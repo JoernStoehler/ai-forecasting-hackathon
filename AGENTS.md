@@ -30,7 +30,7 @@ You start in a GitHub Codespace worktree. Minimal workflow:
 2. Provision tools and sync secrets: `npm run provision`
    - Installs ripgrep (apt-get) and the Codex CLI globally if missing.
    - Writes `~/.codex/config.toml` and optionally `~/.codex/auth.json` from `CODEX_AUTH_JSON_B64`.
-   - Creates `.env.local` from `ENV_LOCAL_B64` or a placeholder `API_KEY=PLACEHOLDER`.
+   - Creates `.env.local` from `ENV_LOCAL_B64` or a placeholder `GEMINI_API_KEY=PLACEHOLDER`.
 3. Launch the dev server: `npm run dev` (Vite on port 5173)
 4. Optional: Vibe Kanban for tickets: `npm run vk`
 </edit>

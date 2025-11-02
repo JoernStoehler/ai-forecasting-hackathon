@@ -94,7 +94,7 @@ EOF
 
 sync_env_local() {
   local env_path="$PROJECT_ROOT/.env.local"
-  write_from_secret "$env_path" "ENV_LOCAL_B64" "API_KEY=PLACEHOLDER" "true"
+  write_from_secret "$env_path" "ENV_LOCAL_B64" "GEMINI_API_KEY=PLACEHOLDER" "true"
 }
 
 main() {

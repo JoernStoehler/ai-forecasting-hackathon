@@ -2,12 +2,13 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { Event } from '../types';
 
-const API_KEY = process.env.API_KEY;
+// Prefer GEMINI_API_KEY; fall back to legacy API_KEY for backward compat.
+const API_KEY = process.env.GEMINI_API_KEY || process.env.API_KEY;
 
 if (!API_KEY) {
   // This is a fallback for development if the env var is not set.
   // In a real production environment, the key should always be present.
-  console.warn("API_KEY environment variable not set. Using a placeholder. App will not function correctly without a valid key.");
+  console.warn("GEMINI_API_KEY not set (nor API_KEY). Using a placeholder. App will not function correctly without a valid key.");
 }
 
 const ai = new GoogleGenAI({ apiKey: API_KEY || " " });
