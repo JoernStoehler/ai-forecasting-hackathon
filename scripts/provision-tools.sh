@@ -101,12 +101,25 @@ sync_env_local() {
   write_from_secret "$env_path" "ENV_LOCAL_B64" "API_KEY=PLACEHOLDER" "true"
 }
 
+disable_git_gpg_signing() {
+  # Disable GPG signing globally to avoid failures in sandboxed/devcontainer
+  # environments where $HOME is not writable or no keys are provisioned.
+  if git config --global commit.gpgsign false 2>/dev/null; then
+    echo "Disabled global Git GPG signing for commits."
+  else
+    echo "Skipping global Git config (no permission to write to HOME)."
+  fi
+  # Best effort for tags as well; ignore failures if HOME is read-only.
+  git config --global tag.gpgsign false >/dev/null 2>&1 || true
+}
+
 main() {
   echo "[provision] Steps are commented out by default. Nothing executed."
   echo "[provision] Uncomment lines below to enable specific steps."
   ensure_tools
   sync_codex_files
   sync_env_local
+  disable_git_gpg_signing
 }
 
 main "$@"

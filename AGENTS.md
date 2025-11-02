@@ -32,6 +32,7 @@ You start in a GitHub Codespace worktree. The `.devcontainer/devcontainer.json` 
      - `CODEX_AUTH_JSON_B64` ➝ `~/.codex/auth.json` (skipped if file already exists)
      - `ENV_LOCAL_B64` ➝ project `.env.local` (skipped if file already exists, otherwise placeholder `API_KEY=PLACEHOLDER`)
    - The script always overwrites `~/.codex/config.toml` with the repo default; edit `scripts/provision-tools.sh` if you need different defaults.
+   - To avoid Codespaces permission issues, provisioning disables Git GPG signing globally (`commit.gpgsign=false`, `tag.gpgsign=false`). If you require signed commits, re-enable after setting up your keys.
 3. Authenticate the Codex CLI: run `codex`, complete the browser login, then `curl` the localhost callback URL
 4. Provide local credentials: `echo "API_KEY=<your key>" >> .env.local`
 5. Launch the dev server: `npm run dev` (Vite serves on port 5173 by default)
