@@ -1,7 +1,8 @@
 {
   "name": "ai-forecasting-hackathon",
   "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "postCreateCommand": "npm run provision",
+  "postCreateCommand": "npm run post-create",
+  "postStartCommand": "bash scripts/post-start.sh",
   "customizations": {
     "codespaces": {
       "openFiles": [
@@ -11,4 +12,3 @@
     }
   }
 }
-

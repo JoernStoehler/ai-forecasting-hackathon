@@ -23,19 +23,30 @@ Gemini App related choices:
 - A free-tier `GEMINI_API_KEY` is provided by Google for all end-users, and set by us manually for our development servers in `.env.local`
 - Gemini App uses `metadata.json`
 
+## Repo at a Glance
+
+- `src/` holds the React 19 application; inline comments/JSDoc are the canonical documentation.
+- Runtime config lives in `.env.local`, which lifecycle scripts load into every shell and MCP.
+- `scripts/post-create.sh` bootstraps tools and re-links `.persist/`; `scripts/post-start.sh` refreshes env exports on each container boot.
+- `.persist/` stores Codex CLI history, Vibe-Kanban data, and other stateful assets so rebuilds stay idempotent.
+- `.devcontainer/devcontainer.json` wires the lifecycle hooks on top of the `universal:2` base image.
+- Prompting/context material lives in `materials/`; add stand-alone docs only when the project owner asks for them.
+
 Development Environment:
 - `devcontainer.json` with `universal:2` image
-- Various tools such as ripgrep, codex cli are installed automatically by `scripts/provision.sh` during the devcontainer post-create lifecycle event
-- We persist configuration and data for codex cli and vibe-kanban inside `.persist/`; provide your own `.env.local` with `GEMINI_API_KEY`
-- If you want to use a tool but it's not installed, install it immediately and then extend `provision.sh`
+- `scripts/post-create.sh` installs ripgrep, Codex CLI, and re-links `.persist/` so tooling state survives rebuilds
+- `scripts/post-start.sh` loads `.env.local` into every shell and Codex MCP; keep `.env.local` as the only place you hand-edit keys
+- We persist configuration and data for codex cli and vibe-kanban inside `.persist/`; confirm the symlinks remain intact after changes
+- If you want to use a tool but it's not installed, install it immediately and then extend `scripts/post-create.sh`
 - We use Codex CLI for vibecoding
 - The project owner uses `@bloop/vibe-kanban` (VK) for ticket management and vibecoding agent creation
 - We ship `vibe-kanban-web-companion` (<https://github.com/BloopAI/vibe-kanban-web-companion>) so VK can point-and-click components; keep its setup working in development
 
 Documentation:
-- `docs/hackathon-submission.md` records our approach and results
-- `README.md` provides instructions for minimum steps for local setup (first preview, first vibecoding agent)
-- `AGENTS.md` provides instructions for local development after setup from a vibecoding agent's PoV
+- Prefer inline code comments and JSDoc for authoritative explanations (keeps context next to usage)
+- `README.md` documents minimum local setup plus lifecycle script expectations
+- `AGENTS.md` provides project policy, constraints, and expectations for vibecoding agents
+- `materials/` stores prompting/context packs referenced by the app and GenAI calls
 
 Deployment:
 - The project owner manually syncs the latest code to AI Studio / Gemini App for deployment
@@ -48,13 +59,19 @@ Only few agents are started 1:1 by the project owner on main.
 
 Container provision steps (already ran):
 1. Build the devcontainer (e.g. VS Code **Dev Containers: Reopen in Container** or `devcontainer up`), which reads `devcontainer.json` and starts the container
-2. The postCreateCommand runs `scripts/provision.sh`, which installs ripgrep, codex cli, and sets up persistence for various other dev tools
+2. The postCreateCommand runs `npm run post-create` (which calls `scripts/post-create.sh`) to install ripgrep, codex cli, and refresh persisted tooling state
 
 Setup Steps (already ran):
 1. `git worktree add -b <agent-branch> <agent-worktree-path> origin/main`
 2. `cd <agent-worktree-path>`
 3. `npm install`
 4. `codex --yolo exec "<ticket-description>"` started your session
+
+Local onboarding workflow (repeat when starting fresh on a machine):
+1. Reopen the repo in the devcontainer (VS Code **Dev Containers: Reopen in Container** or `devcontainer up`) so the lifecycle hooks run.
+2. Ensure `.env.local` contains valid `GEMINI_API_KEY` and `TAVILY_API_KEY`. Editing the file is enough; the next shell session picks the changes up automatically.
+3. Run `npm install` if dependencies changed.
+4. Start the app with `npm run dev` in a dedicated terminal (never via Codex shell tools); Vite prints the URL to open locally.
 
 You can directly get to work.
 
@@ -65,6 +82,7 @@ Common Commands:
 - `npx vite lint` - runs Vite's linter (if configured)
 - `npx vite test` - runs Vite's test runner (if configured)
 - `npm run vk` - runs vibe-kanban web server at http://localhost:3000, it blocks indefinitely, do not run this command
+- `codex ...` - Codex CLI is preconfigured via `.persist/codex/config.toml` with Playwright, Tavily, and Vibe-Kanban MCP servers
 
 ## Conventions
 
@@ -85,6 +103,37 @@ Common Commands:
 - Sometimes the project owner starts a 1:1 chat with a coding agent in the `main` worktree, in which case no assigned ticket exists.
 - VibeKanban manages the worktrees. Unless the project owner explicitly tells you, you don't need to commit, rebase, merge or push. VibeKanban automatically commits your work whenever you end your turn.
 - We don't have nor need a GitHub CI.
+- Communication style:
+  - Must lead with findings/issues before summaries; messages must be self-contained and reference files/lines explicitly.
+  - Must present options with pros/cons/scores when requesting owner decisions.
+  - Should mirror the owner's direct tone, avoid filler, and list residual risks or open questions in every update.
+
+## Constraints & Priorities
+
+**Must have (hard blockers if broken)**
+- Owner time is scarce: all flows you touch must keep running without owner intervention, and you must present pros/cons/options up front.
+- Keep onboarding truthful and lightweight. README and inline comments must match reality; update them immediately when you change behavior.
+- `.env.local` is the single secret source. `scripts/post-create.sh` / `scripts/post-start.sh` must remain the only loaders—do not add parallel secret plumbing.
+- `.persist/` links must stay intact so Codex CLI and Vibe-Kanban state survive rebuilds. Lifecycle scripts must stay idempotent.
+- Never launch blocking commands (`npm run dev`, `npm run vk`, etc.) via Codex shell tools; always use a dedicated terminal.
+- Keep `<VibeKanbanWebCompanion />` mounted alongside `<App />` in `src/index.tsx`.
+- `AGENTS.md` is owner-controlled. Only edit it with explicit owner approval and provide a clear, line-referenced diff.
+- Favor KISS/YAGNI: after each change the repo should be *more* explicit and simpler—no legacy names or hidden steps left behind.
+
+**Should have (call out when you cannot comply)**
+- Use Playwright MCP for UI inspection instead of manual screenshot workflows.
+- Add concise comments/JSDoc for non-obvious logic so future agents learn in-context.
+- Surface tooling or ergonomics friction quickly; we keep the repo intuitive.
+- Offer options with pros/cons/score before asking the owner to decide direction.
+- Clarify ambiguous instructions or missing documentation immediately rather than guessing.
+
+If you must violate a must-have, stop and escalate to the project owner before proceeding.
+
+## Troubleshooting
+
+- **API keys missing in shells or Codex?** Double-check `.env.local`, then run `bash scripts/post-start.sh` (or restart the devcontainer) to regenerate `.persist/secrets/env.sh`.
+- **MCP servers unavailable?** Re-run `npm run post-create` to reinstall Codex CLI tooling; extend the script if you add new tools.
+- **Persisted state lost?** Ensure `.persist/` exists and the lifecycle-created symlinks (`~/.codex`, `/var/tmp/vibe-kanban/worktrees`, etc.) still point there.
 
 **Project Philosophy**
 - We are writing a causal model for forecasting x-risk from AI, communicated via a webapp.
@@ -139,8 +188,8 @@ Common Commands:
 
 ## Project Structure
 
-- Environment: `devcontainer.json`, `scripts/provision.sh`, `.env.local`
-- Documentation: `AGENTS.md`, `README.md`, `docs/hackathon-submission.md`
+- Environment: `devcontainer.json`, `scripts/post-create.sh`, `scripts/post-start.sh`, `.env.local`
+- Documentation: inline comments/JSDoc, `AGENTS.md`, `README.md`
 - Source Code: `src/`
   - `src/components/` reusable React components
   - `src/types.ts` data model types

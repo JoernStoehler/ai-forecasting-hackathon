@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "provision": "bash scripts/provision.sh",
+    "post-create": "bash scripts/post-create.sh",
+    "provision": "npm run post-create",
     "vk": "npx -y vibe-kanban@latest"
   },
   "dependencies": {
