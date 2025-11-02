@@ -5,10 +5,7 @@
 # AI Forecasting Hackathon
 
 Submitted by: Jörn Stöhler  
-[Code](https://github.com/JoernStoehler/ai-forecasting-hackathon) | [Documentation](https://joernstoehler.github.io/ai-forecasting-hackathon/) | [WebApp](https://ai-forecasting-hackathon.joernstoehler.com) | [Hackathon](https://apartresearch.com/sprints/the-ai-forecasting-hackathon-2025-10-31-to-2025-11-02)
-
-<!-- TODO: replace the GPT-5 model with our Gemini model; replace the backend agent with a LLM call architecture -->
-<!-- TODO: verify the Documentation link still reflects current stack (we may no longer publish MkDocs) -->
+[Code](https://github.com/JoernStoehler/ai-forecasting-hackathon) | [Hackathon](https://apartresearch.com/sprints/the-ai-forecasting-hackathon-2025-10-31-to-2025-11-02) | [Gemini App](TODO)
 
 ## Overview
 
@@ -39,6 +36,8 @@ I do think that GPT-5 currently fails a multitude of relevant capabilities that 
 
 With these compensations in place, I believe we can get GPT-5 with scaffolding to act as a human expert on AI x-risk forecasting, and leverage its capabilities to achieve all our asks at once.
 
+Due to resource constraints, we will focus in our MVP to use Gemini 2.5 Flash instead of the smarter GPT-5, and we use it in a single-pass instead of agentic mode where 2.5 Flash first reasons and then already emits the answer predictions.
+
 ## Project Components
 
 The project consists of the following components:
@@ -62,94 +61,17 @@ The project consists of the following components:
 
 None planned yet.
 
-## Tech Stack (Summary)
-
-<edit>
-- Frontend: Vite + React 19 + TypeScript, single-page app rooted in `App.tsx` with UI logic under `components/`.
-- AI Runtime: Gemini 2.5 Flash via `@google/genai`; JSON schema enforcement lives in `services/geminiService.ts`.
-- Data & Types: Timeline seed data in `metadata.json`, shared TypeScript contracts in `types.ts` and constants in `constants.ts`.
-- Tooling: Codex CLI for auth, ripgrep for search, Vibe Kanban (`npm run vk`) for worktree orchestration; all provisioned through `npm run provision`.
-- Deployment: Gemini Apps handles hosting and attaches API keys per end-user session—no custom backend in this MVP.
-</edit>
-
 ## Quick Start
 
-<edit>
-Minimal reproduction requires Node >= 20 and npm inside the GitHub Codespace.
+To immediately use the app, head to the Gemini App Link: TODO.
 
-The `.devcontainer/devcontainer.json` image bootstraps a Codespace and automatically runs `npm run provision`. For manual shells, follow the steps below.
+For local development: 
+- Fork the repo
+- Add a free-tier or paid-tier Gemini API key to the Codespace secrets as `GEMINI_API_KEY`
+- Create a GitHub Codespace from your fork
+- Run `npm run dev` to start the development server. 
+- Click the link in the Codespace terminal to open the app in a browser tab, with automatic port forwarding.
 
-1) Install JavaScript dependencies:
+For details, your AI agent can read AGENTS.md and answer your questions.
 
-```
-npm install
-```
-
-2) Provision development tooling (installs `ripgrep` via `apt-get` and the `codex` CLI via `npm install -g`; the script will prompt for sudo inside the Codespace):
-
-```
-npm run provision
-```
-
-   - Optional: populate Codespaces secrets so provisioning can restore them automatically:
-     - `CODEX_AUTH_JSON_B64` – base64-encoded `~/.codex/auth.json`
-     - `ENV_LOCAL_B64` – base64-encoded project `.env.local`
-   - Provisioning overwrites `~/.codex/config.toml` with repo defaults; tweak `scripts/provision-tools.sh` if you want to change them.
-   - Create each value with `base64 -w0 < file` (or `base64 | tr -d '\n'` on macOS).
-
-3) Authenticate the Codex CLI (browser login + localhost callback):
-
-```
-codex
-```
-
-Follow the browser flow, then `curl` the `http://localhost:...` URL you are redirected to in order to finish the handshake.
-
-4) Add credentials for local runs by creating `.env.local` with your Gemini API key:
-
-```
-echo "GEMINI_API_KEY=<your key>" >> .env.local
-```
-
-5) Start the dev server:
-
-```
-npm run dev
-```
-
-Run `npm run vk` if you need the Vibe Kanban harness on port 3000.
-
-Before handing off changes, make sure strict type-checking and the production build pass:
-
-```
-npx tsc --noEmit
-npm run build
-```
-
-Production deploys through Gemini Apps—end users automatically receive managed API access and only need to open the shared app link.
-
-If secrets are absent, provisioning preserves existing credential files and creates `.env.local` with `GEMINI_API_KEY=PLACEHOLDER` so you remember to fill it manually.
-</edit>
-
-## Repository Layout
-
-<edit>
-- `App.tsx`, `index.tsx`, `index.html`: React entrypoints rendered by Vite.
-- `components/`: Presentational + interactive pieces of the timeline UI.
-- `services/geminiService.ts`: Thin client for Gemini 2.5 Flash with JSON schema enforcement.
-- `constants.ts`, `types.ts`, `metadata.json`: Shared configuration, type definitions, and seed timeline data.
-- `scripts/provision-tools.sh`: One-time tooling bootstrap run via `npm run provision`.
-- `dist/`: Generated assets after `npm run build` (ignored in source control if not needed).
-- `README.md`, `AGENTS.md`: Source of truth for onboarding and conventions.
-- `vite.config.ts`, `tsconfig.json`, `package.json`: Build/toolchain configuration.
-</edit>
-
-<edit>
-## Gemini Integration
-
-This MVP does not ship a custom backend API. All forecasting data flows directly between the React app and Gemini:
-
-- `services/geminiService.ts` calls `ai.models.generateContent` on Gemini 2.5 Flash with a JSON schema that enforces the event structure returned to the UI.
-- Timeline metadata lives client-side in `metadata.json`; the app merges Gemini responses into local state.
-- If we ever reintroduce a backend (for persistence or key management), document the endpoints here.
-</edit>
+Production deploys through Gemini Apps. End users automatically receive managed API access and only need to open the shared app link.

@@ -1,0 +1,14 @@
+{
+  "name": "ai-forecasting-hackathon",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "postCreateCommand": "npm run provision",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "README.md",
+        "AGENTS.md"
+      ]
+    }
+  }
+}
+
