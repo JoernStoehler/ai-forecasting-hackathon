@@ -1,5 +1,4 @@
 {
-  "name": "Gemini Timeline",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:0-20-bullseye",
+  "name": "AI Forecast",
   "postCreateCommand": "npm run provision"
 }

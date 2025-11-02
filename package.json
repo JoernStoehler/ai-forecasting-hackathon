@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "provision": "bash scripts/provision-tools.sh",
-    "vk": "PORT=3000 npx -y vibe-kanban"
+    "vk": "npx -y vibe-kanban@latest"
   },
   "dependencies": {
     "@google/genai": "^1.28.0",

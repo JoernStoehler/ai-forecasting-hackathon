@@ -16,7 +16,7 @@ The project vision is documented in README.md.
 - Frontend: Vite + React 19 + TypeScript rendered from `App.tsx`, with UI pieces in `components/` and shared types in `types.ts`.
 - AI Runtime: Gemini 2.5 Flash via `@google/genai`; client wrapper lives in `services/geminiService.ts` with JSON schema enforcement.
 - Data: Timeline seeds stored in `metadata.json`, constants in `constants.ts`.
-- Tooling: Codex CLI + ripgrep provisioned through `npm run provision`; Vibe Kanban launcher exposed as `npm run vk`.
+ - Tooling: Codex CLI + ripgrep provisioned through `npm run provision`; Vibe Kanban launcher exposed as `npm run vk`.
 - Documentation: README.md and this AGENTS.md (MkDocs, backend, and materials directories are no longer part of the MVP).
 </edit>
 

@@ -89,14 +89,6 @@ sync_codex_files() {
 model = "gpt-5"
 model_reasoning_effort = "high"
 
-[mcp_servers.playwright]
-command = "npx"
-args = ["@playwright/mcp@latest"]
-
-[mcp_servers.vibe_kanban]
-command = "npx"
-args = ["-y", "vibe-kanban@latest", "--mcp"]
-
 [projects."/workspaces/ai-forecasting-hackathon"]
 trust_level = "trusted"
 EOF
@@ -110,12 +102,11 @@ sync_env_local() {
 }
 
 main() {
+  echo "[provision] Steps are commented out by default. Nothing executed."
+  echo "[provision] Uncomment lines below to enable specific steps."
   ensure_tools
-  echo "Tool provisioning completed."
-
   sync_codex_files
   sync_env_local
-  echo "Secret material sync completed."
 }
 
 main "$@"
