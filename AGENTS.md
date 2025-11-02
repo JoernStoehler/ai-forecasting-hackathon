@@ -24,13 +24,15 @@ The project vision is documented in README.md.
 
 <!-- EDIT WHENEVER SCRIPTS CHANGE -->
 <edit>
-You start in a GitHub Codespace worktree. Keep it simple:
+You start in a GitHub Codespace worktree. Minimal workflow:
 
 1. Install dependencies: `npm install`
-2. Launch the dev server: `npm run dev` (Vite on port 5173)
-3. Optional: Vibe Kanban for tickets: `npm run vk`
-
-No auto-provisioning, no dotfile writes, no signing config. Configure your own tools as needed.
+2. Provision tools and sync secrets: `npm run provision`
+   - Installs ripgrep (apt-get) and the Codex CLI globally if missing.
+   - Writes `~/.codex/config.toml` and optionally `~/.codex/auth.json` from `CODEX_AUTH_JSON_B64`.
+   - Creates `.env.local` from `ENV_LOCAL_B64` or a placeholder `API_KEY=PLACEHOLDER`.
+3. Launch the dev server: `npm run dev` (Vite on port 5173)
+4. Optional: Vibe Kanban for tickets: `npm run vk`
 </edit>
 
 ## API Reference
