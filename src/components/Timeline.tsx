@@ -1,9 +1,9 @@
 import React from 'react';
-import { Event } from '../types';
+import { ScenarioEvent } from '../types';
 import { EventItem } from './EventItem';
 
 interface TimelineProps {
-  events: Event[];
+  events: ScenarioEvent[];
   searchQuery: string;
 }
 
@@ -29,10 +29,15 @@ const getMonthName = (dateStr: string) => {
 };
 
 export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery }) => {
+  const visibleEvents = React.useMemo(
+    () => events.filter(event => !event.postMortem),
+    [events]
+  );
+
   // Create a nested structure for years and months to scope sticky headers.
   // The original `events` array is pre-sorted, so insertion order is chronological.
-  const structuredTimeline: Record<string, Record<string, Event[]>> = {};
-  events.forEach(event => {
+  const structuredTimeline: Record<string, Record<string, ScenarioEvent[]>> = {};
+  visibleEvents.forEach(event => {
     const year = event.date.substring(0, 4);
     const month = getMonthName(event.date);
     if (!structuredTimeline[year]) {
@@ -44,7 +49,7 @@ export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery }) => {
     structuredTimeline[year][month].push(event);
   });
 
-  const lastEvent = events.length > 0 ? events[events.length - 1] : null;
+  const lastEvent = visibleEvents.length > 0 ? visibleEvents[visibleEvents.length - 1] : null;
 
   return (
     <div className="relative pt-4">

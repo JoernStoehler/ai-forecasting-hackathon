@@ -1,37 +1,25 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { Event } from '../types';
+import { ScenarioEvent } from '../types';
+import { coerceScenarioEvents } from '../utils/events';
 
-// Prefer GEMINI_API_KEY; fall back to legacy API_KEY for backward compat.
-const API_KEY = process.env.GEMINI_API_KEY || process.env.API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 if (!API_KEY) {
-  // This is a fallback for development if the env var is not set.
-  // In a real production environment, the key should always be present.
-  console.warn("GEMINI_API_KEY not set (nor API_KEY). Using a placeholder. App will not function correctly without a valid key.");
-}
-
-const ai = new GoogleGenAI({ apiKey: API_KEY || " " });
-
-const model = 'gemini-2.5-flash';
-
-// Basic schema validation
-function validateEvents(data: unknown): data is Event[] {
-  if (!Array.isArray(data)) return false;
-  return data.every(item => 
-    typeof item === 'object' &&
-    item !== null &&
-    'date' in item && typeof item.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.date) &&
-    'icon' in item && typeof item.icon === 'string' &&
-    'title' in item && typeof item.title === 'string' &&
-    'description' in item && typeof item.description === 'string'
+  console.warn(
+    'GEMINI_API_KEY missing. Set VITE_GEMINI_API_KEY in .env.local so forecasts work locally.'
   );
 }
 
-export async function getAiForecast(history: Event[], systemPrompt: string): Promise<Event[]> {
+const ai = new GoogleGenAI({ apiKey: API_KEY || ' ' });
+
+const model = 'gemini-2.5-flash';
+
+export async function getAiForecast(history: ScenarioEvent[], systemPrompt: string): Promise<ScenarioEvent[]> {
   try {
     const historyJson = JSON.stringify(history, null, 2);
-    
+
+    // TODO(next milestone): inject randomness parameters (e.g. seeds, scenario branches) before requesting forecasts.
     // FIX: Updated to use responseSchema for reliable JSON output as per Gemini API guidelines.
     const response = await ai.models.generateContent({
         model: model,
@@ -48,6 +36,7 @@ export async function getAiForecast(history: Event[], systemPrompt: string): Pro
                 icon: { type: Type.STRING },
                 title: { type: Type.STRING },
                 description: { type: Type.STRING },
+                postMortem: { type: Type.BOOLEAN },
               },
               required: ['date', 'icon', 'title', 'description'],
             },
@@ -62,22 +51,16 @@ export async function getAiForecast(history: Event[], systemPrompt: string): Pro
     }
     
     // FIX: Removed markdown stripping (`replace`) as `responseMimeType: 'application/json'` ensures clean JSON output.
-    const newEventsData = JSON.parse(text);
+    const newEventsData = coerceScenarioEvents(JSON.parse(text), 'Gemini response');
 
-    if (validateEvents(newEventsData)) {
-      // Ensure dates are not in the past
-      const lastDate = history[history.length - 1]?.date;
-      if (lastDate) {
-        for (const event of newEventsData) {
-          if (event.date < lastDate) {
-            throw new Error(`Model returned an event with a past date: ${event.date}`);
-          }
-        }
+    const lastDate = history[history.length - 1]?.date;
+    if (lastDate) {
+      const invalidDate = newEventsData.find(event => event.date < lastDate);
+      if (invalidDate) {
+        throw new Error(`Model returned an event with a past date: ${invalidDate.date}`);
       }
-      return newEventsData;
-    } else {
-      throw new Error("AI response failed schema validation.");
     }
+    return newEventsData;
 
   } catch (error) {
     console.error("Error fetching AI forecast:", error);

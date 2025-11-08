@@ -1,13 +1,13 @@
 import React from 'react';
 import { Icon } from './icons';
 import { FileControls } from './FileControls';
-import { Event } from '../types';
+import { ScenarioEvent } from '../types';
 
 interface HeaderProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  events: Event[];
-  onImport: (newEvents: Event[], mode: 'replace' | 'merge') => void;
+  events: ScenarioEvent[];
+  onImport: (newEvents: ScenarioEvent[]) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, events, onImport }) => {

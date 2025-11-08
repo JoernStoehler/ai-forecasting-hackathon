@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Event } from '../types';
+import { ScenarioEvent } from '../types';
 import { Icon } from './icons';
-import { ICON_SET } from '../constants';
+import { ICON_SET, type IconName } from '../constants';
 
 interface ComposePanelProps {
   latestDate: string;
-  onSubmit: (event: Event) => void;
+  onSubmit: (event: ScenarioEvent) => void;
   isLoading: boolean;
 }
 
@@ -17,7 +17,7 @@ const getNextDay = (dateStr: string) => {
 
 export const ComposePanel: React.FC<ComposePanelProps> = ({ latestDate, onSubmit, isLoading }) => {
   const [date, setDate] = useState(getNextDay(latestDate));
-  const [icon, setIcon] = useState('Landmark');
+  const [icon, setIcon] = useState<IconName>('Landmark');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -42,12 +42,12 @@ export const ComposePanel: React.FC<ComposePanelProps> = ({ latestDate, onSubmit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim() || isLoading) return;
-    onSubmit({ date, icon, title, description });
+    onSubmit({ date, icon, title, description, postMortem: false });
     setTitle('');
     setDescription('');
   };
 
-  const handleIconSelect = (selectedIcon: string) => {
+  const handleIconSelect = (selectedIcon: IconName) => {
     setIcon(selectedIcon);
     setShowIconPicker(false);
   }

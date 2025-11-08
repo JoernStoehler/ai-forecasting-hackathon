@@ -9,6 +9,14 @@
         "README.md",
         "AGENTS.md"
       ]
+    },
+    "vscode": {
+      "extensions": [
+        "openai.chatgpt",
+        "vitest.explorer",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ]
     }
   }
 }

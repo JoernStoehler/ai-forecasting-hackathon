@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
 import { Icon } from './icons';
-import { Event } from '../types';
+import { ScenarioEvent } from '../types';
+import { coerceScenarioEvents } from '../utils/events';
 
 interface FileControlsProps {
-    events: Event[];
-    onImport: (newEvents: Event[], mode: 'replace' | 'merge') => void;
+    events: ScenarioEvent[];
+    onImport: (newEvents: ScenarioEvent[]) => void;
 }
 
 export const FileControls: React.FC<FileControlsProps> = ({ events, onImport }) => {
@@ -34,14 +35,9 @@ export const FileControls: React.FC<FileControlsProps> = ({ events, onImport }) 
                 const text = e.target?.result;
                 if (typeof text !== 'string') throw new Error("File is not readable");
                 const parsedEvents = JSON.parse(text);
-                // Simple validation
-                if (Array.isArray(parsedEvents) && parsedEvents.every(item => 'date' in item && 'title' in item)) {
-                    // For simplicity, we always replace. A more complex app could offer a merge option.
-                    if (window.confirm("Replace current timeline with the imported one?")) {
-                       onImport(parsedEvents, 'replace');
-                    }
-                } else {
-                    throw new Error("Invalid event file format.");
+                const validatedEvents = coerceScenarioEvents(parsedEvents, file.name || 'imported file');
+                if (window.confirm("Replace current timeline with the imported one?")) {
+                   onImport(validatedEvents);
                 }
             } catch (error) {
                 alert(`Error importing file: ${error instanceof Error ? error.message : "Unknown error"}`);

@@ -1,161 +1,90 @@
-<!-- EDIT THIS FILE ONLY WITH OWNER APPROVAL -->
-<!-- THE WORDING HAS BEEN CAREFULLY TWEAKED AND SHOULD NOT BE CASUALLY CHANGED -->
-
+<!-- CHANGE: Re-centered this handbook on the lightweight React/Vite stack actually in the repo. Pro: keeps onboarding truthful; Con: replaces the prior generic template; Alternative: keep the longer multi-project copy and ask owners to mentally filter it. -->
 # AGENTS.md
 
-This handbook is the definitive onboarding for development agents. Forecasting agents ignore it; human contributors may skim it or have an AI walk them through it. Assume the owner remembers none of your past work, minimize pings, and always package decisions with pros/cons/alternatives. The vision statement itself lives in `README.md`.
+This is your canonical onboarding for the AI Forecasting Hackathon app. Re-read it whenever the repo changes; assume the owner does not remember prior work. Lead with findings, surface risks, and package every decision with pros/cons/alternatives.
 
-The web app deploys through AI Studio / Gemini App.
+## Product Snapshot
+- Vite + React 19 + TypeScript SPA deployed manually to Gemini App / AI Studio.
+- GenAI layer: `@google/genai` calling Gemini 2.5 Flash via `src/services/geminiService.ts`.
+- Data is client-side only; timelines persist in `localStorage` plus export/import JSON. There is no backend, queue, or data pipeline.
+- Styling uses Tailwind + a small amount of custom CSS defined in `src/index.css`.
 
-## Tech Stack
+<!-- CHANGE: Added an explicit repo map so contributors can see where docs live versus code. Pro: faster orientation; Con: slightly longer section; Alternative: rely on README links only. -->
+## Repo Map
+- `src/` — React app (components, timeline logic, services, utils). File headers explain intent; add new headers when creating files.
+- `src/data/initialScenarioEvents.json` — seed events; keep narrative context in `materials/`.
+- `src/services/geminiService.ts` — the only place that talks to Gemini. Never duplicate API glue elsewhere.
+- `src/utils/events.ts` — validation/helpers for scenario events. Reuse instead of hand-rolled schema checks.
+- `materials/` — prompt/context packs and writing guides referenced by the app.
+- `docs/specs.md` — running design + logic specs (one section per feature). Treat it as the layer between tickets and code.
+- `docs/architecture.md` — explains UI/data flow for humans.
+- `docs/scenario-style.md` — narrative conventions for scenario authors.
+- `docs/hackathon-submission-template.md` — owner’s submission boilerplate.
+- `scripts/post-create.sh` / `scripts/post-start.sh` — lifecycle hooks that install tools and wire `.persist/`.
+- `.persist/` — Codex CLI + Vibe-Kanban state; never delete or replace with real directories.
 
-Gemini App related choices:
-- Vite + React 19 + TypeScript
-- Entry points: `index.html`, `src/App.tsx`
-- GenAI layer: `@google/genai` via `src/services/geminiService.ts`, using Gemini 2.5 Flash for speed and headroom
-- A free-tier `GEMINI_API_KEY` is required for development; store it in `.env.local`
-- Gemini Apps consume `metadata.json`
+## Sources of Truth & Cross-Refs
+1. **Tickets (Vibe-Kanban)** — Problems/user stories live here. Every change traces back to a ticket.
+2. **Specs (docs/specs.md + focused docs)** — Capture design intent, UI flow, data contracts, and open questions before coding. Keep them short but specific.
+3. **Code + Comments** — Implement the spec. Reference tickets/specs inline using `<!-- Ticket: <uuid> -->`, `<!-- Docs: docs/<file>#anchor -->`, or `// Code: path::symbol`.
 
-## Repo at a Glance
+Flow: tickets → specs → code/tests → UI behavior. When something feels off, escalate in that order. Never ship code that contradicts the spec without updating the spec first.
 
-- `src/` hosts the React 19 app; inline comments and JSDoc are the source of truth
-- `.env.local` carries all runtime secrets and is auto-loaded into shells and MCPs
-- `scripts/post-create.sh` provisions tools (ripgrep, Codex CLI) and re-links `.persist/`
-- `scripts/post-start.sh` refreshes env exports every container boot
-- `.persist/` keeps Codex CLI history, Vibe-Kanban data, and other state that must survive rebuilds
-- `.devcontainer/devcontainer.json` wires the lifecycle hooks onto the `universal:2` base image
-- Prompt/context packs live under `materials/`; add stand-alone docs only with owner approval
-- When new tooling is needed, extend `scripts/post-create.sh` so the lifecycle stays idempotent
-- Codex CLI is the primary agent for vibecoding
-- Vibe-Kanban (`@bloop/vibe-kanban`) manages tickets and worktrees
-- Keep `vibe-kanban-web-companion` running and integrated so VK editing stays functional
+<!-- CHANGE: Collapsed onboarding steps into one ordered list matching actual workflow. Pro: reduces back and forth; Con: duplicates a subset of README; Alternative: keep only README in sync. -->
+## Onboarding & Local Workflow
+1. **Devcontainer** — open in the provided container (`Dev Containers: Reopen in Container` or `devcontainer up`) so lifecycle hooks run.
+2. **Secrets** — add `GEMINI_API_KEY` and `TAVILY_API_KEY` to `.env.local`. Hooks sync them into shells and MCPs next boot.
+3. **Install deps** — `npm install`.
+4. **Dev server** — run `npm run dev` in a dedicated terminal (never via Codex shell). Vite picks the next open port.
+5. **Check before handing off** — run `npm run check` (lint + typecheck + build) to ensure everything still works.
 
-Documentation:
-- Inline code comments and JSDoc explain behavior where needed
-- `README.md` is written for the hackathon judges who want to inspect code and run locally
-- `AGENTS.md` (this file) is written for human and codex developers, and defines goals, decisions and recommended workflows
-- `materials/` holds prompt/context packs referenced by the app and GenAI
-
-Deployment:
-- The owner manually syncs to Gemini Apps / AI Studio
-- The deployment target is fragile - consider when code changes may plausibly break it and warn the owner
-
-## Quick Commands
-
-Vibe-Kanban (operated by the owner) creates a worktree per agent; only a few agents run directly on `main`.
-
-Local onboarding workflow (owner only):
-1. Open the repo in the devcontainer so lifecycle hooks run
-2. Ensure `.env.local` has valid `GEMINI_API_KEY` and `TAVILY_API_KEY`; edits take effect next shell session
-3. Run `npm install` if dependencies changed
-4. Launch `npm run dev` in its own terminal (never through Codex shell tools) and open the logged URL
-
-Container provision steps (already ran):
-1. Build the devcontainer (VS Code **Dev Containers: Reopen in Container** or `devcontainer up`)
-2. `postCreateCommand` executes `scripts/post-create.sh`, `postStartCommand` executes `scripts/post-start.sh`, so tooling and env vars are ready
-
-Setup Steps (already ran):
-1. `git worktree add -b <agent-branch> <agent-worktree-path> origin/main`
-2. `cd <agent-worktree-path>`
+Owner-only setup that already ran:
+1. `git worktree add -b <agent-branch> <path> origin/main`
+2. `cd <path>`
 3. `npm install`
-4. `codex --yolo exec "<ticket-description>"`
+4. `codex --yolo exec \"<ticket>\"`
 
-You can directly get to work.
+## Everyday Commands
+- `npm run dev` — Vite dev server (manual terminal).
+- `npm run build` — production bundle in `dist/`.
+- `npm run typecheck` — `tsc --noEmit`.
+- `npm run lint` — ESLint over `src/`.
+- `npm run check` — lint + typecheck + build.
+- `npm run vk` — launch Vibe-Kanban web companion (never from Codex shell).
 
-Common Commands:
-- `npm run dev` — start Vite in a dedicated terminal; it picks the next open port automatically; never run this through Codex shell tools
-- `npm run build` — produce the production bundle under `dist/`
-- `npx tsc --noEmit` — type-check the project
-- `npm run vk` — launch the Vibe-Kanban web server; never run this through Codex shell tools
-- `codex …` — Codex CLI ships preconfigured with Playwright, Tavily, and Vibe-Kanban MCP servers via `.persist/codex/config.toml`
+## Conventions & Constraints
+- **Secrets** — `.env.local` is the only source of truth. Only lifecycle scripts may load them globally.
+- **Persistence** — keep `.persist/` symlinks intact so Codex CLI + Vibe-Kanban remember history.
+- **UI Requirements** — `<VibeKanbanWebCompanion />` must stay mounted alongside `<App />`.
+- **Blocking commands** — never start long-running dev servers via Codex shell tools.
+- **File headers** — every `.ts`/`.tsx` source file starts with a short purpose/comment block referencing the relevant ticket/spec so intent stays co-located.
+- **Docs edits** — `AGENTS.md` is owner-controlled. Include inline `<!-- pro/con/alt -->` notes (as in this file) when modifying it.
+- **Communication** — lead with findings, cite files/lines, list residual risks or open questions in every update.
+- **Playwright MCP** — use it for UI inspection instead of manual screenshot requests.
+- **JSDoc/comments** — add only where intent would otherwise be unclear. Prefer “why” over “what”.
 
-## Conventions
+## Documentation Layers
+1. **README.md** — judge-friendly overview + quick start.
+2. **AGENTS.md** (this file) — scopes decisions, workflows, constraints.
+3. **docs/specs.md** — feature-level intent. Reference it (or spin off new docs) before coding.
+4. **docs/architecture.md** — when you need to reason about data flow or components.
+5. **docs/scenario-style.md** — when writing or reviewing scenario content.
+6. **Inline comments/JSDoc** — definitive behavior-level docs.
 
-- We do not require coverage or automated tests at current scale
-- AI-authored tickets or files must start with `<!-- CREATOR: codex -->`
-- When editing markdown files that require owner review, use inline `<!-- ... -->` to explain pro/con/alternative of each change
-- Use Playwright MCP for UI inspection instead of requesting manual screenshots
-- Apply JSDoc/comments only where they clarify intent—the why, not the what
-- Report ergonomics or tooling friction early so the workflow stays smooth
-- Default to clear, explicit, non-magic code and messages
-- Push back if owner instructions are ambiguous or contradictory; seek clarity
-- Always present pros/cons/alternatives when you need an owner decision
-- Escalate questions that impact project direction when intent is unclear
-- Flag missing or unclear documentation immediately—we aim for self-explanatory code
-- Never launch blocking commands (e.g. `npm run dev`) through Codex shell tools; use a dedicated terminal
-- Keep `<VibeKanbanWebCompanion />` mounted alongside `<App />` in `src/index.tsx`
-- Vibe-Kanban owns git operations; do not commit, rebase, merge, or push unless explicitly told
-- We do not run GitHub CI
-- Communication style: lead with findings/issues, cite files and lines, supply option tables with scores when seeking decisions, mirror the owner's direct tone, avoid filler, and document residual risks or open questions in every update
-
-## Constraints & Priorities
-
-**Must have (hard blockers if broken)**
-- Keep onboarding truthful and lightweight: update README + inline comments immediately when behavior changes
-- `.env.local` remains the single source for secrets; only `scripts/post-create.sh` / `scripts/post-start.sh` may load them
-- Preserve `.persist/` links so Codex CLI and Vibe-Kanban state survive rebuilds; lifecycle scripts must stay idempotent
-- Never run blocking commands via Codex shell tools—always use a dedicated terminal
-- Keep `<VibeKanbanWebCompanion />` mounted with `<App />`
-- `AGENTS.md` is owner-controlled; edit only with explicit approval and supply a line-referenced diff
-- Favor KISS/YAGNI: every change should leave the repo simpler and more explicit than before—no legacy naming or hidden steps
-- Gemini App deployment must remain functional; warn the owner of risky changes
-
-**Should have (call out when you cannot comply)**
-- Respect owner time: all flows must run end-to-end without owner babysitting, and decisions must ship with pros/cons/options
-- Prefer to do things after evaluating the alternatives, and roll back if the owner rejects, rather than ask for permission and wait
-- Use Playwright MCP for UI work rather than manual screenshots
-- Add concise comments/JSDoc around non-obvious logic for future agents
-- Surface tooling or ergonomics issues quickly
-- Present options with pros/cons/score when requesting owner decisions
-- Seek clarification immediately when documentation or requirements are ambiguous
-
-If you cannot avoid violating a must-have, or if you violated at it and cannot undo/fix it, stop and escalate to the project owner before proceeding.
+## Decision Making & Escalation
+- Tickets in Vibe-Kanban stay the source of truth. Clarify ambiguous intent immediately.
+- Present options with pros/cons and a recommendation when something requires owner input.
+- Flag risky changes early (Gemini App deploys are fragile).
+- We do not require automated tests today; prefer fast manual validation and lint/typecheck coverage.
 
 ## Troubleshooting
-
-- **API keys missing in shells or Codex?** Verify `.env.local`, then run `bash scripts/post-start.sh` (or restart the devcontainer) to regenerate `.persist/secrets/env.sh`
-- **MCP servers unavailable?** Re-run `npm run post-create`; extend the script if you install new tools
-- **Persisted state lost?** Confirm `.persist/` exists and that lifecycle-created links (`~/.codex`, `/var/tmp/vibe-kanban/worktrees`, etc.) still point there
+- **Missing API keys** — verify `.env.local`, then `bash scripts/post-start.sh` (or restart container) to regenerate `.persist/secrets/env.sh`.
+- **MCP servers down** — rerun `npm run post-create`; extend the script only when adding new tools.
+- **Persisted state lost** — confirm symlinks under `.persist/` still point to the repo.
+- **Broken timeline JSON** — run `npm run lint` to surface schema errors; validation lives in `src/utils/events.ts`.
 
 ## Project Philosophy
-
-- We are building a causal model for AI x-risk, communicated through the web app
-- Gemini App leverages the end user's free-tier quota, avoiding custom backends or configuration steps
-- UX is content-first: minimal distractions, intuitive interactions
-- Visual design stays modern, minimalistic, and professional
-- KISS and YAGNI apply—the app should remain simple
-
-## Features
-
-- Vibe-Kanban tracks planned and past work
-- Long-term aim: sample immersive futures without mode collapse, including causal interventions by key actors, covering both direct and indirect x-risk drivers, and explaining any emerging jargon. Events are stored as ordered `ScenarioEvent` entries:
-
-```typescript
-interface ScenarioEvent {
-  /** A rough date (we care about year-month granularity). */
-  date: string; // e.g. "2027-11-15"
-  /** Whether the event stays hidden until post-mortem. */
-  postMortem: boolean; // e.g. false
-  /** Icon name from lucide-react. */
-  icon: string; // e.g. "robot"
-  /** One-sentence title always shown in the UI. */
-  title: string; // e.g. "US government gives go-ahead for joined $1B training run by Nvidia, Google."
-  /** One-paragraph description revealed on expansion. */
-  description: string; // e.g. "Nvidia's and Google's jointly offered to train a vastly larger AI model than current SOTA. Per the 2026 Compute Act, they had to privately seek government approval. The government now announced the project publicly, citing the economic benefits and assurances of safety measures. The $1B training run on modern hardware is 10x larger than GPT-6."
-}
-```
-
-- We supply GenAI with model materials plus random variables to encourage broad sampling and detailed, immersive continuations
-
-## Project Structure
-
-- Environment: `devcontainer.json`, `scripts/post-create.sh`, `scripts/post-start.sh`, `.env.local`
-- Documentation: inline comments/JSDoc, `AGENTS.md`, `README.md`
-- Source Code: `src/`
-  - `src/components/`
-  - `src/types.ts`
-  - `src/services/geminiService.ts`
-  - `src/App.tsx`
-- Gemini App assets: `index.html`, `metadata.json`
-- Dev Tools: `package.json`, `package-lock.json`, `tsconfig.json`, `vite.config.ts`, `.gitignore`
-
+- KISS + explicitness outweigh clever abstractions.
+- The web app is content-first; UX should stay calm, modern, and professional.
+- All artifacts are hand-authored; when something changes, update README + inline docs immediately so onboarding stays truthful.
+- Warn the owner whenever a change could plausibly break deployment to Gemini App / AI Studio.
