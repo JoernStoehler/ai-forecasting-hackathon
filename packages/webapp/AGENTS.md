@@ -6,8 +6,10 @@
 ## Code Conventions
 - Follow best practices for modern frontend development with React and TypeScript.
 - Pure functions with immutable types preferred where sensible.
-- Commands: `vite, vite build, vitest, playwright test, eslint, prettier, tsc --noEmit` and other standard tools.
-- JSDoc comments on file and function levels for the the why behind complex logic or decisions.
+- Commands: 
+  - for development: `npm run lint -w packages/webapp`, `npm run typecheck -w packages/webapp`, `npm run build -w packages/webapp`.
+  - for preview: `npm run dev -w packages/webapp` (Vite dev server) or `npm run preview -w packages/webapp` (serve built output).
+- JSDoc comments on fileoverview and function levels for the why behind complex logic or decisions.
 
 ## Testing
 - Use Vitest for unit and integration tests. Playwright for end-to-end tests.
