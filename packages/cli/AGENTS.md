@@ -1,28 +1,30 @@
-# AGENTS.md (webapp)
-- Purpose: Frontend, interactive web game
-- Tech stack: Vite + React 18 + TypeScript SPA
-- Depends on: `packages/engine/` for the simulation engine (shared with CLI)
+<!-- Owner review required; drafted by agent on 2025-12-10, adapted from webapp/AGENTS.md -->
+<!-- Diff vs webapp/AGENTS baseline (commit 310c600):
+     - Purpose/depends/tech stack updated to CLI.
+     - Commands changed to CLI build/typecheck/test and run example.
+     - Testing note reflects current Vitest coverage for JSONL helpers.
+     - Latency note points to engine forecaster.
+     - API contract link points to engine exports.
+     - Env note: single GEMINI_API_KEY, mock/no-ai options. -->
+
+# AGENTS.md (cli)
+- Purpose: Minimal CLI frontend for the engine; one-turn JSONL pipeline for development and tooling.
+- Tech stack: Node + TypeScript, ESM.
+- Depends on: `@ai-forecasting/engine` (node or mock forecaster).
 
 ## Code Conventions
-- Follow best practices for modern frontend development with React and TypeScript.
-- Pure functions with immutable types preferred where sensible.
-- Commands: `vite, vite build, vitest, playwright test, eslint, prettier, tsc --noEmit` and other standard tools.
-- JSDoc comments on file and function levels for the the why behind complex logic or decisions.
+- Keep CLI thin; business logic lives in the engine. Prefer pure helpers; isolate I/O (stdin/stdout, fs).
+- Label placeholder/heuristic logic explicitly so replacements are intentional.
+- Commands: `npm run build -w packages/cli`, `npm run typecheck -w packages/cli`, `npm test -w packages/cli`; run via `node dist/index.js --input-player <player.jsonl> [--input-state <state.jsonl>] --output-game-master <gm.jsonl> --output-state <new-state.jsonl> [--mock|--no-ai]`.
 
 ## Testing
-- Use Vitest for unit and integration tests. Playwright for end-to-end tests.
-- Cover happy paths, edge cases, error paths.
+- Vitest coverage exists for JSONL helpers; add more integration tests as the interface evolves. <!-- placeholder: expand tests later -->
 
 ## Latency and Performance
-- Follow best practices for web performance optimization.
-- Focus only on hotspots identified via profiling.
-- Optimize only after profiling; document expectations, results, flags in comments near benchmarked code.
-- Document the why behind code changes, e.g. latency impact.
-- The main source of latency is the engine event emitter (time to first event, time to last event), which is mostly due to Gemini API calls (time to first token, time to last token).
+- Network latency comes from the engine’s forecaster (Gemini); CLI itself should stay fast and stream prints promptly.
 
 ## Engine API Contract
-- See `packages/engine/`, in particular `packages/engine/src/types/api.ts`
+- See `packages/engine/src/index.ts` for exports consumed here (`createEngine`, `createNodeForecaster`, `createMockForecaster`, `ScenarioEvent`).
 
-## Deployment
-- The web app is deployed manually to Gemini App aka AI Studio Build as a static bundle. Gemini App automatically inserts a free api key per player as `GEMINI_API_KEY` in the environment, so we don't have to manage keys ourselves besides development.
-- Data is stored client-side only.
+## Deployment / Env
+- Single env name: `GEMINI_API_KEY` (required unless using `--mock`/`--no-ai`). No fallbacks.

@@ -1,28 +1,30 @@
-# AGENTS.md (webapp)
-- Purpose: Frontend, interactive web game
-- Tech stack: Vite + React 18 + TypeScript SPA
-- Depends on: `packages/engine/` for the simulation engine (shared with CLI)
+<!-- Owner review required; drafted by agent on 2025-12-10, adapted from webapp/AGENTS.md -->
+<!-- Diff vs webapp/AGENTS baseline (commit 310c600):
+     - Purpose/depends/tech stack updated to engine library.
+     - Commands changed to engine build/typecheck.
+     - Testing note reflects current Vitest-only coverage.
+     - Latency note points to adapters (Gemini).
+     - API contract link points to engine exports.
+     - Env note keeps single GEMINI_API_KEY. -->
+
+# AGENTS.md (engine)
+- Purpose: Isomorphic simulation engine library shared by webapp and CLI.
+- Tech stack: TypeScript library, ESM output.
+- Depends on: none inside repo; adapters use `@google/genai`.
 
 ## Code Conventions
-- Follow best practices for modern frontend development with React and TypeScript.
-- Pure functions with immutable types preferred where sensible.
-- Commands: `vite, vite build, vitest, playwright test, eslint, prettier, tsc --noEmit` and other standard tools.
-- JSDoc comments on file and function levels for the the why behind complex logic or decisions.
+- Keep core pure (no globals). Forecasters/adapters encapsulate I/O.
+- Label placeholder/heuristic logic explicitly so future changes are reviewed consciously.
+- Commands: `npm run build -w packages/engine`, `npm run typecheck -w packages/engine`.
 
 ## Testing
-- Use Vitest for unit and integration tests. Playwright for end-to-end tests.
-- Cover happy paths, edge cases, error paths.
+- Vitest coverage exists for event validation helpers; expand as engine grows. <!-- placeholder: add more tests later -->
 
 ## Latency and Performance
-- Follow best practices for web performance optimization.
-- Focus only on hotspots identified via profiling.
-- Optimize only after profiling; document expectations, results, flags in comments near benchmarked code.
-- Document the why behind code changes, e.g. latency impact.
-- The main source of latency is the engine event emitter (time to first event, time to last event), which is mostly due to Gemini API calls (time to first token, time to last token).
+- Engine core is lightweight; latency is dominated by forecaster adapters (Gemini calls). Optimizations should live in adapters (chunking, retries, caching) and be documented at the call site.
 
 ## Engine API Contract
-- See `packages/engine/`, in particular `packages/engine/src/types/api.ts`
+- See `packages/engine/src/types.ts` and `packages/engine/src/index.ts` exports (`createEngine`, `Forecaster`, `ScenarioEvent`, `MATERIALS`, etc.).
 
-## Deployment
-- The web app is deployed manually to Gemini App aka AI Studio Build as a static bundle. Gemini App automatically inserts a free api key per player as `GEMINI_API_KEY` in the environment, so we don't have to manage keys ourselves besides development.
-- Data is stored client-side only.
+## Deployment / Env
+- Single env name everywhere: `GEMINI_API_KEY` (no fallbacks). Browser exposure happens via Vite `envPrefix: ['GEMINI_']` in the webapp.
