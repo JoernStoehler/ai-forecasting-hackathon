@@ -1,15 +1,13 @@
-# Deployment to AI Studio (Gemini App) — quick notes
+# Deploying the webapp to AI Studio (Gemini App / Build mode)
 
-- https://ai.google.dev/gemini-api/docs/aistudio-build-mode
-  - Build mode hosts a static front-end; it substitutes `GEMINI_API_KEY` (or `GOOGLE_API_KEY`) at runtime for each viewer.
-  - Keep the placeholder env reference in the code (don’t hardcode real keys); the host injects per-user keys via proxying.
-  - Code is visible to viewers; exporting to other hosts with a real key would expose and bill that key.
-- https://ai.google.dev/tutorials/setup
-  - SDKs expect `GEMINI_API_KEY`; browser usage still requires explicitly passing the key, so the injected placeholder must stay in the build.
-  - Local dev must supply the key manually (e.g., `.env.local`); there is no automatic import from AI Studio when running locally.
+Bullet list of authoritative URLs (open these for details):
+- AI Studio Build mode docs: https://ai.google.dev/gemini-api/docs/aistudio-build-mode
+- API key setup (env var): https://ai.google.dev/tutorials/setup
+- Streaming / responseMimeType usage: https://ai.google.dev/gemini-api/docs/quickstart
 
-Practical rules we follow here
-- Single env name everywhere: `GEMINI_API_KEY` (exposed to Vite via `envPrefix: ['GEMINI_']`).
-- No fallbacks (`VITE_*`, `GOOGLE_API_KEY`, `window.*`) to keep dev/prod symmetry.
-- Static-only deployment; if we ever host elsewhere, add a backend proxy to avoid shipping a real key.
-- Mark any placeholder/heuristic logic explicitly; replace with real logic only when intended.
+Key takeaways (Dec 2025):
+- Build mode keeps `process.env.*` placeholders in the bundled JS; when a user runs the app inside AI Studio, the platform proxies requests and injects **that user’s** Gemini API key at runtime. Shared apps never expose the author’s key; do not hardcode keys.
+- Keep using the same `GEMINI_API_KEY` name in dev and prod. In local dev add it to `.env.local`; in AI Studio the placeholder is auto-injected per viewer.
+- Apps are pure static frontends; no backend. If exporting outside AI Studio (e.g., Vercel), you must supply a key yourself and it will be exposed client-side—avoid for production unless you add a server proxy.
+- Streaming works with `generateContentStream` and `responseMimeType: 'application/json'`/`responseSchema`; matches what the webapp uses.
+- Security: never commit real keys; assume anyone you share the AI Studio app with can read your source but not your key. Restrict keys and rotate if leaked.

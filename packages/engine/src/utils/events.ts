@@ -1,15 +1,15 @@
 import { ICON_SET } from '../constants';
-import type { ScenarioEvent } from '../types';
+import type { EngineEvent, NewsEvent, ScenarioEvent } from '../types';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const ICONS = new Set<string>(ICON_SET);
 
-export function isScenarioEvent(value: unknown): value is ScenarioEvent {
+export function isNewsEvent(value: unknown): value is NewsEvent {
   if (typeof value !== 'object' || value === null) {
     return false;
   }
 
-  const candidate = value as Partial<ScenarioEvent>;
+  const candidate = value as Partial<NewsEvent>;
 
   return (
     typeof candidate.date === 'string' &&
@@ -25,24 +25,26 @@ export function isScenarioEvent(value: unknown): value is ScenarioEvent {
 }
 
 export function coerceScenarioEvents(payload: unknown, context: string): ScenarioEvent[] {
-  if (!Array.isArray(payload) || !payload.every(isScenarioEvent)) {
+  if (!Array.isArray(payload) || !payload.every(isNewsEvent)) {
     throw new Error(`Invalid ScenarioEvent payload from ${context}.`);
   }
   return sortAndDedupEvents(payload);
 }
 
-export function sortAndDedupEvents(events: ScenarioEvent[]): ScenarioEvent[] {
-  const deduped = new Map<string, ScenarioEvent>();
+export function sortAndDedupEvents<T extends EngineEvent>(events: T[]): T[] {
+  const deduped = new Map<string, EngineEvent>();
   events.forEach(event => {
-    const key = `${event.date}-${event.title}`.toLowerCase();
-    deduped.set(key, event);
+    const key = event.type === 'story-opened'
+      ? `story-opened-${event.refId}-${event.date}`
+      : `news-${event.date}-${event.title}`.toLowerCase();
+    deduped.set(key, normalizeEvent(event));
   });
   return [...deduped.values()].sort(
-    (a, b) => a.date.localeCompare(b.date) || a.title.localeCompare(b.title)
-  );
+    (a, b) => a.date.localeCompare(b.date) || getTitle(a).localeCompare(getTitle(b))
+  ) as T[];
 }
 
-export function nextDateAfter(history: ScenarioEvent[]): string {
+export function nextDateAfter(history: EngineEvent[]): string {
   if (history.length === 0) {
     return new Date().toISOString().split('T')[0];
   }
@@ -60,3 +62,34 @@ export function assertChronology(history: ScenarioEvent[], additions: ScenarioEv
     throw new Error(`Model returned an event with a past date: ${invalid.date}`);
   }
 }
+
+function normalizeEvent(event: EngineEvent): EngineEvent {
+  if (event.type === 'story-opened') {
+    return {
+      ...event,
+      type: 'story-opened',
+      id: event.id ?? `story-opened-${event.refId}-${event.date}`,
+    };
+  }
+  const news = event as NewsEvent;
+  return {
+    ...news,
+    type: news.type ?? 'news',
+    id: news.id ?? `news-${news.date}-${slug(news.title)}`,
+  };
+}
+
+function slug(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
+}
+
+function getTitle(event: EngineEvent): string {
+  return event.type === 'story-opened' ? `story-opened-${event.refId}` : event.title;
+}
+
+// Back-compat alias for existing callers.
+export const isScenarioEvent = isNewsEvent;

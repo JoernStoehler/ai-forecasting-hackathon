@@ -1,6 +1,5 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { coerceScenarioEvents, MATERIALS, preparePrompt, PreparedPromptSchema, type ScenarioEvent } from '@ai-forecasting/engine';
-import { z } from 'zod';
 
 // Builds a self-contained prompt.json (with inlined materials) for later call/replay.
 // OPEN QUESTION: owner to confirm contents shape (string vs Content[]); see PreparedPrompt comment in engine.

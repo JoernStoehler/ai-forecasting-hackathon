@@ -1,4 +1,4 @@
-import type { Forecaster, ForecasterContext, ForecasterOptions } from '../types.js';
+import type { Forecaster, ForecasterContext, ScenarioEvent } from '../types.js';
 import { nextDateAfter } from '../utils/events.js';
 
 export interface MockForecasterOptions {
@@ -11,7 +11,7 @@ export function createMockForecaster(opts: MockForecasterOptions = {}): Forecast
 
   return {
     name: 'mock',
-    async forecast(context: ForecasterContext, _options?: ForecasterOptions) {
+    async forecast(context: ForecasterContext): Promise<ScenarioEvent[]> {
       const nextDate = nextDateAfter(context.history);
       // PLACEHOLDER LOGIC: deterministic single event to keep flows testable without real AI.
       return [

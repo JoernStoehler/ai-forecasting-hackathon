@@ -9,6 +9,9 @@ export {
 } from './utils/events.js';
 export type {
   ScenarioEvent,
+  EngineEvent,
+  NewsEvent,
+  NewsStoryOpenedEvent,
   Forecaster,
   ForecasterContext,
   ForecasterOptions,
@@ -18,6 +21,9 @@ export type {
   PreparedPrompt,
 } from './types.js';
 export {
+  NewsEventSchema,
+  NewsStoryOpenedEventSchema,
+  EngineEventSchema,
   ScenarioEventSchema,
   ScenarioEventArraySchema,
   PreparedPromptSchema,

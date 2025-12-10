@@ -1,6 +1,8 @@
-import { GoogleGenAI, Type } from '@google/genai';
-import type { Forecaster, ForecasterContext, ForecasterOptions } from '../types.js';
-import { coerceScenarioEvents, assertChronology } from '../utils/events.js';
+import { GoogleGenAI } from '@google/genai';
+import type { Forecaster, ForecasterContext, ForecasterOptions, ScenarioEvent } from '../types.js';
+import { streamGeminiRaw, type GenAIClient } from '../forecaster/geminiStreaming.js';
+import { parseActionChunk } from '../forecaster/streamingPipeline.js';
+import { isNewsEvent } from '../utils/events.js';
 
 interface BrowserForecasterConfig {
   apiKey: string | undefined;
@@ -22,49 +24,15 @@ export function createBrowserForecaster(config: BrowserForecasterConfig): Foreca
         throw new Error('GEMINI_API_KEY is missing. Add it to your .env.local or hosting env.');
       }
 
-      // PLACEHOLDER LOGIC: straight request/response; no chunking, no retries.
-      const response = await ai.models.generateContent({
-        model,
-        contents: JSON.stringify(context.history, null, 2),
-        config: {
-          systemInstruction: context.systemPrompt,
-          responseMimeType: 'application/json',
-          responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                date: { type: Type.STRING },
-                icon: { type: Type.STRING },
-                title: { type: Type.STRING },
-                description: { type: Type.STRING },
-                postMortem: { type: Type.BOOLEAN },
-              },
-              required: ['date', 'icon', 'title', 'description'],
-            },
-          },
-          ...normalizeOptions(options),
-        },
-      });
-
-      const text = typeof response.text === 'string' ? response.text.trim() : '';
-      if (!text) {
-        throw new Error('Gemini response did not include text content.');
+      // Only send news events to the model; UI events like story-opened are omitted.
+      let history = context.history.filter(isNewsEvent) as ScenarioEvent[];
+      const events: ScenarioEvent[] = [];
+      for await (const raw of streamGeminiRaw({ client: ai as unknown as GenAIClient, model, history, systemPrompt: context.systemPrompt, options })) {
+        const { events: batch, nextHistory } = parseActionChunk({ actionsJsonl: raw }, history);
+        events.push(...batch);
+        history = nextHistory;
       }
-
-      const newEvents = coerceScenarioEvents(JSON.parse(text), 'Gemini response');
-      assertChronology(context.history, newEvents);
-      return newEvents;
+      return events;
     },
-  };
-}
-
-function normalizeOptions(options?: ForecasterOptions) {
-  if (!options) return undefined;
-  const { temperature, seed, maxEvents } = options;
-  return {
-    ...(temperature !== undefined ? { temperature } : {}),
-    ...(seed !== undefined ? { seed } : {}),
-    ...(maxEvents !== undefined ? { maxOutputTokens: Math.max(256, maxEvents * 128) } : {}),
   };
 }
