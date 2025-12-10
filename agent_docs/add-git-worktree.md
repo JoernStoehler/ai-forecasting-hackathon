@@ -1,6 +1,5 @@
 # Add a Git Worktree
-# Add a Git Worktree
-<!-- REVIEW: check paths/flags align with your preferred workflow. -->
-- Create: `scripts/worktree-new.sh <path> <branch>` (add `--force` to skip clean/up-to-date checks).
-- Remove: `scripts/worktree-remove.sh <path> [--force]`.
-- Worktrees mount at `/workspaces/worktrees` in the container (`/srv/devworktrees/ai-forecasting-hackathon/worktrees` on host).
+- We isolate the workdirs of agents using Git worktrees.
+- Creation: `scripts/worktree-new.sh <path> <branch> [--force]`: validates, adds worktree and branch from `main`, hydrates toolchains.
+- Removal: `scripts/worktree-remove.sh <path> [--force]`: validates, removes worktree and branch.
+- List: `git worktree list`
