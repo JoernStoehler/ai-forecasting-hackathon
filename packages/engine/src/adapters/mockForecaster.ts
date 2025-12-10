@@ -16,6 +16,8 @@ export function createMockForecaster(opts: MockForecasterOptions = {}): Forecast
       // PLACEHOLDER LOGIC: deterministic single event to keep flows testable without real AI.
       return [
         {
+          type: 'news-published',
+          id: `mock-${nextDate}`,
           date: nextDate,
           icon: 'BrainCircuit',
           title: `${label} forecast event`,

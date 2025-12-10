@@ -2,7 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import type { Forecaster, ForecasterContext, ForecasterOptions, ScenarioEvent } from '../types.js';
 import { streamGeminiRaw, type GenAIClient } from '../forecaster/geminiStreaming.js';
 import { parseActionChunk } from '../forecaster/streamingPipeline.js';
-import { isNewsEvent } from '../utils/events.js';
+import { isNewsPublishedEvent } from '../utils/events.js';
 
 interface NodeForecasterConfig {
   apiKey?: string;
@@ -25,12 +25,13 @@ export function createNodeForecaster(config: NodeForecasterConfig = {}): Forecas
       }
 
       // Only send news events to the model; UI events like story-opened are omitted.
-      let history = context.history.filter(isNewsEvent) as ScenarioEvent[];
+      let history = context.history.filter(isNewsPublishedEvent) as ScenarioEvent[];
       const events: ScenarioEvent[] = [];
       for await (const raw of streamGeminiRaw({ client: ai as unknown as GenAIClient, model, history, systemPrompt: context.systemPrompt, options })) {
         const { events: batch, nextHistory } = parseActionChunk({ actionsJsonl: raw }, history);
-        events.push(...batch);
-        history = nextHistory;
+        const newsOnly = batch.filter(isNewsPublishedEvent) as ScenarioEvent[];
+        events.push(...newsOnly);
+        history = nextHistory.filter(isNewsPublishedEvent) as ScenarioEvent[];
       }
       return events;
     },

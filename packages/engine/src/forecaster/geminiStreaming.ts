@@ -1,6 +1,6 @@
 import { Type } from '@google/genai';
 import type { GenerateContentConfig } from '@google/genai';
-import type { ScenarioEvent, ForecasterOptions } from '../types.js';
+import type { ForecasterOptions, NewsPublishedEvent } from '../types.js';
 
 export type GenAIClient = {
   models: {
@@ -15,7 +15,7 @@ export type GenAIClient = {
 interface StreamParams {
   client: GenAIClient;
   model: string;
-  history: ScenarioEvent[];
+  history: NewsPublishedEvent[];
   systemPrompt: string;
   options?: ForecasterOptions;
 }
@@ -38,13 +38,15 @@ export async function* streamGeminiRaw(params: StreamParams): AsyncGenerator<str
         items: {
           type: Type.OBJECT,
           properties: {
+            type: { type: Type.STRING },
+            id: { type: Type.STRING },
             date: { type: Type.STRING },
             icon: { type: Type.STRING },
             title: { type: Type.STRING },
             description: { type: Type.STRING },
             postMortem: { type: Type.BOOLEAN },
           },
-          required: ['date', 'icon', 'title', 'description'],
+          required: ['type', 'date', 'icon', 'title', 'description'],
         },
       },
       ...normalizeOptions(options),

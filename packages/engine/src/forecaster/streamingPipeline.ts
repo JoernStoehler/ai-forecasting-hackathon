@@ -1,19 +1,20 @@
-import { ScenarioEventArraySchema } from '../schemas.js';
-import type { ScenarioEvent } from '../types.js';
+import { CommandArraySchema } from '../schemas.js';
+import type { Command, EngineEvent, PublishNewsCommand } from '../types.js';
+import { normalizePublishNews } from '../utils/normalize.js';
 
 export interface ActionBatch {
   actionsJsonl: string; // raw JSONL text chunk containing 1..n actions
 }
 
 export interface ParseResult {
-  events: ScenarioEvent[];
-  nextHistory: ScenarioEvent[];
-  nextState: ScenarioEvent[]; // placeholder; refine when state structure is expanded
+  events: EngineEvent[];
+  nextHistory: EngineEvent[];
+  nextState: EngineEvent[]; // placeholder; refine when state structure is expanded
 }
 
 /**
  * Streaming parser (HELLO-WORLD PLACEHOLDER):
- * - Expects JSON/JSONL of ScenarioEvents; 1 action ≙ 1 event for now.
+ * - Expects JSON/JSONL of Commands; 1 publish-news command ≙ 1 NewsPublished event.
  * - Validates each chunk with zod; no recovery or per-event state feedback yet.
  * - Emits once per chunk; nextState mirrors history until richer aggregates exist.
  *
@@ -25,7 +26,7 @@ export interface ParseResult {
  *   - UI state is ephemeral (React-only); reducible from history + defaults; may also
  *     respond to UI-only actions without emitting engine events.
  */
-export function parseActionChunk(chunk: ActionBatch, history: ScenarioEvent[]): ParseResult {
+export function parseActionChunk(chunk: ActionBatch, history: EngineEvent[]): ParseResult {
   const text = chunk.actionsJsonl.trim();
   if (!text) {
     return { events: [], nextHistory: history, nextState: history };
@@ -40,11 +41,26 @@ export function parseActionChunk(chunk: ActionBatch, history: ScenarioEvent[]): 
     parsed = JSON.parse(text);
   }
 
-  const events = ScenarioEventArraySchema.parse(parsed);
+  const commands = CommandArraySchema.parse(parsed) as Command[];
+  const events = commands.flatMap(commandToEvents);
   const nextHistory = [...history, ...events];
   return {
     events,
     nextHistory,
     nextState: nextHistory, // placeholder until richer state exists
   };
+}
+
+function commandToEvents(cmd: Command): EngineEvent[] {
+  if (cmd.type === 'publish-news') {
+    const news = normalizePublishNews(cmd as PublishNewsCommand);
+    return [news];
+  }
+  if (cmd.type === 'open-story') {
+    return [{ type: 'story-opened', id: cmd.refId, date: cmd.date }];
+  }
+  if (cmd.type === 'close-story') {
+    return [{ type: 'story-closed', id: cmd.refId, date: cmd.date }];
+  }
+  return [];
 }

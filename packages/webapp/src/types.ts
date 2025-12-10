@@ -1,9 +1,1 @@
-import type { IconName } from '@ai-forecasting/engine';
-
-export interface ScenarioEvent {
-  date: string; // YYYY-MM-DD
-  icon: IconName; // Lucide icon name
-  title: string;
-  description: string;
-  postMortem?: boolean; // hidden until the scenario enters post-mortem mode
-}
+export type { NewsPublishedEvent as ScenarioEvent } from '@ai-forecasting/engine';

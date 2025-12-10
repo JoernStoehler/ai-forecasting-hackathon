@@ -10,8 +10,15 @@ export {
 export type {
   ScenarioEvent,
   EngineEvent,
-  NewsEvent,
-  NewsStoryOpenedEvent,
+  Command,
+  PublishNewsCommand,
+  OpenStoryCommand,
+  CloseStoryCommand,
+  NewsPublishedEvent,
+  StoryOpenedEvent,
+  StoryClosedEvent,
+  TurnStartedEvent,
+  TurnFinishedEvent,
   Forecaster,
   ForecasterContext,
   ForecasterOptions,
@@ -21,8 +28,16 @@ export type {
   PreparedPrompt,
 } from './types.js';
 export {
-  NewsEventSchema,
-  NewsStoryOpenedEventSchema,
+  PublishNewsCommandSchema,
+  OpenStoryCommandSchema,
+  CloseStoryCommandSchema,
+  CommandSchema,
+  CommandArraySchema,
+  NewsPublishedEventSchema,
+  StoryOpenedEventSchema,
+  StoryClosedEventSchema,
+  TurnStartedEventSchema,
+  TurnFinishedEventSchema,
   EngineEventSchema,
   ScenarioEventSchema,
   ScenarioEventArraySchema,
@@ -31,10 +46,11 @@ export {
 export { createBrowserForecaster } from './adapters/geminiBrowserForecaster.js';
 export { createNodeForecaster } from './adapters/geminiNodeForecaster.js';
 export { createMockForecaster } from './adapters/mockForecaster.js';
-import type { EngineConfig as Config, EngineApi, ScenarioEvent } from './types.js';
+import type { EngineConfig as Config, EngineApi, EngineEvent } from './types.js';
 import { coerceScenarioEvents, sortAndDedupEvents, nextDateAfter, assertChronology } from './utils/events.js';
 import type { AggregatedState, PreparedPrompt } from './types.js';
 import type { GenerateContentConfig, Content } from '@google/genai';
+import { projectPrompt } from './utils/promptProjector.js';
 
 /**
  * Minimal orchestrator: given a forecaster, provide helper methods to run forecasts
@@ -66,24 +82,29 @@ export function createEngine(config: Config): EngineApi {
  * State is intentionally re-derivable; we will add richer derived fields later
  * (indexes, hashes) once the prompt/state contract is confirmed.
  */
-export function aggregate(history: ScenarioEvent[]): AggregatedState {
+export function aggregate(history: EngineEvent[]): AggregatedState {
   const events = sortAndDedupEvents(history);
-  const latestDate = events.length ? events[events.length - 1].date : null;
+  const dateCandidates = events
+    .map(evt => ('date' in evt ? (evt as { date: string }).date : evt.type === 'turn-started' || evt.type === 'turn-finished' ? evt.from : null))
+    .filter((d): d is string => !!d)
+    .sort();
+  const latestDate = dateCandidates.length ? dateCandidates[dateCandidates.length - 1] : null;
   return { events, latestDate, eventCount: events.length };
 }
 
 /**
  * Builds a self-contained prompt object ready for generateContent.
  * Materials are inlined into systemInstruction. contents is a structured Content[]
- * (history as user text) so the saved prompt is generateContent/Stream-ready.
+ * with projected timeline/dynamic blocks so the saved prompt is generateContent/Stream-ready.
  */
 export function preparePrompt(options: {
   model: string;
   systemPrompt: string;
-  history: ScenarioEvent[];
+  history: EngineEvent[];
   materials: { id: string; title: string; body: string }[];
 }): PreparedPrompt {
   const { model, systemPrompt, history, materials } = options;
+  const projection = projectPrompt({ history });
   const config: GenerateContentConfig = {
     systemInstruction: [systemPrompt, ...materials.map(m => `\n[MATERIAL:${m.id}]\n${m.body}`)].join('\n'),
     responseMimeType: 'application/json',
@@ -91,7 +112,7 @@ export function preparePrompt(options: {
   const contents: Content[] = [
     {
       role: 'user',
-      parts: [{ text: JSON.stringify(history, null, 2) }],
+      parts: [{ text: projection }],
     },
   ];
   const request = {
