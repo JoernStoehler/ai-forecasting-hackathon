@@ -1,22 +1,26 @@
 {
+  // see also:
+  // - .vscode/ai-forecasting-hackathon.code-workspace
+  // - .devcontainer/Dockerfile
+  // - scripts/devcontainer-post-create.sh
   "name": "ai-forecasting-hackathon",
-  "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "postCreateCommand": "npm run post-create",
-  "postStartCommand": "bash scripts/post-start.sh",
-  "customizations": {
-    "codespaces": {
-      "openFiles": [
-        "README.md",
-        "AGENTS.md"
-      ]
-    },
-    "vscode": {
-      "extensions": [
-        "openai.chatgpt",
-        "vitest.explorer",
-        "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode"
-      ]
-    }
-  }
+  "dockerFile": "Dockerfile",
+  "workspaceFolder": "/workspaces/ai-forecasting-hackathon",
+  "updateRemoteUserUID": true,
+  "postCreateCommand": "bash scripts/devcontainer-post-create.sh",
+  "containerEnv": {
+    "LOCAL_DEVCONTAINER": "true",
+    "HISTFILE": "/home/vscode/.bash_history_dir/.bash_history",
+    "NPM_CONFIG_CACHE": "/home/vscode/.cache/npm",
+    "PLAYWRIGHT_BROWSERS_PATH": "/home/vscode/.cache/ms-playwright"
+  },
+  "mounts": [
+    "source=/srv/devhome/.codex,target=/home/vscode/.codex,type=bind,consistency=cached",
+    "source=/srv/devhome/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached",
+    "source=/srv/devhome/.bash_history_dir,target=/home/vscode/.bash_history_dir,type=bind,consistency=cached",
+    "source=/srv/devhome/.cache/npm,target=/home/vscode/.cache/npm,type=bind,consistency=cached",
+    "source=/srv/devhome/.cache/vite,target=/home/vscode/.cache/vite,type=bind,consistency=cached",
+    "source=/srv/devhome/.cache/ms-playwright,target=/home/vscode/.cache/ms-playwright,type=bind,consistency=cached",
+    "source=/srv/devworktrees/ai-forecasting-hackathon/worktrees,target=/workspaces/worktrees,type=bind,consistency=cached"
+  ]
 }

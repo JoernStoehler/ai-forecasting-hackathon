@@ -4,28 +4,31 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
+  {
+    ignores: ['**/node_modules', '**/dist']
+  },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['src/**/*.{ts,tsx}'],
+    files: ['packages/webapp/src/**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 'latest',
-      sourceType: 'module',
+      sourceType: 'module'
     },
     plugins: {
       react,
-      'react-hooks': reactHooks,
+      'react-hooks': reactHooks
     },
     settings: {
       react: {
-        version: 'detect',
-      },
+        version: 'detect'
+      }
     },
     rules: {
       ...react.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
       'react/jsx-uses-react': 'off',
-      'react/react-in-jsx-scope': 'off',
-    },
+      'react/react-in-jsx-scope': 'off'
+    }
   }
 );

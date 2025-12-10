@@ -15,4 +15,16 @@ export default defineConfig({
       '@': srcDir,
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          lucide: ['lucide-react'],
+          genai: ['@google/genai'],
+          vibe: ['vibe-kanban-web-companion'],
+        },
+      },
+    },
+  },
 });
