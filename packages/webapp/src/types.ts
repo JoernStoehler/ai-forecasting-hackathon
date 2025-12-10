@@ -1,4 +1,4 @@
-import type { IconName } from './constants';
+import type { IconName } from '@ai-forecasting/engine';
 
 export interface ScenarioEvent {
   date: string; // YYYY-MM-DD

@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "declaration": false,
+    "declarationMap": false,
+    "composite": false,
+    "noEmit": false,
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@ai-forecasting/engine": ["../engine/dist/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*", "test/**/*"]
+}

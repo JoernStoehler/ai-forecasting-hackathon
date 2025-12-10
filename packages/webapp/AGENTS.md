@@ -1,7 +1,7 @@
 # AGENTS.md (webapp)
 - Purpose: Frontend, interactive web game
 - Tech stack: Vite + React 18 + TypeScript SPA
-- Depends on: `packages/engine/` for the simulation engine
+- Depends on: `packages/engine/` for the simulation engine (shared with CLI)
 
 ## Code Conventions
 - Follow best practices for modern frontend development with React and TypeScript.

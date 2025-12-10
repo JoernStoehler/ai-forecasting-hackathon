@@ -5,13 +5,12 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { ScenarioEvent } from './types';
 import { INITIAL_EVENTS } from './data';
-import { SYSTEM_PROMPT } from './constants';
+import { coerceScenarioEvents, sortAndDedupEvents } from '@ai-forecasting/engine';
 import { getAiForecast } from './services/geminiService';
 import { Header } from './components/Header';
 import { Timeline } from './components/Timeline';
 import { ComposePanel } from './components/ComposePanel';
 import { Toast } from './components/Toast';
-import { coerceScenarioEvents, sortAndDedupEvents } from './utils/events';
 
 const STORAGE_KEY = 'takeoff-timeline-events';
 
@@ -52,7 +51,7 @@ function App() {
     setError(null);
     setEvents(historyWithUserEvent);
     try {
-      const forecastEvents = await getAiForecast(historyWithUserEvent, SYSTEM_PROMPT);
+      const forecastEvents = await getAiForecast(historyWithUserEvent);
       setEvents(prevEvents => sortAndDedupEvents([...prevEvents, ...forecastEvents]));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');

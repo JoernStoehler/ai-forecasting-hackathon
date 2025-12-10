@@ -1,0 +1,21 @@
+{
+  "name": "@ai-forecasting/cli",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "takeoff": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@ai-forecasting/engine": "^0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.2",
+    "vitest": "^2.1.3"
+  }
+}

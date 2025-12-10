@@ -1,0 +1,28 @@
+import type { Forecaster, ForecasterContext, ForecasterOptions } from '../types.js';
+import { nextDateAfter } from '../utils/events.js';
+
+export interface MockForecasterOptions {
+  /** Title prefix to make it obvious this is synthetic. */
+  label?: string;
+}
+
+export function createMockForecaster(opts: MockForecasterOptions = {}): Forecaster {
+  const label = opts.label ?? 'MOCK';
+
+  return {
+    name: 'mock',
+    async forecast(context: ForecasterContext, _options?: ForecasterOptions) {
+      const nextDate = nextDateAfter(context.history);
+      // PLACEHOLDER LOGIC: deterministic single event to keep flows testable without real AI.
+      return [
+        {
+          date: nextDate,
+          icon: 'BrainCircuit',
+          title: `${label} forecast event`,
+          description: 'Placeholder forecast — replace with real model output when running with Gemini.',
+          postMortem: false,
+        },
+      ];
+    },
+  };
+}
