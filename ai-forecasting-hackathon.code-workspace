@@ -14,8 +14,10 @@
   },
   "extensions": {
     "recommendations": [
+      "openai.chatgpt",
       "dbaeumer.vscode-eslint",
-      "esbenp.prettier-vscode"
+      "esbenp.prettier-vscode",
+      "vitest.explorer"
     ]
   }
 }
