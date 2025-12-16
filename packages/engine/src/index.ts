@@ -46,6 +46,13 @@ export {
 export { createBrowserForecaster } from './adapters/geminiBrowserForecaster.js';
 export { createNodeForecaster } from './adapters/geminiNodeForecaster.js';
 export { createMockForecaster } from './adapters/mockForecaster.js';
+export { createReplayForecaster } from './adapters/replayForecaster.js';
+export {
+  loadReplayTape,
+  createReplayGenAIClient,
+  createRecordingGenAIClient,
+} from './forecaster/replayClient.js';
+export type { ReplayTape, ReplayChunk } from './forecaster/replayTypes.js';
 import type { EngineConfig as Config, EngineApi, EngineEvent } from './types.js';
 import { coerceScenarioEvents, sortAndDedupEvents, nextDateAfter, assertChronology } from './utils/events.js';
 import type { AggregatedState, PreparedPrompt } from './types.js';

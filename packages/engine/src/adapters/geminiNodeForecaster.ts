@@ -7,6 +7,8 @@ import { isNewsPublishedEvent } from '../utils/events.js';
 interface NodeForecasterConfig {
   apiKey?: string;
   model?: string;
+  /** Optional custom client (e.g., replay/recording). */
+  client?: GenAIClient;
 }
 
 const DEFAULT_MODEL = 'gemini-2.5-flash';
@@ -15,7 +17,7 @@ export function createNodeForecaster(config: NodeForecasterConfig = {}): Forecas
   const apiKey = config.apiKey ?? process.env.GEMINI_API_KEY;
   const model = config.model ?? DEFAULT_MODEL;
 
-  const ai = new GoogleGenAI({ apiKey: apiKey ?? '' });
+  const ai = config.client ?? (new GoogleGenAI({ apiKey: apiKey ?? '' }) as unknown as GenAIClient);
 
   return {
     name: 'gemini-node',

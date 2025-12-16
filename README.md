@@ -1,6 +1,6 @@
 # AI Forecasting Hackathon
 
-Vite + React 19 + TypeScript SPA for immersive scenario forecasting with Gemini 2.5 Flash. Client-only data (localStorage + JSON import/export); deploy as a static bundle (Gemini App later).
+Vite + React 18 + TypeScript SPA for immersive scenario forecasting with Gemini 2.5 Flash. Client-only data (localStorage + JSON import/export); deploy as a static bundle (Gemini App later).
 
 ## Quick Start
 1. Open in the devcontainer (post-create installs deps and runs `scripts/hello.sh`).
