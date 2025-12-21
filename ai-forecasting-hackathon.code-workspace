@@ -1,7 +1,10 @@
 {
   "folders": [
     {
-      "path": "."
+      "path": "/workspaces/ai-forecasting-hackathon"
+    },
+    {
+      "path": "/workspaces/worktrees"
     }
   ],
   "settings": {
