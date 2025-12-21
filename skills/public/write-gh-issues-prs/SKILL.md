@@ -1,3 +1,8 @@
+---
+name: write-gh-issues-prs
+description: Write GitHub issues and PRs for this repo with the established conventions. Use when drafting issue or PR content or guidance.
+---
+
 ## Writing GitHub Issues and PRs
 - We use GitHub issues and PRs to coordinate work between agents and the project owner.
 - Best practices with regards to content are explained in the templates: `.github/ISSUE_TEMPLATE/task.md`, `.github/PULL_REQUEST_TEMPLATE.md`.
