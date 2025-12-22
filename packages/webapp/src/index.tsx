@@ -1,11 +1,10 @@
 
 /**
- * Mounts the React tree plus <VibeKanbanWebCompanion />.
+ * Mounts the React tree.
  * Keep this file minimal so Gemini App embeds remain predictable.
  */
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { VibeKanbanWebCompanion } from 'vibe-kanban-web-companion';
 import App from './App';
 import './index.css';
 
@@ -18,6 +17,5 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <React.StrictMode>
     <App />
-    <VibeKanbanWebCompanion />
   </React.StrictMode>
 );

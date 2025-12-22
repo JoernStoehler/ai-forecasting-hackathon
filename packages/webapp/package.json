@@ -10,15 +10,13 @@
     "lint": "eslint src --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
     "check": "npm run lint && npm run typecheck && npm run build",
-    "vk": "npx -y vibe-kanban@latest",
     "test:e2e": "playwright test"
   },
   "dependencies": {
     "@ai-forecasting/engine": "^0.1.0",
     "lucide-react": "^0.552.0",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "vibe-kanban-web-companion": "^0.0.5"
+    "react-dom": "^18.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",

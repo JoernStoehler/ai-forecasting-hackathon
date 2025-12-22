@@ -23,7 +23,6 @@ export default defineConfig({
           react: ['react', 'react-dom'],
           lucide: ['lucide-react'],
           genai: ['@google/genai'],
-          vibe: ['vibe-kanban-web-companion'],
         },
       },
     },
