@@ -1,1 +1,1 @@
-export type { NewsPublishedEvent as ScenarioEvent } from '@ai-forecasting/engine';
+export type { EngineEvent, ScenarioEvent } from '@ai-forecasting/engine';

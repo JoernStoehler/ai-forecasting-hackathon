@@ -19,9 +19,10 @@ describe('runParse', () => {
         description: 'Test description',
       },
       {
-        type: 'open-story',
-        refId: 'story-1',
-        date: '2025-01-02',
+        type: 'patch-news',
+        targetId: 'news-2025-01-02-test-headline',
+        date: '2025-01-03',
+        patch: { title: 'Updated headline' },
       },
     ];
 
@@ -37,9 +38,9 @@ describe('runParse', () => {
       title: 'Test headline',
     });
     expect(events[1]).toMatchObject({
-      type: 'story-opened',
-      id: 'story-1',
-      date: '2025-01-02',
+      type: 'news-patched',
+      targetId: 'news-2025-01-02-test-headline',
+      date: '2025-01-03',
     });
   });
 });

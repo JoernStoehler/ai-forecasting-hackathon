@@ -34,16 +34,15 @@ const highlightText = (text: string, highlight: string) => {
 
 export const EventItem: React.FC<EventItemProps> = ({ event, searchQuery = '', isLast }) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const isPostMortem = event.postMortem === true;
 
   return (
     <div className="flex items-start">
       {/* Icon Gutter */}
       <div className="w-12 flex-shrink-0 flex justify-center pt-1">
-        <div className={`p-1 rounded-full ${isPostMortem ? 'bg-amber-100' : 'bg-beige-50'}`}>
+        <div className="p-1 rounded-full bg-beige-50">
           <Icon
             name={event.icon}
-            className={`w-5 h-5 ${isPostMortem ? 'text-amber-700' : 'text-stone-600'}`}
+            className="w-5 h-5 text-stone-600"
           />
         </div>
       </div>
@@ -55,17 +54,12 @@ export const EventItem: React.FC<EventItemProps> = ({ event, searchQuery = '', i
         aria-expanded={isExpanded}
       >
         <div className="flex items-center gap-2 pt-1">
-          <h3 className={`font-medium leading-tight ${isPostMortem ? 'text-amber-800' : 'text-stone-800'}`}>
+          <h3 className="font-medium leading-tight text-stone-800">
             {highlightText(event.title, searchQuery)}
           </h3>
-          {isPostMortem && (
-            <span className="text-xs font-semibold uppercase tracking-wide text-amber-700">
-              Post-Mortem
-            </span>
-          )}
         </div>
         {isExpanded && (
-          <div className={`mt-2 leading-relaxed ${isPostMortem ? 'text-amber-900' : 'text-stone-600'}`}>
+          <div className="mt-2 leading-relaxed text-stone-600">
             {highlightText(event.description, searchQuery)}
           </div>
         )}

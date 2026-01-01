@@ -2,23 +2,28 @@ export { SYSTEM_PROMPT, ICON_SET, type IconName } from './constants.js';
 export { INITIAL_EVENTS } from './data/index.js';
 export { MATERIALS, type MaterialDoc } from './data/materials.js';
 export {
+  coerceEngineEvents,
   coerceScenarioEvents,
   sortAndDedupEvents,
   nextDateAfter,
   assertChronology,
+  applyNewsPatches,
 } from './utils/events.js';
-export { normalizePublishNews } from './utils/normalize.js';
+export { normalizePublishNews, normalizePublishHiddenNews, normalizePatchNews } from './utils/normalize.js';
 export { stripHtmlComments, stripCommentsFromMaterials } from './utils/materials.js';
 export type {
   ScenarioEvent,
   EngineEvent,
   Command,
   PublishNewsCommand,
-  OpenStoryCommand,
-  CloseStoryCommand,
+  PublishHiddenNewsCommand,
+  PatchNewsCommand,
+  GameOverCommand,
   NewsPublishedEvent,
-  StoryOpenedEvent,
-  StoryClosedEvent,
+  HiddenNewsPublishedEvent,
+  NewsPatchedEvent,
+  ScenarioHeadCompletedEvent,
+  GameOverEvent,
   TurnStartedEvent,
   TurnFinishedEvent,
   Forecaster,
@@ -31,13 +36,16 @@ export type {
 } from './types.js';
 export {
   PublishNewsCommandSchema,
-  OpenStoryCommandSchema,
-  CloseStoryCommandSchema,
+  PublishHiddenNewsCommandSchema,
+  PatchNewsCommandSchema,
+  GameOverCommandSchema,
   CommandSchema,
   CommandArraySchema,
   NewsPublishedEventSchema,
-  StoryOpenedEventSchema,
-  StoryClosedEventSchema,
+  HiddenNewsPublishedEventSchema,
+  NewsPatchedEventSchema,
+  ScenarioHeadCompletedEventSchema,
+  GameOverEventSchema,
   TurnStartedEventSchema,
   TurnFinishedEventSchema,
   EngineEventSchema,
@@ -50,7 +58,7 @@ export { createNodeForecaster } from './adapters/geminiNodeForecaster.js';
 export { createMockForecaster } from './adapters/mockForecaster.js';
 export type { ReplayTape, ReplayChunk } from './forecaster/replayTypes.js';
 import type { EngineConfig as Config, EngineApi, EngineEvent } from './types.js';
-import { coerceScenarioEvents, sortAndDedupEvents, nextDateAfter, assertChronology } from './utils/events.js';
+import { coerceEngineEvents, sortAndDedupEvents, nextDateAfter, assertChronology } from './utils/events.js';
 import type { AggregatedState, PreparedPrompt } from './types.js';
 import type { GenerateContentConfig, Content } from '@google/genai';
 import { projectPrompt } from './utils/promptProjector.js';
@@ -67,7 +75,7 @@ export function createEngine(config: Config): EngineApi {
   return {
     async forecast(history, options) {
       const forecastEvents = await forecaster.forecast({ history, systemPrompt: systemPrompt ?? '' }, options);
-      const validated = coerceScenarioEvents(forecastEvents, forecaster.name);
+      const validated = coerceEngineEvents(forecastEvents, forecaster.name);
       assertChronology(history, validated);
       return validated;
     },
@@ -77,7 +85,7 @@ export function createEngine(config: Config): EngineApi {
     nextDate(history) {
       return nextDateAfter(history);
     },
-    coerce: coerceScenarioEvents,
+    coerce: coerceEngineEvents,
   } satisfies EngineApi;
 }
 

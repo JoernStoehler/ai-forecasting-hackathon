@@ -42,7 +42,7 @@ export const ComposePanel: React.FC<ComposePanelProps> = ({ latestDate, onSubmit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim() || isLoading) return;
-    onSubmit({ type: 'news-published', date, icon, title, description, postMortem: false });
+    onSubmit({ type: 'news-published', date, icon, title, description });
     setTitle('');
     setDescription('');
   };

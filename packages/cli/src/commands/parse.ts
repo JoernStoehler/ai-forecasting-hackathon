@@ -5,6 +5,8 @@ import {
   type Command,
   type EngineEvent,
   normalizePublishNews,
+  normalizePublishHiddenNews,
+  normalizePatchNews,
 } from '@ai-forecasting/engine';
 import { formatZodIssues, writeEventsJsonl } from './eventIo.js';
 
@@ -86,10 +88,12 @@ function commandToEvents(cmd: Command): EngineEvent[] {
   switch (cmd.type) {
     case 'publish-news':
       return [normalizePublishNews(cmd)];
-    case 'open-story':
-      return [{ type: 'story-opened', id: cmd.refId, date: cmd.date }];
-    case 'close-story':
-      return [{ type: 'story-closed', id: cmd.refId, date: cmd.date }];
+    case 'publish-hidden-news':
+      return [normalizePublishHiddenNews(cmd)];
+    case 'patch-news':
+      return [normalizePatchNews(cmd)];
+    case 'game-over':
+      return [{ type: 'game-over', date: cmd.date, summary: cmd.summary }];
     default:
       return [];
   }
