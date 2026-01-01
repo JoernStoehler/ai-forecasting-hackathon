@@ -43,8 +43,7 @@ export function formatZodIssues(issues: Issue[]): string {
 function parseEvent(payload: unknown, label: string, lineNumber: number): EngineEvent {
   if (payload && typeof payload === 'object' && typeof (payload as { type?: unknown }).type === 'string') {
     const raw = payload as Record<string, unknown>;
-    const normalized = raw.type === 'news' ? { ...raw, type: 'news-published' } : raw;
-    const result = EngineEventSchema.safeParse(normalized);
+    const result = EngineEventSchema.safeParse(raw);
     if (result.success) return result.data;
     throw new Error(
       `${label}: invalid engine event on line ${lineNumber}.\n${formatZodIssues(result.error.issues)}`

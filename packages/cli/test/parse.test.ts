@@ -19,9 +19,24 @@ describe('runParse', () => {
         description: 'Test description',
       },
       {
-        type: 'open-story',
-        refId: 'story-1',
+        type: 'publish-hidden-news',
+        date: '2025-01-03',
+        icon: 'Cpu',
+        title: 'Hidden headline',
+        description: 'Hidden description',
+      },
+      {
+        type: 'patch-news',
+        id: 'news-2025-01-02-test-headline',
         date: '2025-01-02',
+        patch: {
+          title: 'Updated headline',
+        },
+      },
+      {
+        type: 'game-over',
+        date: '2025-01-04',
+        summary: 'Simulation ends.',
       },
     ];
 
@@ -31,15 +46,22 @@ describe('runParse', () => {
     const lines = (await readFile(outputEvents, 'utf-8')).split(/\r?\n/).filter(Boolean);
     const events = lines.map(line => JSON.parse(line));
 
-    expect(events).toHaveLength(2);
+    expect(events).toHaveLength(4);
     expect(events[0]).toMatchObject({
       type: 'news-published',
       title: 'Test headline',
     });
     expect(events[1]).toMatchObject({
-      type: 'story-opened',
-      id: 'story-1',
-      date: '2025-01-02',
+      type: 'hidden-news-published',
+      title: 'Hidden headline',
+    });
+    expect(events[2]).toMatchObject({
+      type: 'news-patched',
+      id: 'news-2025-01-02-test-headline',
+    });
+    expect(events[3]).toMatchObject({
+      type: 'game-over',
+      summary: 'Simulation ends.',
     });
   });
 });

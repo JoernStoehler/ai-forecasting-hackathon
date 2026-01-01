@@ -12,46 +12,80 @@ export interface PublishNewsCommand {
   icon: IconName;
   title: string;
   description: string;
-  postMortem?: boolean;
 }
 
-export interface OpenStoryCommand {
-  type: 'open-story';
-  refId: string;
-  date: string; // date of the turn when the user opened it (coerced to current turn)
+export interface PublishHiddenNewsCommand {
+  type: 'publish-hidden-news';
+  id?: string;
+  date: string; // YYYY-MM-DD
+  icon: IconName;
+  title: string;
+  description: string;
 }
 
-export interface CloseStoryCommand {
-  type: 'close-story';
-  refId: string;
-  date: string;
+export interface NewsPatch {
+  date?: string; // YYYY-MM-DD
+  icon?: IconName;
+  title?: string;
+  description?: string;
 }
 
-export type Command = PublishNewsCommand | OpenStoryCommand | CloseStoryCommand;
+export interface PatchNewsCommand {
+  type: 'patch-news';
+  id: string;
+  date: string; // YYYY-MM-DD
+  patch: NewsPatch;
+}
+
+export interface GameOverCommand {
+  type: 'game-over';
+  date: string; // YYYY-MM-DD
+  summary: string;
+}
+
+export type Command =
+  | PublishNewsCommand
+  | PublishHiddenNewsCommand
+  | PatchNewsCommand
+  | GameOverCommand;
 
 /**
  * EVENTS (facts, appended to the event log)
  */
 export interface NewsPublishedEvent {
-  type?: 'news-published';
+  type: 'news-published';
   id?: string;
   date: string;
   icon: IconName;
   title: string;
   description: string;
-  postMortem?: boolean;
 }
 
-export interface StoryOpenedEvent {
-  type: 'story-opened';
-  id: string; // same as refId
+export interface HiddenNewsPublishedEvent {
+  type: 'hidden-news-published';
+  id?: string;
   date: string;
+  icon: IconName;
+  title: string;
+  description: string;
 }
 
-export interface StoryClosedEvent {
-  type: 'story-closed';
+export interface NewsPatchedEvent {
+  type: 'news-patched';
   id: string;
   date: string;
+  patch: NewsPatch;
+}
+
+export interface ScenarioHeadCompletedEvent {
+  type: 'scenario-head-completed';
+  date: string;
+}
+
+export interface GameOverEvent {
+  type: 'game-over';
+  date: string;
+  summary: string;
 }
 
 export interface TurnStartedEvent {
@@ -70,13 +104,14 @@ export interface TurnFinishedEvent {
 
 export type EngineEvent =
   | NewsPublishedEvent
-  | StoryOpenedEvent
-  | StoryClosedEvent
+  | HiddenNewsPublishedEvent
+  | NewsPatchedEvent
+  | ScenarioHeadCompletedEvent
+  | GameOverEvent
   | TurnStartedEvent
   | TurnFinishedEvent;
 
-// Back-compat alias for the current UI/CLI; equals NewsPublishedEvent.
-export type ScenarioEvent = NewsPublishedEvent;
+export type ScenarioEvent = NewsPublishedEvent | HiddenNewsPublishedEvent;
 
 export interface ForecasterContext {
   history: EngineEvent[];
@@ -97,7 +132,7 @@ export interface ForecasterOptions {
 export interface Forecaster {
   /** Human-readable identifier (for logging, error messages). */
   readonly name: string;
-  forecast(context: ForecasterContext, options?: ForecasterOptions): Promise<ScenarioEvent[]>;
+  forecast(context: ForecasterContext, options?: ForecasterOptions): Promise<EngineEvent[]>;
 }
 
 export interface EngineConfig {
@@ -106,10 +141,10 @@ export interface EngineConfig {
 }
 
 export interface EngineApi {
-  forecast(history: ScenarioEvent[], options?: ForecasterOptions): Promise<ScenarioEvent[]>;
-  merge(history: ScenarioEvent[], additions: ScenarioEvent[]): ScenarioEvent[];
-  nextDate(history: ScenarioEvent[]): string;
-  coerce(payload: unknown, source: string): ScenarioEvent[];
+  forecast(history: EngineEvent[], options?: ForecasterOptions): Promise<EngineEvent[]>;
+  merge(history: EngineEvent[], additions: EngineEvent[]): EngineEvent[];
+  nextDate(history: EngineEvent[]): string;
+  coerce(payload: unknown, source: string): EngineEvent[];
 }
 
 export interface AggregatedState {

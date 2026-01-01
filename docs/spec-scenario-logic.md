@@ -5,8 +5,8 @@ Describe how scenarios are composed today and what rules must remain true as we 
 
 ## Domain Model
 ### ScenarioEvent shape
-- **Current** — Defined in `src/types.ts` with `{ date: string; icon: IconName; title: string; description: string; postMortem?: boolean }`. Dates use `YYYY-MM-DD`, icons must match `ICON_SET`, and `postMortem` defaults to `false`.
-- **Spec** — Keep the single event type until we introduce clearly distinct entities (e.g., decisions vs. outcomes). Any extension must stay JSON-serializable, schema-validated, and backwards-compatible with persisted timelines.
+- **Current** — Defined in `src/types.ts` with `{ type: 'news-published' | 'hidden-news-published'; date: string; icon: IconName; title: string; description: string }`. Dates use `YYYY-MM-DD`, icons must match `ICON_SET`.
+- **Spec** — Keep the news event types JSON-serializable and schema-validated; any extension must stay backwards-compatible with persisted timelines.
 
 ### Timeline state
 - **Current** — `src/App.tsx` keeps `events` in React state, seeded from `src/data/initialScenarioEvents.json` but overridden by `localStorage` (`takeoff-timeline-events`). The list is deduped + sorted via `sortAndDedupEvents` before every render.
@@ -14,8 +14,8 @@ Describe how scenarios are composed today and what rules must remain true as we 
 
 ## Turn Sequence
 1. **User turn**
-   - Current: Compose Panel validates non-empty title/description, auto-sets `date = latest + 1 day`, and emits an event with `postMortem: false`.
-   - Spec: Future versions may allow editing the date or toggling `postMortem`, but user-authored events must always be validated client-side before we mutate state or talk to Gemini.
+   - Current: Compose Panel validates non-empty title/description, auto-sets `date = latest + 1 day`, and emits a `news-published` event.
+   - Spec: Future versions may allow editing the date or authoring hidden news, but user-authored events must always be validated client-side before we mutate state or talk to Gemini.
 2. **Local reconciliation**
    - Current: We optimistically insert the user event, sort/dedup, and show it immediately.
    - Spec: Optimistic inserts stay, but once we support branching, we must scope reconciliation to the active branch.
@@ -32,8 +32,8 @@ Describe how scenarios are composed today and what rules must remain true as we 
 - **Spec** — Continue writing after every update until we introduce explicit save points. Any future sync (cloud storage, multiplayer) must still round-trip through the ScenarioEvent JSON to keep export/import stable.
 
 ## Search & Visibility
-- **Current** — Searches filter in-memory events and highlight matches. Events flagged `postMortem` are hidden from the timeline entirely.
-- **Spec** — Post-mortem entries remain hidden until we build a dedicated reveal mode. When we add other visibility filters (branches, tags), they must layer on top of the existing search/highlight behavior rather than overwrite it.
+- **Current** — Searches filter in-memory events and highlight matches. Hidden news entries are not rendered on the timeline.
+- **Spec** — Hidden entries remain filtered out until we build a dedicated reveal mode. When we add other visibility filters (branches, tags), they must layer on top of the existing search/highlight behavior rather than overwrite it.
 
 ## Error Handling & Recovery
 - **Current** — Gemini errors trigger a toast, revert state to the last stable snapshot, and stop the spinner.

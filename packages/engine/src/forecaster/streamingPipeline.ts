@@ -1,6 +1,13 @@
 import { CommandArraySchema } from '../schemas.js';
-import type { Command, EngineEvent, PublishNewsCommand } from '../types.js';
-import { normalizePublishNews } from '../utils/normalize.js';
+import type {
+  Command,
+  EngineEvent,
+  PublishNewsCommand,
+  PublishHiddenNewsCommand,
+  PatchNewsCommand,
+  GameOverCommand,
+} from '../types.js';
+import { normalizePublishNews, normalizePublishHiddenNews } from '../utils/normalize.js';
 
 export interface ActionBatch {
   actionsJsonl: string; // raw JSONL text chunk containing 1..n actions
@@ -20,7 +27,7 @@ export interface ParseResult {
  *
  * EVENT SOURCING SKETCH (v0.1 target)
  *   prompt(history) -> Gemini stream -> parse/validate -> events -> history -> aggregates
- *   - LLM outputs engine events directly (NewsEvent today; later also NewsStoryOpenedEvent).
+ *   - LLM outputs Commands that map to events (news, hidden news, patch, game-over).
  *   - Each validated event appends to history and updates aggregates; the next streamed
  *     item should validate against the fresh aggregates (not implemented yet).
  *   - UI state is ephemeral (React-only); reducible from history + defaults; may also
@@ -56,11 +63,17 @@ function commandToEvents(cmd: Command): EngineEvent[] {
     const news = normalizePublishNews(cmd as PublishNewsCommand);
     return [news];
   }
-  if (cmd.type === 'open-story') {
-    return [{ type: 'story-opened', id: cmd.refId, date: cmd.date }];
+  if (cmd.type === 'publish-hidden-news') {
+    const news = normalizePublishHiddenNews(cmd as PublishHiddenNewsCommand);
+    return [news];
   }
-  if (cmd.type === 'close-story') {
-    return [{ type: 'story-closed', id: cmd.refId, date: cmd.date }];
+  if (cmd.type === 'patch-news') {
+    const patch = cmd as PatchNewsCommand;
+    return [{ type: 'news-patched', id: patch.id, date: patch.date, patch: patch.patch }];
+  }
+  if (cmd.type === 'game-over') {
+    const gameOver = cmd as GameOverCommand;
+    return [{ type: 'game-over', date: gameOver.date, summary: gameOver.summary }];
   }
   return [];
 }

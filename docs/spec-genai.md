@@ -6,9 +6,9 @@ Explain how Gemini 2.5 Flash is integrated today and what contract new code must
 ## Current Implementation Snapshot
 - **Entry point** — `src/services/geminiService.ts` exports `getAiForecast(history, systemPrompt)`; all callers must use this helper (no direct SDK calls elsewhere).
 - **Client** — Instantiates `GoogleGenAI` with `import.meta.env.VITE_GEMINI_API_KEY`. Missing keys log a warning but still create a client (with a filler string) so local UI keeps working until the call fails.
-- **Model & prompt** — Hard-coded to `gemini-2.5-flash` and paired with `SYSTEM_PROMPT` from `src/constants.ts`, which instructs the model to emit JSON arrays of ScenarioEvent objects.
+- **Model & prompt** — Hard-coded to `gemini-2.5-flash` and paired with `SYSTEM_PROMPT` from `src/constants.ts`, which instructs the model to emit JSON arrays of Command objects.
 - **Payload** — The entire timeline history is stringified (pretty JSON) and sent as the `contents`. There is no truncation or summarization yet.
-- **Response contract** — Uses `responseMimeType: 'application/json'` plus a detailed `responseSchema` (array of objects with `date`, `icon`, `title`, `description`, optional `postMortem`). The service trusts `response.text`, parses it, pipes it through `coerceScenarioEvents`, and rejects any event dated earlier than the latest history entry.
+- **Response contract** — Uses `responseMimeType: 'application/json'` plus a detailed `responseSchema` for Command[] (`publish-news`, `publish-hidden-news`, `patch-news`, `game-over`). The engine parses the stream into commands, validates with Zod, and rejects any event dated earlier than the latest history entry.
 - **Error handling** — Any exception logs to the console and rethrows a wrapped `Error` so `App` can show a toast and revert optimistic state. There is no retry, timeout control, or caching.
 - **Materials injection** — Not yet wired; prompts rely solely on the timeline history + system prompt.
 

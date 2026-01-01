@@ -1,6 +1,6 @@
 import { Type } from '@google/genai';
 import type { GenerateContentConfig } from '@google/genai';
-import type { ForecasterOptions, NewsPublishedEvent } from '../types.js';
+import type { ForecasterOptions, EngineEvent } from '../types.js';
 import { projectPrompt } from '../utils/promptProjector.js';
 
 export type GenAIClient = {
@@ -16,7 +16,7 @@ export type GenAIClient = {
 interface StreamParams {
   client: GenAIClient;
   model: string;
-  history: NewsPublishedEvent[];
+  history: EngineEvent[];
   systemPrompt: string;
   options?: ForecasterOptions;
 }
@@ -32,19 +32,62 @@ export function buildGenerateContentRequest(params: Omit<StreamParams, 'client'>
       responseMimeType: 'application/json',
       responseSchema: {
         type: Type.ARRAY,
+        minItems: '1',
         items: {
-          type: Type.OBJECT,
-          properties: {
-            type: { type: Type.STRING },
-            id: { type: Type.STRING },
-            refId: { type: Type.STRING },
-            date: { type: Type.STRING },
-            icon: { type: Type.STRING },
-            title: { type: Type.STRING },
-            description: { type: Type.STRING },
-            postMortem: { type: Type.BOOLEAN },
-          },
-          required: ['type', 'date'],
+          anyOf: [
+            {
+              type: Type.OBJECT,
+              properties: {
+                type: { type: Type.STRING, enum: ['publish-news'] },
+                id: { type: Type.STRING },
+                date: { type: Type.STRING, pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
+                icon: { type: Type.STRING },
+                title: { type: Type.STRING },
+                description: { type: Type.STRING },
+              },
+              required: ['type', 'date', 'icon', 'title', 'description'],
+            },
+            {
+              type: Type.OBJECT,
+              properties: {
+                type: { type: Type.STRING, enum: ['publish-hidden-news'] },
+                id: { type: Type.STRING },
+                date: { type: Type.STRING, pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
+                icon: { type: Type.STRING },
+                title: { type: Type.STRING },
+                description: { type: Type.STRING },
+              },
+              required: ['type', 'date', 'icon', 'title', 'description'],
+            },
+            {
+              type: Type.OBJECT,
+              properties: {
+                type: { type: Type.STRING, enum: ['patch-news'] },
+                id: { type: Type.STRING },
+                date: { type: Type.STRING, pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
+                patch: {
+                  type: Type.OBJECT,
+                  minProperties: '1',
+                  properties: {
+                    date: { type: Type.STRING, pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
+                    icon: { type: Type.STRING },
+                    title: { type: Type.STRING },
+                    description: { type: Type.STRING },
+                  },
+                },
+              },
+              required: ['type', 'id', 'date', 'patch'],
+            },
+            {
+              type: Type.OBJECT,
+              properties: {
+                type: { type: Type.STRING, enum: ['game-over'] },
+                date: { type: Type.STRING, pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
+                summary: { type: Type.STRING },
+              },
+              required: ['type', 'date', 'summary'],
+            },
+          ],
         },
       },
       ...normalizeOptions(options),

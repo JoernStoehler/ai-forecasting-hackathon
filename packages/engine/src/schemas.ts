@@ -20,50 +20,85 @@ export const PublishNewsCommandSchema = z.object({
   icon: z.enum(ICON_VALUES),
   title: z.string().min(1),
   description: z.string().min(1),
-  postMortem: z.boolean().optional(),
 });
 
-export const OpenStoryCommandSchema = z.object({
-  type: z.literal('open-story'),
-  refId: z.string().min(1),
+export const PublishHiddenNewsCommandSchema = z.object({
+  type: z.literal('publish-hidden-news'),
+  id: z.string().optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  icon: z.enum(ICON_VALUES),
+  title: z.string().min(1),
+  description: z.string().min(1),
 });
 
-export const CloseStoryCommandSchema = z.object({
-  type: z.literal('close-story'),
-  refId: z.string().min(1),
+export const NewsPatchSchema = z
+  .object({
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+    icon: z.enum(ICON_VALUES).optional(),
+    title: z.string().min(1).optional(),
+    description: z.string().min(1).optional(),
+  })
+  .refine(patch => Object.keys(patch).length > 0, {
+    message: 'Patch must include at least one field.',
+  });
+
+export const PatchNewsCommandSchema = z.object({
+  type: z.literal('patch-news'),
+  id: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  patch: NewsPatchSchema,
+});
+
+export const GameOverCommandSchema = z.object({
+  type: z.literal('game-over'),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  summary: z.string().min(1),
 });
 
 export const CommandSchema = z.discriminatedUnion('type', [
   PublishNewsCommandSchema,
-  OpenStoryCommandSchema,
-  CloseStoryCommandSchema,
+  PublishHiddenNewsCommandSchema,
+  PatchNewsCommandSchema,
+  GameOverCommandSchema,
 ]);
 
 export const CommandArraySchema = z.array(CommandSchema);
 
 // Events (facts)
 export const NewsPublishedEventSchema = z.object({
-  type: z.literal('news-published').optional(),
+  type: z.literal('news-published'),
   id: z.string().min(1).optional(),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   icon: z.enum(ICON_VALUES),
   title: z.string().min(1),
   description: z.string().min(1),
-  postMortem: z.boolean().optional(),
 });
 
-export const StoryOpenedEventSchema = z.object({
-  type: z.literal('story-opened'),
+export const HiddenNewsPublishedEventSchema = z.object({
+  type: z.literal('hidden-news-published'),
+  id: z.string().min(1).optional(),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  icon: z.enum(ICON_VALUES),
+  title: z.string().min(1),
+  description: z.string().min(1),
+});
+
+export const NewsPatchedEventSchema = z.object({
+  type: z.literal('news-patched'),
   id: z.string().min(1),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  patch: NewsPatchSchema,
+});
+
+export const ScenarioHeadCompletedEventSchema = z.object({
+  type: z.literal('scenario-head-completed'),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 });
 
-export const StoryClosedEventSchema = z.object({
-  type: z.literal('story-closed'),
-  id: z.string().min(1),
+export const GameOverEventSchema = z.object({
+  type: z.literal('game-over'),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  summary: z.string().min(1),
 });
 
 export const TurnStartedEventSchema = z.object({
@@ -82,14 +117,18 @@ export const TurnFinishedEventSchema = z.object({
 
 export const EngineEventSchema = z.discriminatedUnion('type', [
   NewsPublishedEventSchema,
-  StoryOpenedEventSchema,
-  StoryClosedEventSchema,
+  HiddenNewsPublishedEventSchema,
+  NewsPatchedEventSchema,
+  ScenarioHeadCompletedEventSchema,
+  GameOverEventSchema,
   TurnStartedEventSchema,
   TurnFinishedEventSchema,
 ]);
 
-// Back-compat aliases used by webapp/CLI today (news only).
-export const ScenarioEventSchema = NewsPublishedEventSchema;
+export const ScenarioEventSchema = z.discriminatedUnion('type', [
+  NewsPublishedEventSchema,
+  HiddenNewsPublishedEventSchema,
+]);
 export const ScenarioEventArraySchema = z.array(ScenarioEventSchema);
 
 // Prepared prompt structure used by CLI; content/config kept minimal on purpose.

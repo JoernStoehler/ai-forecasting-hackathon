@@ -1,36 +1,79 @@
-import { ICON_SET } from '../constants';
-import { slugify } from './strings.js';
-import type { EngineEvent, NewsPublishedEvent, ScenarioEvent, StoryClosedEvent, StoryOpenedEvent } from '../types';
+import { ICON_SET } from "../constants";
+import { EngineEventSchema } from "../schemas.js";
+import { slugify } from "./strings.js";
+import type {
+  EngineEvent,
+  NewsPublishedEvent,
+  HiddenNewsPublishedEvent,
+  ScenarioEvent,
+  NewsPatchedEvent,
+  ScenarioHeadCompletedEvent,
+  GameOverEvent,
+} from "../types";
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const ICONS = new Set<string>(ICON_SET);
 
 export function isNewsPublishedEvent(value: unknown): value is NewsPublishedEvent {
-  if (typeof value !== 'object' || value === null) {
+  if (typeof value !== "object" || value === null) {
     return false;
   }
 
   const candidate = value as Partial<NewsPublishedEvent>;
 
   return (
-    (candidate.type === undefined || candidate.type === 'news-published' || candidate.type === 'news') &&
-    typeof candidate.date === 'string' &&
+    candidate.type === "news-published" &&
+    typeof candidate.date === "string" &&
     DATE_PATTERN.test(candidate.date) &&
-    typeof candidate.icon === 'string' &&
+    typeof candidate.icon === "string" &&
     ICONS.has(candidate.icon) &&
-    typeof candidate.title === 'string' &&
+    typeof candidate.title === "string" &&
     candidate.title.trim().length > 0 &&
-    typeof candidate.description === 'string' &&
-    candidate.description.trim().length > 0 &&
-    (candidate.postMortem === undefined || typeof candidate.postMortem === 'boolean')
+    typeof candidate.description === "string" &&
+    candidate.description.trim().length > 0
   );
 }
 
-export function coerceScenarioEvents(payload: unknown, context: string): ScenarioEvent[] {
-  if (!Array.isArray(payload) || !payload.every(isNewsPublishedEvent)) {
-    throw new Error(`Invalid ScenarioEvent payload from ${context}.`);
+export function isHiddenNewsPublishedEvent(
+  value: unknown
+): value is HiddenNewsPublishedEvent {
+  if (typeof value !== "object" || value === null) {
+    return false;
   }
-  return sortAndDedupEvents(payload) as ScenarioEvent[];
+
+  const candidate = value as Partial<HiddenNewsPublishedEvent>;
+
+  return (
+    candidate.type === "hidden-news-published" &&
+    typeof candidate.date === "string" &&
+    DATE_PATTERN.test(candidate.date) &&
+    typeof candidate.icon === "string" &&
+    ICONS.has(candidate.icon) &&
+    typeof candidate.title === "string" &&
+    candidate.title.trim().length > 0 &&
+    typeof candidate.description === "string" &&
+    candidate.description.trim().length > 0
+  );
+}
+
+export function isScenarioEvent(value: unknown): value is ScenarioEvent {
+  return isNewsPublishedEvent(value) || isHiddenNewsPublishedEvent(value);
+}
+
+export function isNewsPatchedEvent(value: unknown): value is NewsPatchedEvent {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    (value as NewsPatchedEvent).type === "news-patched"
+  );
+}
+
+export function coerceEngineEvents(payload: unknown, context: string): EngineEvent[] {
+  const result = EngineEventSchema.array().safeParse(payload);
+  if (!result.success) {
+    throw new Error(`Invalid EngineEvent payload from ${context}.`);
+  }
+  return sortAndDedupEvents(result.data);
 }
 
 export function sortAndDedupEvents<T extends EngineEvent>(events: T[]): T[] {
@@ -41,97 +84,153 @@ export function sortAndDedupEvents<T extends EngineEvent>(events: T[]): T[] {
   });
   return [...deduped.values()].sort(
     (a, b) =>
-      eventDate(a).localeCompare(eventDate(b)) || getTitle(a).localeCompare(getTitle(b))
+      (eventDate(a) ?? "").localeCompare(eventDate(b) ?? "") ||
+      getTitle(a).localeCompare(getTitle(b))
   ) as T[];
 }
 
 export function nextDateAfter(history: EngineEvent[]): string {
   if (history.length === 0) {
-    return new Date().toISOString().split('T')[0];
+    return new Date().toISOString().split("T")[0];
   }
-  const last = history[history.length - 1];
-  const dateStr = eventDate(last);
+  const dateStr = latestEventDate(history);
+  if (!dateStr) {
+    return new Date().toISOString().split("T")[0];
+  }
   const date = new Date(`${dateStr}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() + 1);
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split("T")[0];
 }
 
-export function assertChronology(history: ScenarioEvent[], additions: ScenarioEvent[]): void {
-  const lastDate = history[history.length - 1]?.date;
+export function assertChronology(history: EngineEvent[], additions: EngineEvent[]): void {
+  const lastDate = latestEventDate(history);
   if (!lastDate) return;
-  const invalid = additions.find(evt => evt.date < lastDate);
+  const invalid = additions.find(evt => {
+    const date = eventDate(evt);
+    return date !== null && date < lastDate;
+  });
   if (invalid) {
-    throw new Error(`Model returned an event with a past date: ${invalid.date}`);
+    throw new Error(
+      `Model returned an event with a past date: ${eventDate(invalid) ?? "unknown"}`
+    );
   }
+}
+
+export function applyNewsPatches(history: EngineEvent[]): ScenarioEvent[] {
+  const ordered = sortAndDedupEvents(history);
+  const byId = new Map<string, ScenarioEvent>();
+  const publishOrder: string[] = [];
+
+  for (const event of ordered) {
+    if (isScenarioEvent(event)) {
+      const normalized = normalizeEvent(event) as ScenarioEvent;
+      const id = normalized.id ?? `${normalized.date}-${normalized.title}`;
+      if (!byId.has(id)) {
+        publishOrder.push(id);
+      }
+      byId.set(id, { ...normalized, id });
+      continue;
+    }
+
+    if (event.type === "news-patched") {
+      const target = byId.get(event.id);
+      if (!target) continue;
+      byId.set(event.id, {
+        ...target,
+        ...event.patch,
+        id: event.id,
+        type: target.type,
+      });
+    }
+  }
+
+  const patched = publishOrder
+    .map(id => byId.get(id))
+    .filter((evt): evt is ScenarioEvent => !!evt);
+  return sortAndDedupEvents(patched) as ScenarioEvent[];
+}
+
+export function latestEventDate(history: EngineEvent[]): string | null {
+  const dates = history
+    .map(eventDate)
+    .filter((date): date is string => typeof date === "string");
+  if (!dates.length) return null;
+  return dates.sort()[dates.length - 1] ?? null;
 }
 
 function normalizeEvent(event: EngineEvent): EngineEvent {
   switch (event.type) {
-    case 'story-opened':
+    case "hidden-news-published": {
+      const news = event as HiddenNewsPublishedEvent;
       return {
-        ...event,
-        id: event.id ?? `story-opened-${slugify(event.date)}`,
+        ...news,
+        type: "hidden-news-published",
+        id: news.id ?? `hidden-news-${news.date}-${slugify(news.title)}`,
       };
-    case 'story-closed':
-      return {
-        ...event,
-        id: event.id ?? `story-closed-${slugify(event.date)}`,
-      };
-    case 'turn-started':
-    case 'turn-finished':
-      return event;
-    case 'news-published':
-    default: {
+    }
+    case "news-published": {
       const news = event as NewsPublishedEvent;
       return {
         ...news,
-        type: 'news-published',
+        type: "news-published",
         id: news.id ?? `news-${news.date}-${slugify(news.title)}`,
       };
     }
+    default:
+      return event;
   }
 }
 
 function getTitle(event: EngineEvent): string {
-  if (event.type === 'news-published') {
+  if (event.type === "news-published" || event.type === "hidden-news-published") {
     return (event as NewsPublishedEvent).title;
   }
-  if (event.type === 'story-opened') return `story-opened-${event.id}`;
-  if (event.type === 'story-closed') return `story-closed-${event.id}`;
-  if (event.type === 'turn-started') return `turn-started-${event.from}-${event.until}`;
-  if (event.type === 'turn-finished') return `turn-finished-${event.from}-${event.until}`;
-  return 'event';
+  if (event.type === "news-patched") return `news-patched-${event.id}`;
+  if (event.type === "scenario-head-completed") return "scenario-head-completed";
+  if (event.type === "game-over") return (event as GameOverEvent).summary;
+  if (event.type === "turn-started") return `turn-started-${event.from}-${event.until}`;
+  if (event.type === "turn-finished") return `turn-finished-${event.from}-${event.until}`;
+  return "event";
 }
 
 function dedupKey(event: EngineEvent): string {
   switch (event.type) {
-    case 'story-opened':
-      return `story-opened-${event.id ?? 'missing'}-${event.date}`;
-    case 'story-closed':
-      return `story-closed-${event.id ?? 'missing'}-${event.date}`;
-    case 'turn-started':
+    case "news-patched": {
+      const patch = JSON.stringify(event.patch ?? {});
+      return `news-patched-${event.id}-${event.date}-${patch}`;
+    }
+    case "scenario-head-completed":
+      return `scenario-head-completed-${event.date}`;
+    case "game-over":
+      return `game-over-${event.date}-${event.summary}`;
+    case "turn-started":
       return `turn-started-${event.from}-${event.until}-${event.actor}`;
-    case 'turn-finished':
+    case "turn-finished":
       return `turn-finished-${event.from}-${event.until}-${event.actor}`;
-    case 'news-published':
+    case "hidden-news-published":
+    case "news-published":
     default: {
       const news = event as NewsPublishedEvent;
-      return `news-${news.date}-${news.title}`.toLowerCase();
+      const prefix = event.type === "hidden-news-published" ? "hidden-news" : "news";
+      const id = news.id ?? `${news.date}-${news.title}`;
+      return `${prefix}-${id}`.toLowerCase();
     }
   }
 }
 
-function eventDate(event: EngineEvent): string {
+function eventDate(event: EngineEvent): string | null {
   if (hasDate(event)) return event.date;
-  if (event.type === 'turn-started' || event.type === 'turn-finished') return event.from;
-  return '1970-01-01';
+  if (event.type === "turn-started" || event.type === "turn-finished") return event.from;
+  return null;
 }
 
 function hasDate(
   event: EngineEvent
-): event is NewsPublishedEvent | StoryClosedEvent | StoryOpenedEvent {
-  return 'date' in event && typeof (event as NewsPublishedEvent).date === 'string';
+): event is
+  | NewsPublishedEvent
+  | HiddenNewsPublishedEvent
+  | NewsPatchedEvent
+  | ScenarioHeadCompletedEvent
+  | GameOverEvent {
+  return "date" in event && typeof (event as { date?: string }).date === "string";
 }
-
-// Back-compat alias for existing callers.
-export const isScenarioEvent = isNewsPublishedEvent;
