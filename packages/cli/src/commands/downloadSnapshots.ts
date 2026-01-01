@@ -8,6 +8,10 @@ import TurndownService from 'turndown';
  * Stores metadata (url, accessedAt) as HTML comments at the top of each file.
  */
 
+// Regex patterns for cleaning HTML before markdown conversion
+const SCRIPT_TAG_PATTERN = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+const STYLE_TAG_PATTERN = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi;
+
 interface Source {
   id: string;
   url: string;
@@ -93,7 +97,7 @@ async function downloadAndConvert(source: Source): Promise<string> {
   const response = await fetch(source.url);
   
   if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    throw new Error(`HTTP ${response.status}: ${response.statusText} for ${source.url}`);
   }
 
   const html = await response.text();
@@ -104,8 +108,8 @@ async function downloadAndConvert(source: Source): Promise<string> {
 
   // Basic cleanup: remove script and style tags
   const cleaned = html
-    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-    .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+    .replace(SCRIPT_TAG_PATTERN, '')
+    .replace(STYLE_TAG_PATTERN, '');
 
   const markdown = turndown.turndown(cleaned);
 
