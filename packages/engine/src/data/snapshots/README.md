@@ -112,23 +112,27 @@ Once downloaded, you can reference snapshots in your materials code:
 
 ```typescript
 // In packages/engine/src/data/materials.ts
-import { readFileSync } from 'fs';
+import { readFile } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-export const MATERIALS: MaterialDoc[] = [
-  {
-    id: 'example-source',
-    title: 'Example Research Article',
-    body: readFileSync(
-      join(__dirname, 'snapshots', 'example-source.md'),
+// Load snapshots asynchronously at module initialization
+const snapshotCache: Record<string, string> = {};
+
+async function loadSnapshot(id: string): Promise<string> {
+  if (!snapshotCache[id]) {
+    snapshotCache[id] = await readFile(
+      join(__dirname, 'snapshots', `${id}.md`),
       'utf-8'
-    ),
-  },
-  // ... other materials
-];
+    );
+  }
+  return snapshotCache[id];
+}
+
+// Note: For synchronous loading in module scope, you may need to use
+// top-level await (ES2022+) or load materials lazily when needed.
 ```
 
 Or keep materials as inline strings and add provenance comments:

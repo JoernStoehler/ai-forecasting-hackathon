@@ -9,7 +9,9 @@ import TurndownService from 'turndown';
  */
 
 // Regex patterns for cleaning HTML before markdown conversion
+// Matches <script>...</script> tags including nested < characters within
 const SCRIPT_TAG_PATTERN = /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi;
+// Matches <style>...</style> tags including nested < characters within
 const STYLE_TAG_PATTERN = /<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi;
 
 interface Source {
@@ -81,12 +83,13 @@ async function readSources(path: string): Promise<Source[]> {
     throw new Error('sources.json must contain an array');
   }
 
-  for (const source of sources) {
+  for (let i = 0; i < sources.length; i++) {
+    const source = sources[i];
     if (!source.id || typeof source.id !== 'string') {
-      throw new Error('Each source must have a string "id" field');
+      throw new Error(`Source at index ${i} must have a string "id" field`);
     }
     if (!source.url || typeof source.url !== 'string') {
-      throw new Error('Each source must have a string "url" field');
+      throw new Error(`Source at index ${i} (id: ${source.id}) must have a string "url" field`);
     }
   }
 
