@@ -1,4 +1,5 @@
 import { parseActionChunk } from '../forecaster/streamingPipeline.js';
+import { buildGenerateContentRequest } from '../forecaster/geminiStreaming.js';
 import type { Forecaster, ForecasterContext, ForecasterOptions, ScenarioEvent } from '../types.js';
 import { isScenarioEvent, coerceScenarioEvents, sortAndDedupEvents } from '../utils/events.js';
 import { loadReplayTape } from '../forecaster/replayClient.js';
@@ -18,21 +19,19 @@ export function createReplayForecaster(config: ReplayForecasterConfig): Forecast
 
   return {
     name: 'replay',
-    async forecast(context: ForecasterContext, _options?: ForecasterOptions): Promise<ScenarioEvent[]> {
+    async forecast(context: ForecasterContext, options?: ForecasterOptions): Promise<ScenarioEvent[]> {
       const tape = await loadReplayTape(tapePath);
 
       if (strict) {
-        // Validate request equivalence.
-        const incomingHistory = normalizeHistory(context.history);
-        const tapeHistory = normalizeHistory(tape.request.history);
-        if (tape.request.model !== 'gemini-2.5-flash') {
-          // Non-blocking note: we do not force model match beyond recorded value here.
-        }
-        if (tape.request.systemPrompt !== context.systemPrompt) {
-          throw new Error('Replay systemPrompt mismatch.');
-        }
-        if (JSON.stringify(incomingHistory) !== JSON.stringify(tapeHistory)) {
-          throw new Error('Replay history mismatch.');
+        const incomingHistory = context.history.filter(isScenarioEvent);
+        const request = buildGenerateContentRequest({
+          model: tape.request.model,
+          history: incomingHistory,
+          systemPrompt: context.systemPrompt,
+          options,
+        });
+        if (JSON.stringify(request) !== JSON.stringify(tape.request)) {
+          throw new Error('Replay request mismatch.');
         }
       }
 

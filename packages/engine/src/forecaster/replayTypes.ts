@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { NewsPublishedEvent } from '../types.js';
+import type { GenerateContentConfig } from '@google/genai';
 
 /**
  * Recorded Gemini streaming session for one request. Stored as JSON (not JSONL).
@@ -11,6 +11,12 @@ export interface ReplayChunk {
   text: string;
 }
 
+export interface ReplayRequest {
+  model: string;
+  contents: string;
+  config: GenerateContentConfig;
+}
+
 export interface ReplayTape {
   meta: {
     label?: string;
@@ -19,13 +25,7 @@ export interface ReplayTape {
     sdk?: string;
     comment?: string;
   };
-  request: {
-    model: string;
-    systemPrompt: string;
-    materialsUsed?: string[];
-    /** History sent to the model; should be news-only. */
-    history: NewsPublishedEvent[];
-  };
+  request: ReplayRequest;
   stream: ReplayChunk[];
 }
 
@@ -45,10 +45,8 @@ export const ReplayTapeSchema = z.object({
   }),
   request: z.object({
     model: z.string(),
-    systemPrompt: z.string(),
-    materialsUsed: z.array(z.string()).optional(),
-    history: z.any(), // validated downstream to avoid circular import
+    contents: z.string(),
+    config: z.any(),
   }),
   stream: z.array(ReplayChunkSchema),
 });
-

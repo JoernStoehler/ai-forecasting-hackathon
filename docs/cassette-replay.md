@@ -14,9 +14,11 @@ Status: draft design matching explicit owner request (Dec 2025). Each API call l
   },
   "request": {
     "model": "gemini-2.5-flash",
-    "systemPrompt": "SYSTEM ROLE: ...",
-    "materialsUsed": ["expert-model-of-x-risk"],
-    "history": [{ "...": "news events exactly as sent" }]
+    "contents": "[{\"type\":\"news-published\",...}]",
+    "config": {
+      "systemInstruction": "SYSTEM ROLE: ...",
+      "responseMimeType": "application/json"
+    }
   },
   "stream": [
     { "delayNs": 0,        "text": "[{\"type\":\"news-published\",...}]" },
@@ -27,10 +29,12 @@ Status: draft design matching explicit owner request (Dec 2025). Each API call l
 ```
 - `delayNs`: nanoseconds after the previous chunk before yielding this chunk (first chunk delay is since call start).
 - `text`: raw string as yielded by the SDK (`part.text` after calling the function if it was lazy).
-- `materialsUsed` is optional; history must be the news-only array actually sent.
+- `request` is the exact `generateContentStream` payload; contents must match byte-for-byte (whitespace included).
+- Only `meta.recordedAt` is ignored during request matching.
 
-## APIs (engine)
-- `createReplayForecaster({ tapePath, strict? })` — Forecaster that replays `stream` with delays, parsing chunks through the same streaming pipeline; validates model/systemPrompt/history when `strict` (default).
+## APIs (engine, Node-only)
+Import from `@ai-forecasting/engine/node` to avoid bundling node:fs into the webapp.
+- `createReplayForecaster({ tapePath, strict? })` — Forecaster that replays `stream` with delays, parsing chunks through the same streaming pipeline; validates the full request when `strict` (default).
 - `createReplayGenAIClient(tape)` — Mock GenAI client implementing `generateContentStream`, for use with lower-level helpers.
 - `createRecordingGenAIClient({ baseClient, tapePath, meta? })` — Wraps a real client, records chunk texts plus inter-chunk delays, writes one tape JSON to `tapePath`, passes through the original stream unchanged.
 - `loadReplayTape(path)` — Reads + validates tape JSON.

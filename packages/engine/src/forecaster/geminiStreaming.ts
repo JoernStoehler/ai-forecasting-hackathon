@@ -20,14 +20,9 @@ interface StreamParams {
   options?: ForecasterOptions;
 }
 
-/**
- * Runs a streaming Gemini call and yields raw text chunks (JSON/JSONL) so that
- * higher layers can parse incrementally and feed state back into validation.
- */
-export async function* streamGeminiRaw(params: StreamParams): AsyncGenerator<string> {
-  const { client, model, history, systemPrompt, options } = params;
-
-  const stream = await client.models.generateContentStream({
+export function buildGenerateContentRequest(params: Omit<StreamParams, 'client'>) {
+  const { model, history, systemPrompt, options } = params;
+  return {
     model,
     contents: JSON.stringify(history, null, 2),
     config: {
@@ -51,7 +46,16 @@ export async function* streamGeminiRaw(params: StreamParams): AsyncGenerator<str
       },
       ...normalizeOptions(options),
     },
-  });
+  };
+}
+
+/**
+ * Runs a streaming Gemini call and yields raw text chunks (JSON/JSONL) so that
+ * higher layers can parse incrementally and feed state back into validation.
+ */
+export async function* streamGeminiRaw(params: StreamParams): AsyncGenerator<string> {
+  const { client, ...rest } = params;
+  const stream = await client.models.generateContentStream(buildGenerateContentRequest(rest));
 
   for await (const part of stream) {
     const chunk = (part as unknown as { text?: string | (() => string) }).text;
