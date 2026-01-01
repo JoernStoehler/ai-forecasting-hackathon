@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * CLI dispatcher (fine-grained commands only for now).
- * Commands: aggregate | prepare | call | parse
+ * Commands: aggregate | prepare | call | parse | download-snapshots
  * Convenience wrappers (e.g., turn) intentionally deferred until the base
  * pipeline is confirmed.
  */
@@ -11,6 +11,7 @@ import { runAggregate } from './commands/aggregate.js';
 import { runPrepare } from './commands/prepare.js';
 import { runCall } from './commands/call.js';
 import { runParse } from './commands/parse.js';
+import { runDownloadSnapshots } from './commands/downloadSnapshots.js';
 
 const argv = parseArgs({
   options: {
@@ -33,6 +34,10 @@ const argv = parseArgs({
     // parse
     'input-json': { type: 'string' },
     'output-events': { type: 'string' },
+    // download-snapshots
+    'sources': { type: 'string' },
+    'output': { type: 'string' },
+    'force': { type: 'boolean' },
   },
   allowPositionals: true,
 });
@@ -87,8 +92,19 @@ async function main() {
       });
       break;
     }
+    case 'download-snapshots': {
+      if (!argv.values['sources'] || !argv.values['output']) {
+        throw new Error('download-snapshots requires --sources and --output');
+      }
+      await runDownloadSnapshots({
+        sources: argv.values['sources'],
+        output: argv.values['output'],
+        force: argv.values['force'] || false,
+      });
+      break;
+    }
     default:
-      throw new Error('Unknown or missing command. Use aggregate|prepare|call|parse.');
+      throw new Error('Unknown or missing command. Use aggregate|prepare|call|parse|download-snapshots.');
   }
 }
 

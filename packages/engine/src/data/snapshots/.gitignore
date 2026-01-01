@@ -1,0 +1,3 @@
+# Keep sources.json but ignore downloaded snapshots during development
+# Committed snapshots should be reviewed before commit
+*.md.tmp
