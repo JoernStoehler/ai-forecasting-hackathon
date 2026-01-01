@@ -23,7 +23,7 @@
 - The main source of latency is the engine event emitter (time to first event, time to last event), which is mostly due to Gemini API calls (time to first token, time to last token).
 
 ## Engine API Contract
-- See `packages/engine/`, in particular `packages/engine/src/types/api.ts`
+- See `packages/engine/src/index.ts` for the engine API surface.
 
 ## Deployment
 - The web app is deployed manually to Gemini App aka AI Studio Build as a static bundle. Gemini App automatically inserts a free api key per player as `GEMINI_API_KEY` in the environment, so we don't have to manage keys ourselves besides development.

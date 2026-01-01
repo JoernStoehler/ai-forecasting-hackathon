@@ -73,7 +73,7 @@
 - [ ] Deterministic replay mode (cassette) for dev + E2E
 - [ ] Materials pack selection + obvious grounding in UI/CLI
 - [ ] Minimal regression tests for the core loop (smoke/E2E)
-- [ ] Clear stance + UX for “branching timelines” vs “post-mortem reveal”
+- [ ] Clear stance + UX for scenario branching (if ever)
 
 ## How To Propose Work
 - Write proposals as GitHub Issues (use `.github/ISSUE_TEMPLATE/task.md` as the default structure).

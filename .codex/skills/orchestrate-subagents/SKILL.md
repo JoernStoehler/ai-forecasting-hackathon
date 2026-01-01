@@ -9,7 +9,7 @@ description: Orchestrate parallel and/or sequential subagents working in separat
 
 Run coding subagents reliably: define a task bundle (often spanning several related issues), create isolated worktrees, spawn 1 or 3 identical attempts, then select the best PR and clean up the rest.
 
-This skill is for the *orchestrator/PM agent*. Subagents do implementation work and should open PRs.
+This skill is for the *orchestrator/PM agent*. Coding agents do implementation work and need not spawn subagents themselves.
 
 ## Workflow (Best-Of-3 Default)
 
@@ -29,6 +29,7 @@ This skill is for the *orchestrator/PM agent*. Subagents do implementation work 
 
 - Use one prompt file for all subagents (identical attempts):
   - Example path: `/tmp/codex-prompt-<date>-<slug>.md`
+- Use an absolute prompt path in `codex exec` (e.g. a `/tmp/...` path).
 - Transform the bundle spec into a prompt. Add instructions that are about how the subagent has to work, beyond the bundle spec.
   1. Work only in their current worktree (`pwd` reveals it).
   2. Run onboarding/sanity: `bash -lc scripts/hello.sh`. Subagents read `AGENTS.md` and will know what to do.
@@ -68,23 +69,26 @@ You are a coding sub-agent. Work only inside your current git worktree.
 ### 3) Create Worktrees and Spawn Subagents
 
 - For best-of-3, create 3 worktrees with 1 subagent each.
-- See `skills/public/git-worktrees/SKILL.md` for worktree management.
+- See `.codex/skills/git-worktrees/SKILL.md` for worktree management.
   - Create: `scripts/worktree-new.sh <path> <branch> [--force]`
   - Remove: `scripts/worktree-remove.sh <path> [--force]`
 - Recommended naming (deterministic, easy to filter in PR list):
   - Slug: `<yyyymmdd>-<short-bundle-name>`
   - Branches: `agent/<slug>/a`, `agent/<slug>/b`, `agent/<slug>/c`
   - Paths: `/workspaces/worktrees/<slug>-a` (and `-b`, `-c`)
-- Start each subagent from inside its worktree directory:
-  - `cd /workspaces/worktrees/<slug>-a && codex exec "Prompt: /tmp/codex-prompt-<date>-<slug>.md" 2>/dev/null 1>/tmp/codex-stdout-<date>-<slug>-a.txt &`
-- Redirect stdout to a temp file for later review; suppress stderr to avoid noise.
+- Start each subagent from inside its worktree directory (no backgrounding):
+  - `cd /workspaces/worktrees/<slug>-a && codex exec "Prompt: /tmp/codex-prompt-<date>-<slug>.md" 2>/dev/null`
+
+Important:
+
+- Do **not** add `&` to the `codex exec` command.
+- To run best-of-3 in parallel, run one subagent per terminal (three terminals total).
 
 ### 4) Monitor and Triage
 
-- A subgents usually runs 1-30 minutes, depending on the bundle size and whether the agent hits blockers.
-- Usually, agents don't log much to stdout, and we suppress stderr since it is very, very detailed about what the agent thinks and does, beyond what we ever want to see.
-- Once the agent finishes, it prints a final message to stdout, which we captured. It also ought to have opened a PR as per the prompt instructions.
-- Wait for all three agents to finish before proceeding to selection. Use coarse sleeps to save attention: `sleep 60`
+- We suppress stderr because it is extremely verbose and not meant for orchestrator review.
+- When the agent is done, it exits and prints its final message to stdout. It also ought to have opened a PR as per the prompt instructions.
+- Wait for all three agents to finish (process exit) before proceeding to selection. Agents maybe will not write to stdout at all until they are done.
 - If a subagent fails early, e.g. due to misspecified scope or unclear instructions or violated task assumptions, you should usually escalate to the owner instead of trying to salvage the run.
 - If a subagent never even starts, e.g. due to a typo in the `codex exec` command, you can usually just restart it without escalating.
 
@@ -100,10 +104,11 @@ You are a coding sub-agent. Work only inside your current git worktree.
 ### 6) Merge, Close, and Clean Up
 
 - Merge the winning PR via GitHub CLI.
-- If the merged PR fell short of acceptance criteria, create follow-up issues for the remaining work. Often some files got committed (temporary tests, markdown notes) that need to be deleted.
+- If the merged PR fell short of acceptance criteria, create follow-up issues for the remaining work.
 - Close losing PRs with a short note (“best-of-3; superseded by #<winner>”).
 - Delete their remote branches.
-- Remove their local worktrees (keep `/tmp` logs for eventual postmortems).
+- Pull in the main worktree so the merged result is reflected locally.
+- Remove the winning and the losing local worktrees.
 - Hand-off to the owner with a summary:
   1. Winner PR link + what it does.
   2. Which PRs were closed and why.

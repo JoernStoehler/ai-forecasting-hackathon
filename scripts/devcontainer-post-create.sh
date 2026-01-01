@@ -48,4 +48,7 @@ if [ -f "${REPO_ROOT}/package.json" ]; then
   npm install
 fi
 
+# Mandatory onboarding snapshot (repo map + sanity info).
+bash -lc "${REPO_ROOT}/scripts/hello.sh"
+
 echo "Devcontainer post-create setup complete."

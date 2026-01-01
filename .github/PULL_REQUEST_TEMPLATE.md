@@ -13,7 +13,7 @@
 ## Testing and Quality Assurance
 - What quality aspects were tested?
   - What concrete commands were run? Could they be run right now and deliver the same result? What interpretation did you make of the commands' output?
-  - What files reviews were reviewed? By agent or project owner? What was the outcome of the review?
+  - What file reviews were done? By agent or project owner? What was the outcome of the review?
   - What new automations for the future were added to assure quality even after future changes? Unit tests, e2e tests, linter rules, new commands, etc.
   - What manual QA steps were taken? By agent or project owner? Are they useful to document for the future and if so where were they documented? What was the outcome of the manual QA?
 
@@ -26,4 +26,4 @@
 - Any follow ups that become clear only during the work on the task? What generating ideas did you have?
 
 ---
-Written-by: codex agent running in worktree <path>
+Written-by: <name> (worktree <path> if applicable)

@@ -195,10 +195,7 @@ def render_with_budget():
     """
     Single-pass render with a simple guard for very large outputs.
 
-    Earlier versions tightened collapse_threshold in steps and only truncated
-    after multiple passes. In practice the first pass already fits in this repo,
-    so we keep the output identical while deleting the unused complexity. If the
-    tree ever exceeds budget_lines, we hard-truncate with a marker line.
+    If the tree ever exceeds budget_lines, we hard-truncate with a marker line.
     """
     lines = render(CONFIG.collapse_threshold)
     if len(lines) > CONFIG.budget_lines:

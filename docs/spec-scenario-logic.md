@@ -1,45 +1,38 @@
 # Scenario Logic Spec
 
 ## Purpose
-Describe how scenarios are composed today and what rules must remain true as we evolve the timeline engine. This file distinguishes the **current implementation (commit 290f56f)** from the **target spec** so contributors know when they can refactor versus when they must update the spec first.
+Describe the timeline/event model and turn loop. This spec targets the current `main` branch only.
 
-## Domain Model
-### ScenarioEvent shape
-- **Current** — Defined in `src/types.ts` with `{ date: string; icon: IconName; title: string; description: string; postMortem?: boolean }`. Dates use `YYYY-MM-DD`, icons must match `ICON_SET`, and `postMortem` defaults to `false`.
-- **Spec** — Keep the single event type until we introduce clearly distinct entities (e.g., decisions vs. outcomes). Any extension must stay JSON-serializable, schema-validated, and backwards-compatible with persisted timelines.
+## Domain Model (current)
+### Event log (source of truth)
+- The persisted scenario state is an append-only `EngineEvent[]` log.
+- Types live in `packages/engine/src/types.ts` and are validated via `packages/engine/src/schemas.ts`.
+- The engine is event-sourced: UIs derive views from the event log (no parallel “authoritative” state).
 
-### Timeline state
-- **Current** — `src/App.tsx` keeps `events` in React state, seeded from `src/data/initialScenarioEvents.json` but overridden by `localStorage` (`takeoff-timeline-events`). The list is deduped + sorted via `sortAndDedupEvents` before every render.
-- **Spec** — Timeline state must remain the single source of truth for every page. Derived views (filters, summaries) should memoize from this array rather than storing parallel copies.
+### Boundary marker: scenario head → body
+- `scenario-head-completed` is a persisted event that marks where the authored scenario seed ends and the interactive/future timeline begins.
+- The webapp renders a visible marker based on the latest `scenario-head-completed.date`.
 
 ## Turn Sequence
 1. **User turn**
-   - Current: Compose Panel validates non-empty title/description, auto-sets `date = latest + 1 day`, and emits an event with `postMortem: false`.
-   - Spec: Future versions may allow editing the date or toggling `postMortem`, but user-authored events must always be validated client-side before we mutate state or talk to Gemini.
+   - Compose Panel emits a `news-published` event (visible news) with `date = latest + 1 day`.
 2. **Local reconciliation**
-   - Current: We optimistically insert the user event, sort/dedup, and show it immediately.
-   - Spec: Optimistic inserts stay, but once we support branching, we must scope reconciliation to the active branch.
+   - The UI optimistically inserts the user event and persists the new event log.
 3. **AI turn**
-   - Current: `getAiForecast` receives the full history + system prompt and returns 1–n new events. We append them and sort/dedup. Errors roll back to the pre-submit snapshot and surface via `Toast`.
-   - Spec: AI turns must always follow a user turn to preserve alternation. If Gemini fails, the user turn remains but we note the failure state so the user can retry without duplicating their event.
+   - The engine forecaster produces `EngineEvent[]` based on the current event log and the system prompt.
+   - Errors revert the optimistic state in the webapp and surface via `Toast`.
 
 ## Validation & Safety Nets
-- **Current** — `coerceScenarioEvents` ensures every array we ingest (seeds, imports, Gemini output) matches the schema and uses allowed icons. `sortAndDedupEvents` prevents chronological regressions and repeated entries by key (`date-title`).
-- **Spec** — Keep schema validation for every entry point and expand it once we add new fields (e.g., `confidence`). Invalid payloads must fail loudly rather than silently truncating.
+- Every entry point that ingests events must validate and normalize (`@ai-forecasting/engine` provides coercion + sort/dedup helpers).
+- Invalid payloads must fail loudly rather than silently truncating.
 
 ## Persistence & Portability
-- **Current** — Local persistence uses `localStorage` writes on every `events` change. Export/import flows are JSON-only, with a confirm dialog before destructive imports.
-- **Spec** — Continue writing after every update until we introduce explicit save points. Any future sync (cloud storage, multiplayer) must still round-trip through the ScenarioEvent JSON to keep export/import stable.
+- Webapp persists the event log to localStorage (`takeoff-timeline-events-v2`) and supports JSON import/export.
+- Schema changes may bump storage keys and reject old save files (migrations are not supported pre-v1.0).
 
-## Search & Visibility
-- **Current** — Searches filter in-memory events and highlight matches. Events flagged `postMortem` are hidden from the timeline entirely.
-- **Spec** — Post-mortem entries remain hidden until we build a dedicated reveal mode. When we add other visibility filters (branches, tags), they must layer on top of the existing search/highlight behavior rather than overwrite it.
+## Visibility (current)
+- Visible timeline items are `news-published` events.
+- Hidden news (`hidden-news-published`) is persisted but not currently rendered in the timeline UI.
 
 ## Error Handling & Recovery
-- **Current** — Gemini errors trigger a toast, revert state to the last stable snapshot, and stop the spinner.
-- **Spec** — Add structured error codes (network, schema, rate-limit) so future UI can offer retry guidance. Never leave the compose button disabled after an error.
-
-## Open Questions / Owner Input Needed
-1. **Branching** — If/when parallel scenario branches are needed, confirm whether they live inside one ScenarioEvent list with metadata or separate timelines.
-2. **Post-mortem reveal UX** — We currently drop those events entirely; confirm whether the first milestone should simply toggle them via a control or if they stay hidden until a “review” phase exists.
-3. **External persistence** — If we expect team sharing, we should add a spec covering how timelines sync beyond local JSON exports.
+- Errors must never leave the UI in a stuck loading state.

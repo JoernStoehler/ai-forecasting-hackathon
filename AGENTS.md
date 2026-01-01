@@ -12,10 +12,29 @@
 ## Onboarding
 - Mandatory first step: run `bash -lc scripts/hello.sh` when you enter a fresh devcontainer/worktree; it prints the repo map and basic sanity info.
 - We use progressive disclosure, agents can triage their own onboarding by reading files they find relevant to their task.
-- Most information as always can be learned from the repo files themselves. Extra explicit information about workflows, conventions, and context can be found in `AGENTS.md`, `packages/*/AGENTS.md`, and `skills/public/`.
-- Skills in `skills/public/` are the preferred place for reusable agent workflows and guidance.
-- Convience scripts are in `scripts/` and `packages/*/scripts/`. They support `--help` for extra info.
+- Most information as always can be learned from the repo files themselves. Extra explicit information about workflows, conventions, and context can be found in `AGENTS.md`, `packages/*/AGENTS.md`, and `.codex/skills/`.
+- Skills in `.codex/skills/` are the preferred place for reusable agent workflows and guidance.
+- Convenience scripts are in `scripts/` and `packages/*/scripts/`. They support `--help` for extra info.
 - We loosely follow literate programming practices, so documentation of the codebase is in the code files.
+
+## Conventions
+- We never describe previous versions or removed features. Only the current state of the codebase is explained in the code and docs. Only knowledge that is relevant for the future of the project is retained. We aggressively prune outdated or worse, false or misleading information.
+- We never ship custom solutions or clever hacks. They increase project complexity so much that they can never be net-positive. Any solution MUST be simple, standard and well-known, and adapted to what we actually need. KISS and YAGNI apply everywhere.
+
+## Roles
+- Project Owner: Jörn Stöhler
+  - Has the final say on all project decisions. Owns the onboarding material and the project vision.
+  - Any agent who edits the onboarding material and project vision MUST never be misrepresented as accepted. Only explicit and unambiguous approval of the edits by Jörn counts as accepted.
+- PM/orchestrator agents
+  - Responsible for project management, issue and PR hygiene, task breakdown and bundling, subagent orchestration, and review/merge support.
+  - Do **not** implement product features unless explicitly asked by the project owner.
+  - Work directly on the main git branch, never submit PRs.
+  - Work in a 1:1 chat with the project owner.
+- Coding agents
+  - Responsible for implementing product features in a git worktree and opening a PR.
+  - Do **not** do PM work unless explicitly asked by the orchestrator agent.
+  - Work in isolated git worktrees, always submit PRs for review by the orchestrator agent.
+  - Fully autonomous, interact only via PRs and issue comments with the orchestrator agent.
 
 ## Communication with Project Owner
 - Jörn is available for questions, especially questions about ambiguous phrasings and missing context.

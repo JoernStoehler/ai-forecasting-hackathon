@@ -169,6 +169,7 @@ main() {
 
   echo "Worktree ready at $path"
   echo "Next: cd $path"
+  echo "Next: bash -lc scripts/hello.sh"
 }
 
 main "$@"

@@ -1,6 +1,6 @@
 ---
 name: write-skills
-description: Create or update SKILL.md files for this repo. Use when authoring skills in skills/public or skills/private.
+description: Create or update SKILL.md files for this repo. Use when authoring skills in .codex/skills/.
 ---
 
 # Write Skills
@@ -15,6 +15,7 @@ description: Create or update SKILL.md files for this repo. Use when authoring s
 - Keep skill names hyphen-case, lowercase, <=64 chars, and avoid consecutive hyphens.
 - Prefer small, focused SKILL.md bodies; move large details into references.
 - Do not package into `.skill` files; this repo is the sole source of truth.
+- Skills must describe the current `main` branch only (no “this used to be…” notes).
 
 ## Instruction budget
 
