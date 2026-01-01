@@ -28,6 +28,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     entr \
     inotify-tools \
     universal-ctags \
+    python3 \
+    python3-yaml \
     && rm -rf /var/lib/apt/lists/*
 
 # Node.js 22.x (with npm)
