@@ -1,9 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
-import { coerceScenarioEvents, sortAndDedupEvents, isScenarioEvent } from '../utils/events.js';
-import type { NewsPublishedEvent } from '../types.js';
 import type { GenAIClient } from './geminiStreaming.js';
 import type { GenerateContentConfig } from '@google/genai';
-import { ReplayTapeSchema, type ReplayTape, type ReplayChunk } from './replayTypes.js';
+import { ReplayTapeSchema, type ReplayTape, type ReplayChunk, type ReplayRequest } from './replayTypes.js';
 
 /**
  * Loads and validates a replay tape JSON file.
@@ -11,8 +9,6 @@ import { ReplayTapeSchema, type ReplayTape, type ReplayChunk } from './replayTyp
 export async function loadReplayTape(path: string): Promise<ReplayTape> {
   const text = await readFile(path, 'utf-8');
   const parsed = ReplayTapeSchema.parse(JSON.parse(text)) as ReplayTape;
-  // Validate history as ScenarioEvents to keep schema drift in check.
-  coerceScenarioEvents(parsed.request.history, `replay:${path}`);
   return parsed;
 }
 
@@ -78,8 +74,8 @@ export function createRecordingGenAIClient(opts: {
             },
             request: {
               model: args.model,
-              systemPrompt: (args.config as GenerateContentConfig)?.systemInstruction as string ?? '',
-              history: parseHistory(args.contents),
+              contents: args.contents,
+              config: args.config,
             },
             stream: chunks,
           };
@@ -95,34 +91,14 @@ function assertRequestMatches(
   tape: ReplayTape,
   args: { model: string; contents: string; config: GenerateContentConfig }
 ) {
-  if (tape.request.model !== args.model) {
-    throw new Error(`Replay model mismatch. Tape=${tape.request.model}, Requested=${args.model}`);
+  const incoming: ReplayRequest = {
+    model: args.model,
+    contents: args.contents,
+    config: args.config,
+  };
+  if (JSON.stringify(incoming) !== JSON.stringify(tape.request)) {
+    throw new Error('Replay request mismatch.');
   }
-  const incomingPrompt = args.config?.systemInstruction as string ?? '';
-  if (tape.request.systemPrompt !== incomingPrompt) {
-    throw new Error('Replay systemPrompt mismatch.');
-  }
-
-  const incomingHistory = normalizeHistory(parseHistory(args.contents));
-  const tapeHistory = normalizeHistory(tape.request.history);
-  if (JSON.stringify(incomingHistory) !== JSON.stringify(tapeHistory)) {
-    throw new Error('Replay history mismatch.');
-  }
-}
-
-function parseHistory(contents: string): NewsPublishedEvent[] {
-  try {
-    const parsed = JSON.parse(contents);
-    const events = Array.isArray(parsed) ? parsed : [];
-    return coerceScenarioEvents(events, 'replay-history');
-  } catch {
-    return [];
-  }
-}
-
-function normalizeHistory(events: NewsPublishedEvent[]): NewsPublishedEvent[] {
-  const newsOnly = events.filter(isScenarioEvent);
-  return sortAndDedupEvents(newsOnly);
 }
 
 function extractText(part: { text?: string | (() => string) }) {
