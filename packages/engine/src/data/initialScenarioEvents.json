@@ -226,5 +226,9 @@
     "icon": "Power",
     "title": "EU agrees to phase out Russian gas and oil by 2028; Russian gas share ~12–13% in 2025",
     "description": "EU energy ministers back a regulation to end Russian fossil imports by Jan 1, 2028 (subject to Parliament). Despite progress, Russian gas (including LNG) remains ~12–13% of EU imports in 2025, with variation by member state."
+  },
+  {
+    "type": "scenario-head-completed",
+    "date": "2025-10-30"
   }
 ]

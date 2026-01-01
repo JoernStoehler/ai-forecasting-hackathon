@@ -3,18 +3,19 @@
  * calls Gemini for forecasts, and renders the search/timeline/compose stack.
  */
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { ScenarioEvent } from './types';
-import { INITIAL_EVENTS, SEED_END_DATE } from './data';
-import { coerceScenarioEvents, sortAndDedupEvents } from '@ai-forecasting/engine';
+import type { EngineEvent, NewsPublishedEvent } from './types';
+import { INITIAL_EVENTS } from './data';
+import { coerceEngineEvents, sortAndDedupEvents } from '@ai-forecasting/engine';
 import { getAiForecast } from './services/geminiService';
 import { Header } from './components/Header';
 import { Timeline } from './components/Timeline';
 import { ComposePanel } from './components/ComposePanel';
 import { Toast } from './components/Toast';
+import { getScenarioHeadDate, getVisibleNews } from './utils/events';
 
-const STORAGE_KEY = 'takeoff-timeline-events';
+const STORAGE_KEY = 'takeoff-timeline-events-v2';
 
-const loadEventsFromStorage = (): ScenarioEvent[] => {
+const loadEventsFromStorage = (): EngineEvent[] => {
   if (typeof window === 'undefined') {
     return INITIAL_EVENTS;
   }
@@ -24,7 +25,7 @@ const loadEventsFromStorage = (): ScenarioEvent[] => {
     if (!savedEvents) {
       return INITIAL_EVENTS;
     }
-    return coerceScenarioEvents(JSON.parse(savedEvents), 'local storage');
+    return coerceEngineEvents(JSON.parse(savedEvents), 'local storage');
   } catch (error) {
     console.error('Failed to load events from localStorage:', error);
     return INITIAL_EVENTS;
@@ -32,7 +33,7 @@ const loadEventsFromStorage = (): ScenarioEvent[] => {
 };
 
 function App() {
-  const [events, setEvents] = useState<ScenarioEvent[]>(loadEventsFromStorage);
+  const [events, setEvents] = useState<EngineEvent[]>(loadEventsFromStorage);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,7 +44,7 @@ function App() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
   }, [events]);
 
-  const handleUserSubmit = useCallback(async (newEvent: ScenarioEvent) => {
+  const handleUserSubmit = useCallback(async (newEvent: NewsPublishedEvent) => {
     const previousEvents = eventsRef.current;
     const historyWithUserEvent = sortAndDedupEvents([...previousEvents, newEvent]);
 
@@ -51,9 +52,7 @@ function App() {
     setError(null);
     setEvents(historyWithUserEvent);
     try {
-      const forecastEvents = await getAiForecast(historyWithUserEvent, {
-        seedHistoryEndDate: SEED_END_DATE,
-      });
+      const forecastEvents = await getAiForecast(historyWithUserEvent);
       setEvents(prevEvents => sortAndDedupEvents([...prevEvents, ...forecastEvents]));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
@@ -63,27 +62,33 @@ function App() {
     }
   }, []);
 
-  const handleImport = useCallback((newEvents: ScenarioEvent[]) => {
+  const handleImport = useCallback((newEvents: EngineEvent[]) => {
     setEvents(sortAndDedupEvents(newEvents));
     alert('Timeline imported successfully!');
   }, []);
 
+  const visibleEvents = useMemo(() => getVisibleNews(events), [events]);
 
   const filteredEvents = useMemo(() => {
     if (!searchQuery.trim()) {
-      return events;
+      return visibleEvents;
     }
     const lowercasedQuery = searchQuery.toLowerCase();
-    return events.filter(event =>
+    return visibleEvents.filter(event =>
       event.title.toLowerCase().includes(lowercasedQuery) ||
       event.description.toLowerCase().includes(lowercasedQuery)
     );
-  }, [events, searchQuery]);
+  }, [visibleEvents, searchQuery]);
 
   const latestEventDate = useMemo(() => {
     if (events.length === 0) return new Date().toISOString().split('T')[0];
-    return events[events.length - 1].date;
+    const latestWithDate = [...events].reverse().find(event => 'date' in event);
+    return latestWithDate && typeof latestWithDate.date === 'string'
+      ? latestWithDate.date
+      : new Date().toISOString().split('T')[0];
   }, [events]);
+
+  const boundaryDate = useMemo(() => getScenarioHeadDate(events), [events]);
 
   return (
     <div className="bg-beige-50 text-stone-800 min-h-screen font-sans">
@@ -98,7 +103,7 @@ function App() {
         <Timeline
           events={filteredEvents}
           searchQuery={searchQuery}
-          seedHistoryEndDate={SEED_END_DATE}
+          boundaryDate={boundaryDate}
         />
       </main>
 

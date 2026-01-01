@@ -13,15 +13,19 @@ describe('runParse', () => {
     const commands = [
       {
         type: 'publish-news',
+        id: 'news-1',
         date: '2025-01-02',
         icon: 'Landmark',
         title: 'Test headline',
         description: 'Test description',
       },
       {
-        type: 'open-story',
-        refId: 'story-1',
-        date: '2025-01-02',
+        type: 'patch-news',
+        id: 'news-1',
+        date: '2025-01-03',
+        patch: {
+          title: 'Updated headline',
+        },
       },
     ];
 
@@ -37,9 +41,9 @@ describe('runParse', () => {
       title: 'Test headline',
     });
     expect(events[1]).toMatchObject({
-      type: 'story-opened',
-      id: 'story-1',
-      date: '2025-01-02',
+      type: 'news-patched',
+      id: 'news-1',
+      date: '2025-01-03',
     });
   });
 });

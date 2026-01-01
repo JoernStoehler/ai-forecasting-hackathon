@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ScenarioEvent } from '../types';
+import type { NewsPublishedEvent } from '../types';
 import { Icon } from './icons';
 import { ICON_SET, type IconName } from '../constants';
 
 interface ComposePanelProps {
   latestDate: string;
-  onSubmit: (event: ScenarioEvent) => void;
+  onSubmit: (event: NewsPublishedEvent) => void;
   isLoading: boolean;
 }
 
@@ -42,7 +42,7 @@ export const ComposePanel: React.FC<ComposePanelProps> = ({ latestDate, onSubmit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim() || isLoading) return;
-    onSubmit({ type: 'news-published', date, icon, title, description, postMortem: false });
+    onSubmit({ type: 'news-published', date, icon, title, description });
     setTitle('');
     setDescription('');
   };

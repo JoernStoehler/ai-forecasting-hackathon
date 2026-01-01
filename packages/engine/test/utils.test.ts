@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { coerceScenarioEvents, sortAndDedupEvents, nextDateAfter } from '../src/utils/events.js';
+import { coerceScenarioEvents, coerceEngineEvents, sortAndDedupEvents, nextDateAfter } from '../src/utils/events.js';
 import { ICON_SET } from '../src/constants.js';
 
 const baseEvent = {
@@ -13,6 +13,14 @@ describe('event utils', () => {
   it('coerces valid payloads', () => {
     const result = coerceScenarioEvents([baseEvent], 'test');
     expect(result).toHaveLength(1);
+  });
+
+  it('coerces engine events with scenario boundary', () => {
+    const result = coerceEngineEvents(
+      [baseEvent, { type: 'scenario-head-completed', date: '2025-01-01' }],
+      'test'
+    );
+    expect(result).toHaveLength(2);
   });
 
   it('sorts and dedups by date-title', () => {

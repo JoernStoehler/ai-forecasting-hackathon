@@ -1,11 +1,11 @@
 import React from 'react';
-import { ScenarioEvent } from '../types';
+import type { NewsPublishedEvent } from '../types';
 import { EventItem } from './EventItem';
 
 interface TimelineProps {
-  events: ScenarioEvent[];
+  events: NewsPublishedEvent[];
   searchQuery: string;
-  seedHistoryEndDate?: string;
+  boundaryDate?: string | null;
 }
 
 const YearMarker: React.FC<{ year: string }> = ({ year }) => (
@@ -33,7 +33,7 @@ const ForecastMarker: React.FC<{ date: string }> = ({ date }) => (
       <span className="ml-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-700 bg-beige-50 px-2 py-1 rounded">
         Forecast begins
       </span>
-      <span className="ml-2 text-xs text-stone-500">Seed history ends {date}</span>
+      <span className="ml-2 text-xs text-stone-500">Scenario head ends {date}</span>
     </div>
   </div>
 );
@@ -43,16 +43,11 @@ const getMonthName = (dateStr: string) => {
     return date.toLocaleString('en-US', { month: 'short' });
 };
 
-export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery, seedHistoryEndDate }) => {
-  const visibleEvents = React.useMemo(
-    () => events.filter(event => !event.postMortem),
-    [events]
-  );
-
+export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery, boundaryDate }) => {
   // Create a nested structure for years and months to scope sticky headers.
   // The original `events` array is pre-sorted, so insertion order is chronological.
-  const structuredTimeline: Record<string, Record<string, ScenarioEvent[]>> = {};
-  visibleEvents.forEach(event => {
+  const structuredTimeline: Record<string, Record<string, NewsPublishedEvent[]>> = {};
+  events.forEach(event => {
     const year = event.date.substring(0, 4);
     const month = getMonthName(event.date);
     if (!structuredTimeline[year]) {
@@ -64,7 +59,7 @@ export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery, seedHis
     structuredTimeline[year][month].push(event);
   });
 
-  const lastEvent = visibleEvents.length > 0 ? visibleEvents[visibleEvents.length - 1] : null;
+  const lastEvent = events.length > 0 ? events[events.length - 1] : null;
 
   let cutoffInserted = false;
 
@@ -79,12 +74,12 @@ export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery, seedHis
               {monthEvents.flatMap((event, index) => {
                 const items: React.ReactNode[] = [];
                 if (
-                  seedHistoryEndDate &&
+                  boundaryDate &&
                   !cutoffInserted &&
-                  event.date > seedHistoryEndDate
+                  event.date > boundaryDate
                 ) {
                   items.push(
-                    <ForecastMarker key={`forecast-marker-${seedHistoryEndDate}`} date={seedHistoryEndDate} />
+                    <ForecastMarker key={`forecast-marker-${boundaryDate}`} date={boundaryDate} />
                   );
                   cutoffInserted = true;
                 }
@@ -102,8 +97,8 @@ export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery, seedHis
           ))}
         </div>
       ))}
-      {seedHistoryEndDate && !cutoffInserted && (
-        <ForecastMarker date={seedHistoryEndDate} />
+      {boundaryDate && !cutoffInserted && (
+        <ForecastMarker date={boundaryDate} />
       )}
     </div>
   );
