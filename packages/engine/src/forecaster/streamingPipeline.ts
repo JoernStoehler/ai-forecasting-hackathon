@@ -1,6 +1,6 @@
 import { CommandArraySchema } from '../schemas.js';
-import type { Command, EngineEvent, PublishNewsCommand } from '../types.js';
-import { normalizePublishNews } from '../utils/normalize.js';
+import type { Command, EngineEvent, PublishNewsCommand, PublishHiddenNewsCommand, PatchNewsCommand } from '../types.js';
+import { normalizePublishNews, normalizePublishHiddenNews, normalizePatchNews } from '../utils/normalize.js';
 
 export interface ActionBatch {
   actionsJsonl: string; // raw JSONL text chunk containing 1..n actions
@@ -14,13 +14,13 @@ export interface ParseResult {
 
 /**
  * Streaming parser (HELLO-WORLD PLACEHOLDER):
- * - Expects JSON/JSONL of Commands; 1 publish-news command ≙ 1 NewsPublished event.
+ * - Expects JSON/JSONL of Commands; each command maps to one EngineEvent.
  * - Validates each chunk with zod; no recovery or per-event state feedback yet.
  * - Emits once per chunk; nextState mirrors history until richer aggregates exist.
  *
  * EVENT SOURCING SKETCH (v0.1 target)
  *   prompt(history) -> Gemini stream -> parse/validate -> events -> history -> aggregates
- *   - LLM outputs engine events directly (NewsEvent today; later also NewsStoryOpenedEvent).
+ *   - LLM outputs engine events directly (news, hidden news, patches, game over).
  *   - Each validated event appends to history and updates aggregates; the next streamed
  *     item should validate against the fresh aggregates (not implemented yet).
  *   - UI state is ephemeral (React-only); reducible from history + defaults; may also
@@ -56,11 +56,16 @@ function commandToEvents(cmd: Command): EngineEvent[] {
     const news = normalizePublishNews(cmd as PublishNewsCommand);
     return [news];
   }
-  if (cmd.type === 'open-story') {
-    return [{ type: 'story-opened', id: cmd.refId, date: cmd.date }];
+  if (cmd.type === 'publish-hidden-news') {
+    const news = normalizePublishHiddenNews(cmd as PublishHiddenNewsCommand);
+    return [news];
   }
-  if (cmd.type === 'close-story') {
-    return [{ type: 'story-closed', id: cmd.refId, date: cmd.date }];
+  if (cmd.type === 'patch-news') {
+    const patch = normalizePatchNews(cmd as PatchNewsCommand);
+    return [patch];
+  }
+  if (cmd.type === 'game-over') {
+    return [{ type: 'game-over', date: cmd.date, summary: cmd.summary }];
   }
   return [];
 }

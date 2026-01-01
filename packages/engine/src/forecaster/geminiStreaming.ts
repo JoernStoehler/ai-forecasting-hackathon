@@ -1,6 +1,6 @@
 import { Type } from '@google/genai';
 import type { GenerateContentConfig } from '@google/genai';
-import type { ForecasterOptions, NewsPublishedEvent } from '../types.js';
+import type { ForecasterOptions, EngineEvent } from '../types.js';
 import { projectPrompt } from '../utils/promptProjector.js';
 
 export type GenAIClient = {
@@ -16,14 +16,14 @@ export type GenAIClient = {
 interface StreamParams {
   client: GenAIClient;
   model: string;
-  history: NewsPublishedEvent[];
+  history: EngineEvent[];
   systemPrompt: string;
   options?: ForecasterOptions;
 }
 
 export function buildGenerateContentRequest(params: Omit<StreamParams, 'client'>) {
   const { model, history, systemPrompt, options } = params;
-  const projection = projectPrompt({ history, seedHistoryEndDate: options?.seedHistoryEndDate });
+  const projection = projectPrompt({ history });
   return {
     model,
     contents: projection,
@@ -35,14 +35,26 @@ export function buildGenerateContentRequest(params: Omit<StreamParams, 'client'>
         items: {
           type: Type.OBJECT,
           properties: {
-            type: { type: Type.STRING },
+            type: {
+              type: Type.STRING,
+              enum: ['publish-news', 'publish-hidden-news', 'patch-news', 'game-over'],
+            },
             id: { type: Type.STRING },
-            refId: { type: Type.STRING },
+            targetId: { type: Type.STRING },
             date: { type: Type.STRING },
             icon: { type: Type.STRING },
             title: { type: Type.STRING },
             description: { type: Type.STRING },
-            postMortem: { type: Type.BOOLEAN },
+            summary: { type: Type.STRING },
+            patch: {
+              type: Type.OBJECT,
+              properties: {
+                date: { type: Type.STRING },
+                icon: { type: Type.STRING },
+                title: { type: Type.STRING },
+                description: { type: Type.STRING },
+              },
+            },
           },
           required: ['type', 'date'],
         },

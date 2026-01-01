@@ -1,7 +1,7 @@
 import { parseActionChunk } from '../forecaster/streamingPipeline.js';
 import { buildGenerateContentRequest } from '../forecaster/geminiStreaming.js';
-import type { Forecaster, ForecasterContext, ForecasterOptions, ScenarioEvent } from '../types.js';
-import { isScenarioEvent, coerceScenarioEvents, sortAndDedupEvents } from '../utils/events.js';
+import type { Forecaster, ForecasterContext, ForecasterOptions, EngineEvent } from '../types.js';
+import { coerceEngineEvents, sortAndDedupEvents } from '../utils/events.js';
 import { loadReplayTape } from '../forecaster/replayClient.js';
 
 interface ReplayForecasterConfig {
@@ -19,14 +19,13 @@ export function createReplayForecaster(config: ReplayForecasterConfig): Forecast
 
   return {
     name: 'replay',
-    async forecast(context: ForecasterContext, options?: ForecasterOptions): Promise<ScenarioEvent[]> {
+    async forecast(context: ForecasterContext, options?: ForecasterOptions): Promise<EngineEvent[]> {
       const tape = await loadReplayTape(tapePath);
 
       if (strict) {
-        const incomingHistory = context.history.filter(isScenarioEvent);
         const request = buildGenerateContentRequest({
           model: tape.request.model,
-          history: incomingHistory,
+          history: context.history,
           systemPrompt: context.systemPrompt,
           options,
         });
@@ -35,17 +34,16 @@ export function createReplayForecaster(config: ReplayForecasterConfig): Forecast
         }
       }
 
-      let history = normalizeHistory(context.history.filter(isScenarioEvent));
-      const events: ScenarioEvent[] = [];
+      let history = normalizeHistory(context.history);
+      const events: EngineEvent[] = [];
 
       for (const chunk of tape.stream) {
         if (chunk.delayNs && chunk.delayNs > 0) {
           await delayNs(chunk.delayNs);
         }
         const { events: batch, nextHistory } = parseActionChunk({ actionsJsonl: chunk.text }, history);
-        const newsOnly = batch.filter(isScenarioEvent) as ScenarioEvent[];
-        events.push(...newsOnly);
-        history = sortAndDedupEvents(nextHistory).filter(isScenarioEvent);
+        events.push(...batch);
+        history = sortAndDedupEvents(nextHistory);
       }
 
       return events;
@@ -53,9 +51,9 @@ export function createReplayForecaster(config: ReplayForecasterConfig): Forecast
   };
 }
 
-function normalizeHistory(events: unknown[]): ScenarioEvent[] {
-  const newsOnly = Array.isArray(events) ? events.filter(isScenarioEvent) : [];
-  const coerced = coerceScenarioEvents(newsOnly, 'replay-forecaster');
+function normalizeHistory(events: unknown[]): EngineEvent[] {
+  const allEvents = Array.isArray(events) ? events : [];
+  const coerced = coerceEngineEvents(allEvents, 'replay-forecaster');
   return sortAndDedupEvents(coerced);
 }
 

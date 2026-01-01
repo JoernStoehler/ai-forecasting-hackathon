@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { coerceScenarioEvents, sortAndDedupEvents, nextDateAfter } from '../src/utils/events.js';
+import { coerceEngineEvents, sortAndDedupEvents, nextDateAfter } from '../src/utils/events.js';
 import { ICON_SET } from '../src/constants.js';
 
 const baseEvent = {
+  type: 'news-published',
   date: '2025-01-01',
   icon: ICON_SET[0],
   title: 'A',
@@ -11,7 +12,7 @@ const baseEvent = {
 
 describe('event utils', () => {
   it('coerces valid payloads', () => {
-    const result = coerceScenarioEvents([baseEvent], 'test');
+    const result = coerceEngineEvents([baseEvent], 'test');
     expect(result).toHaveLength(1);
   });
 
@@ -28,6 +29,6 @@ describe('event utils', () => {
 
   it('rejects invalid payload', () => {
     // @ts-expect-error testing invalid path
-    expect(() => coerceScenarioEvents([{}], 'bad')).toThrow();
+    expect(() => coerceEngineEvents([{}], 'bad')).toThrow();
   });
 });

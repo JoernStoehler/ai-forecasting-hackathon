@@ -1,7 +1,6 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import {
   EngineEventSchema,
-  ScenarioEventSchema,
   sortAndDedupEvents,
   type EngineEvent,
 } from '@ai-forecasting/engine';
@@ -41,19 +40,9 @@ export function formatZodIssues(issues: Issue[]): string {
 }
 
 function parseEvent(payload: unknown, label: string, lineNumber: number): EngineEvent {
-  if (payload && typeof payload === 'object' && typeof (payload as { type?: unknown }).type === 'string') {
-    const raw = payload as Record<string, unknown>;
-    const normalized = raw.type === 'news' ? { ...raw, type: 'news-published' } : raw;
-    const result = EngineEventSchema.safeParse(normalized);
-    if (result.success) return result.data;
-    throw new Error(
-      `${label}: invalid engine event on line ${lineNumber}.\n${formatZodIssues(result.error.issues)}`
-    );
-  }
-
-  const scenario = ScenarioEventSchema.safeParse(payload);
-  if (scenario.success) return scenario.data as EngineEvent;
+  const result = EngineEventSchema.safeParse(payload);
+  if (result.success) return result.data;
   throw new Error(
-    `${label}: invalid scenario event on line ${lineNumber}.\n${formatZodIssues(scenario.error.issues)}`
+    `${label}: invalid engine event on line ${lineNumber}.\n${formatZodIssues(result.error.issues)}`
   );
 }

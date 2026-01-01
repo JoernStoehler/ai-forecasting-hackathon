@@ -1,11 +1,11 @@
 import React, { useRef } from 'react';
 import { Icon } from './icons';
-import { ScenarioEvent } from '../types';
-import { coerceScenarioEvents } from '../utils/events';
+import { EngineEvent } from '../types';
+import { coerceEngineEvents } from '../utils/events';
 
 interface FileControlsProps {
-    events: ScenarioEvent[];
-    onImport: (newEvents: ScenarioEvent[]) => void;
+    events: EngineEvent[];
+    onImport: (newEvents: EngineEvent[]) => void;
 }
 
 export const FileControls: React.FC<FileControlsProps> = ({ events, onImport }) => {
@@ -35,7 +35,7 @@ export const FileControls: React.FC<FileControlsProps> = ({ events, onImport }) 
                 const text = e.target?.result;
                 if (typeof text !== 'string') throw new Error("File is not readable");
                 const parsedEvents = JSON.parse(text);
-                const validatedEvents = coerceScenarioEvents(parsedEvents, file.name || 'imported file');
+                const validatedEvents = coerceEngineEvents(parsedEvents, file.name || 'imported file');
                 if (window.confirm("Replace current timeline with the imported one?")) {
                    onImport(validatedEvents);
                 }
