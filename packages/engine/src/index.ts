@@ -7,6 +7,7 @@ export {
   nextDateAfter,
   assertChronology,
 } from './utils/events.js';
+export { normalizePublishNews } from './utils/normalize.js';
 export type {
   ScenarioEvent,
   EngineEvent,
