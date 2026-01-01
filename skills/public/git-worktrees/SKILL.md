@@ -15,3 +15,6 @@ description: Create, list, and remove git worktrees for parallel agent work. Use
 
 - The scripts validate the repo state and install npm deps after creation.
 - Use `--force` only when you understand the safety checks you are bypassing.
+- Cleanup order matters:
+  1. Remove the worktree (`scripts/worktree-remove.sh …`) before deleting the branch.
+  2. If Git refuses to delete a branch, check `git worktree list` for dangling attachments.

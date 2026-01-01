@@ -75,18 +75,27 @@ You are a coding sub-agent. Work only inside your current git worktree.
   - Slug: `<yyyymmdd>-<short-bundle-name>`
   - Branches: `agent/<slug>/a`, `agent/<slug>/b`, `agent/<slug>/c`
   - Paths: `/workspaces/worktrees/<slug>-a` (and `-b`, `-c`)
-- Start each subagent from inside its worktree directory:
-  - `cd /workspaces/worktrees/<slug>-a && codex exec "Prompt: /tmp/codex-prompt-<date>-<slug>.md" 2>/dev/null 1>/tmp/codex-stdout-<date>-<slug>-a.txt &`
-- Redirect stdout to a temp file for later review; suppress stderr to avoid noise.
+- Start each subagent from inside its worktree directory.
+- Default launch command (quiet, only keep the final message):
+  - `cd /workspaces/worktrees/<slug>-a && codex exec -o /tmp/codex-lastmsg-<date>-<slug>-a.txt "Prompt: /tmp/codex-prompt-<date>-<slug>.md" 1>/dev/null 2>/dev/null`
+
+Important:
+
+- Do **not** background (`&`) `codex exec` when you are launching it from a managed PTY/session (e.g. when the orchestrator itself is a Codex agent using an exec tool). It will create lifecycle/termination bugs.
+- If you want parallelism, use *separate terminals/sessions* (or `tmux`), one per subagent.
+- We intentionally ignore Codex stdout/stderr and use `-o/--output-last-message` as the only output channel.
 
 ### 4) Monitor and Triage
 
-- A subgents usually runs 1-30 minutes, depending on the bundle size and whether the agent hits blockers.
-- Usually, agents don't log much to stdout, and we suppress stderr since it is very, very detailed about what the agent thinks and does, beyond what we ever want to see.
-- Once the agent finishes, it prints a final message to stdout, which we captured. It also ought to have opened a PR as per the prompt instructions.
-- Wait for all three agents to finish before proceeding to selection. Use coarse sleeps to save attention: `sleep 60`
+- A subagent usually runs 5–30 minutes, depending on the bundle size and whether it hits blockers.
+- Prefer completion signals over time-based guessing:
+  1. The `codex exec` process exits.
+  2. The `-o /tmp/codex-lastmsg-…` file exists and is non-empty.
+  3. A PR exists for the corresponding branch.
+- If you do any waiting, avoid clever one-liners (`sleep && …`). Keep it explicit and boring.
 - If a subagent fails early, e.g. due to misspecified scope or unclear instructions or violated task assumptions, you should usually escalate to the owner instead of trying to salvage the run.
 - If a subagent never even starts, e.g. due to a typo in the `codex exec` command, you can usually just restart it without escalating.
+- Debugging exception: if there is no last-message file and you need the immediate error, rerun once without redirecting stderr, then restore suppression.
 
 ### 5) Select the winning PR (best-of-3)
 
@@ -109,3 +118,11 @@ You are a coding sub-agent. Work only inside your current git worktree.
   2. Which PRs were closed and why.
   3. Anything that needs owner review/decision.
   4. Follow-up issues suggested (if any).
+
+## Orchestrator Note (Codex-in-Codex)
+
+If you are an orchestrator *running inside Codex* (i.e. you have an exec tool that already gives you a long-lived PTY/session per command):
+
+- Start each `codex exec …` in its own session (don’t background it).
+- Use the session/process state to know whether it is running or finished.
+- Use `--output-last-message` for the only output you care about.
