@@ -90,6 +90,8 @@ export interface ForecasterOptions {
   seed?: number;
   /** Limit how many events a forecaster should return; enforced by adapter. */
   maxEvents?: number;
+  /** Date (YYYY-MM-DD) when seed history ends and forecasting begins. */
+  seedHistoryEndDate?: string;
 }
 
 export interface Forecaster {

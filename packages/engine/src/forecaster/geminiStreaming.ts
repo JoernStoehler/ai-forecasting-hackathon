@@ -1,6 +1,7 @@
 import { Type } from '@google/genai';
 import type { GenerateContentConfig } from '@google/genai';
 import type { ForecasterOptions, NewsPublishedEvent } from '../types.js';
+import { projectPrompt } from '../utils/promptProjector.js';
 
 export type GenAIClient = {
   models: {
@@ -22,9 +23,10 @@ interface StreamParams {
 
 export function buildGenerateContentRequest(params: Omit<StreamParams, 'client'>) {
   const { model, history, systemPrompt, options } = params;
+  const projection = projectPrompt({ history, seedHistoryEndDate: options?.seedHistoryEndDate });
   return {
     model,
-    contents: JSON.stringify(history, null, 2),
+    contents: projection,
     config: {
       systemInstruction: systemPrompt,
       responseMimeType: 'application/json',
@@ -35,13 +37,14 @@ export function buildGenerateContentRequest(params: Omit<StreamParams, 'client'>
           properties: {
             type: { type: Type.STRING },
             id: { type: Type.STRING },
+            refId: { type: Type.STRING },
             date: { type: Type.STRING },
             icon: { type: Type.STRING },
             title: { type: Type.STRING },
             description: { type: Type.STRING },
             postMortem: { type: Type.BOOLEAN },
           },
-          required: ['type', 'date', 'icon', 'title', 'description'],
+          required: ['type', 'date'],
         },
       },
       ...normalizeOptions(options),
