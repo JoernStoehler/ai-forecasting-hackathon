@@ -8,6 +8,7 @@ export {
   assertChronology,
 } from './utils/events.js';
 export { normalizePublishNews } from './utils/normalize.js';
+export { stripHtmlComments, stripCommentsFromMaterials } from './utils/materials.js';
 export type {
   ScenarioEvent,
   EngineEvent,
@@ -53,6 +54,7 @@ import { coerceScenarioEvents, sortAndDedupEvents, nextDateAfter, assertChronolo
 import type { AggregatedState, PreparedPrompt } from './types.js';
 import type { GenerateContentConfig, Content } from '@google/genai';
 import { projectPrompt } from './utils/promptProjector.js';
+import { stripCommentsFromMaterials } from './utils/materials.js';
 
 /**
  * Minimal orchestrator: given a forecaster, provide helper methods to run forecasts
@@ -98,6 +100,7 @@ export function aggregate(history: EngineEvent[]): AggregatedState {
  * Builds a self-contained prompt object ready for generateContent.
  * Materials are inlined into systemInstruction. contents is a structured Content[]
  * with projected timeline/dynamic blocks so the saved prompt is generateContent/Stream-ready.
+ * HTML comments are stripped from materials before including them in the prompt.
  */
 export function preparePrompt(options: {
   model: string;
@@ -107,8 +110,12 @@ export function preparePrompt(options: {
 }): PreparedPrompt {
   const { model, systemPrompt, history, materials } = options;
   const projection = projectPrompt({ history });
+  
+  // Strip HTML comments from materials before inlining
+  const cleanedMaterials = stripCommentsFromMaterials(materials);
+  
   const config: GenerateContentConfig = {
-    systemInstruction: [systemPrompt, ...materials.map(m => `\n[MATERIAL:${m.id}]\n${m.body}`)].join('\n'),
+    systemInstruction: [systemPrompt, ...cleanedMaterials.map(m => `\n[MATERIAL:${m.id}]\n${m.body}`)].join('\n'),
     responseMimeType: 'application/json',
   };
   const contents: Content[] = [
