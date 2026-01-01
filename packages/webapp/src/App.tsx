@@ -4,7 +4,7 @@
  */
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { ScenarioEvent } from './types';
-import { INITIAL_EVENTS } from './data';
+import { INITIAL_EVENTS, SEED_END_DATE } from './data';
 import { coerceScenarioEvents, sortAndDedupEvents } from '@ai-forecasting/engine';
 import { getAiForecast } from './services/geminiService';
 import { Header } from './components/Header';
@@ -51,7 +51,9 @@ function App() {
     setError(null);
     setEvents(historyWithUserEvent);
     try {
-      const forecastEvents = await getAiForecast(historyWithUserEvent);
+      const forecastEvents = await getAiForecast(historyWithUserEvent, {
+        seedHistoryEndDate: SEED_END_DATE,
+      });
       setEvents(prevEvents => sortAndDedupEvents([...prevEvents, ...forecastEvents]));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
@@ -96,6 +98,7 @@ function App() {
         <Timeline
           events={filteredEvents}
           searchQuery={searchQuery}
+          seedHistoryEndDate={SEED_END_DATE}
         />
       </main>
 

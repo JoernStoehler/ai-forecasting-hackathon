@@ -5,6 +5,7 @@ import { EventItem } from './EventItem';
 interface TimelineProps {
   events: ScenarioEvent[];
   searchQuery: string;
+  seedHistoryEndDate?: string;
 }
 
 const YearMarker: React.FC<{ year: string }> = ({ year }) => (
@@ -23,12 +24,26 @@ const MonthMarker: React.FC<{ month: string }> = ({ month }) => (
     </div>
 );
 
+const ForecastMarker: React.FC<{ date: string }> = ({ date }) => (
+  <div className="flex items-center py-3" role="separator" aria-label="Forecast begins">
+    <div className="w-12 flex-shrink-0 flex justify-center">
+      <div className="h-5 w-5 rounded-full border-2 border-dashed border-amber-400 bg-beige-50" />
+    </div>
+    <div className="flex-1 border-t border-amber-300/70">
+      <span className="ml-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-700 bg-beige-50 px-2 py-1 rounded">
+        Forecast begins
+      </span>
+      <span className="ml-2 text-xs text-stone-500">Seed history ends {date}</span>
+    </div>
+  </div>
+);
+
 const getMonthName = (dateStr: string) => {
     const date = new Date(dateStr + 'T00:00:00Z');
     return date.toLocaleString('en-US', { month: 'short' });
 };
 
-export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery }) => {
+export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery, seedHistoryEndDate }) => {
   const visibleEvents = React.useMemo(
     () => events.filter(event => !event.postMortem),
     [events]
@@ -51,6 +66,8 @@ export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery }) => {
 
   const lastEvent = visibleEvents.length > 0 ? visibleEvents[visibleEvents.length - 1] : null;
 
+  let cutoffInserted = false;
+
   return (
     <div className="relative pt-4">
       {Object.entries(structuredTimeline).map(([year, months]) => (
@@ -59,18 +76,35 @@ export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery }) => {
           {Object.entries(months).map(([month, monthEvents]) => (
             <div key={month} className="relative">
               <MonthMarker month={month} />
-              {monthEvents.map((event, index) => (
-                <EventItem
-                  key={`${event.date}-${event.title}-${index}`}
-                  event={event}
-                  searchQuery={searchQuery}
-                  isLast={event === lastEvent}
-                />
-              ))}
+              {monthEvents.flatMap((event, index) => {
+                const items: React.ReactNode[] = [];
+                if (
+                  seedHistoryEndDate &&
+                  !cutoffInserted &&
+                  event.date > seedHistoryEndDate
+                ) {
+                  items.push(
+                    <ForecastMarker key={`forecast-marker-${seedHistoryEndDate}`} date={seedHistoryEndDate} />
+                  );
+                  cutoffInserted = true;
+                }
+                items.push(
+                  <EventItem
+                    key={`${event.date}-${event.title}-${index}`}
+                    event={event}
+                    searchQuery={searchQuery}
+                    isLast={event === lastEvent}
+                  />
+                );
+                return items;
+              })}
             </div>
           ))}
         </div>
       ))}
+      {seedHistoryEndDate && !cutoffInserted && (
+        <ForecastMarker date={seedHistoryEndDate} />
+      )}
     </div>
   );
 };

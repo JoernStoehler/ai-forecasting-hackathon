@@ -2,6 +2,7 @@ import type { EngineEvent, NewsPublishedEvent, TurnStartedEvent } from '../types
 
 interface ProjectionInput {
   history: EngineEvent[];
+  seedHistoryEndDate?: string;
 }
 
 /**
@@ -11,7 +12,7 @@ interface ProjectionInput {
  * - A small dynamic block with latest date and current turn window.
  */
 export function projectPrompt(input: ProjectionInput): string {
-  const { timelineLines, dynamic } = buildTimeline(input.history);
+  const { timelineLines, dynamic } = buildTimeline(input.history, input.seedHistoryEndDate);
   return [
     '# TIMELINE (JSONL)',
     ...timelineLines,
@@ -20,10 +21,11 @@ export function projectPrompt(input: ProjectionInput): string {
   ].join('\n');
 }
 
-function buildTimeline(history: EngineEvent[]) {
+function buildTimeline(history: EngineEvent[], seedHistoryEndDate?: string) {
   const lines: string[] = [];
   let currentPlayerTurn: TurnStartedEvent | null = null;
   let openedInTurn: Set<string> = new Set();
+  let cutoffInserted = false;
 
   let latestDate: string | null = null;
   let currentTurn: { from: string; until: string; actor: string } | null = null;
@@ -41,9 +43,32 @@ function buildTimeline(history: EngineEvent[]) {
     }
   };
 
+  const insertCutoffMarker = () => {
+    if (!seedHistoryEndDate || cutoffInserted) return;
+    lines.push(
+      JSON.stringify({
+        type: 'forecast-cutoff',
+        date: seedHistoryEndDate,
+        note: 'Seed history ends here; forecast begins here (not a model knowledge cutoff).',
+      })
+    );
+    cutoffInserted = true;
+  };
+
   for (const evt of history) {
     if ('date' in evt && typeof evt.date === 'string') {
       latestDate = evt.date;
+    }
+
+    const boundaryDate =
+      'date' in evt && typeof evt.date === 'string'
+        ? evt.date
+        : evt.type === 'turn-started' || evt.type === 'turn-finished'
+          ? evt.from
+          : null;
+
+    if (seedHistoryEndDate && boundaryDate && boundaryDate > seedHistoryEndDate && !cutoffInserted) {
+      insertCutoffMarker();
     }
 
     switch (evt.type) {
@@ -85,6 +110,9 @@ function buildTimeline(history: EngineEvent[]) {
 
   // If player turn open at end, flush it too.
   flushOpened();
+  if (seedHistoryEndDate && !cutoffInserted) {
+    insertCutoffMarker();
+  }
 
   const dynamic = {
     latestDate,
