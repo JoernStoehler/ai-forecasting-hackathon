@@ -6,6 +6,8 @@ import type {
   NewsPublishedEvent,
   HiddenNewsPublishedEvent,
   NewsPatchedEvent,
+  NewsOpenedEvent,
+  NewsClosedEvent,
   ScenarioEvent,
   TurnStartedEvent,
   TurnFinishedEvent,
@@ -60,6 +62,10 @@ export function isScenarioEvent(value: unknown): value is ScenarioEvent {
   return isNewsPublishedEvent(value) || isHiddenNewsPublishedEvent(value);
 }
 
+function isTelemetryEvent(event: EngineEvent): event is NewsOpenedEvent | NewsClosedEvent {
+  return event.type === 'news-opened' || event.type === 'news-closed';
+}
+
 export function coerceEngineEvents(payload: unknown, context: string): EngineEvent[] {
   if (!Array.isArray(payload)) {
     throw new Error(`Invalid EngineEvent payload from ${context}.`);
@@ -92,20 +98,23 @@ export function sortAndDedupEvents<T extends EngineEvent>(events: T[]): T[] {
 }
 
 export function nextDateAfter(history: EngineEvent[]): string {
-  if (history.length === 0) {
+  const lastDate = latestGameDate(history);
+  if (!lastDate) {
     return new Date().toISOString().split('T')[0];
   }
-  const last = history[history.length - 1];
-  const dateStr = eventDate(last);
+  const dateStr = lastDate;
   const date = new Date(`${dateStr}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() + 1);
   return date.toISOString().split('T')[0];
 }
 
 export function assertChronology(history: EngineEvent[], additions: EngineEvent[]): void {
-  const lastDate = history[history.length - 1] ? eventDate(history[history.length - 1]) : null;
+  const lastDate = latestGameDate(history);
   if (!lastDate) return;
-  const invalid = additions.find(evt => eventDate(evt) < lastDate);
+  const invalid = additions.find(evt => {
+    const candidate = gameDate(evt);
+    return candidate ? candidate < lastDate : false;
+  });
   if (invalid) {
     throw new Error(`Model returned an event with a past date: ${eventDate(invalid)}`);
   }
@@ -160,6 +169,8 @@ function normalizeEvent(event: EngineEvent): EngineEvent {
       };
     }
     case 'news-patched':
+    case 'news-opened':
+    case 'news-closed':
     case 'scenario-head-completed':
     case 'game-over':
     case 'turn-started':
@@ -171,6 +182,18 @@ function normalizeEvent(event: EngineEvent): EngineEvent {
 }
 
 function compareEvents(a: EngineEvent, b: EngineEvent): number {
+  const aTelemetry = isTelemetryEvent(a);
+  const bTelemetry = isTelemetryEvent(b);
+  if (aTelemetry || bTelemetry) {
+    if (aTelemetry && bTelemetry) {
+      const atCompare = a.at.localeCompare(b.at);
+      if (atCompare !== 0) return atCompare;
+      const targetCompare = a.targetId.localeCompare(b.targetId);
+      if (targetCompare !== 0) return targetCompare;
+      return a.type.localeCompare(b.type);
+    }
+    return aTelemetry ? 1 : -1;
+  }
   const dateCompare = eventDate(a).localeCompare(eventDate(b));
   if (dateCompare !== 0) return dateCompare;
   const priorityCompare = eventSortPriority(a) - eventSortPriority(b);
@@ -194,6 +217,9 @@ function eventSortPriority(event: EngineEvent): number {
       return 5;
     case 'game-over':
       return 6;
+    case 'news-opened':
+    case 'news-closed':
+      return 8;
     default:
       return 9;
   }
@@ -208,6 +234,12 @@ function eventSortTitle(event: EngineEvent): string {
   }
   if (event.type === 'news-patched') {
     return `news-patched-${(event as NewsPatchedEvent).targetId}`;
+  }
+  if (event.type === 'news-opened') {
+    return `news-opened-${(event as NewsOpenedEvent).targetId}`;
+  }
+  if (event.type === 'news-closed') {
+    return `news-closed-${(event as NewsClosedEvent).targetId}`;
   }
   if (event.type === 'scenario-head-completed') return 'scenario-head-completed';
   if (event.type === 'game-over') return 'game-over';
@@ -236,6 +268,14 @@ function dedupKey(event: EngineEvent): string {
       const patch = event as NewsPatchedEvent;
       return `news-patched-${patch.targetId}-${patch.date}`;
     }
+    case 'news-opened': {
+      const opened = event as NewsOpenedEvent;
+      return `news-opened-${opened.targetId}-${opened.at}`;
+    }
+    case 'news-closed': {
+      const closed = event as NewsClosedEvent;
+      return `news-closed-${closed.targetId}-${closed.at}`;
+    }
     case 'scenario-head-completed': {
       const marker = event as ScenarioHeadCompletedEvent;
       return `scenario-head-completed-${marker.date}`;
@@ -262,6 +302,25 @@ function eventDate(event: EngineEvent): string {
   if (event.type === 'turn-started') return event.from;
   if (event.type === 'turn-finished') return event.until;
   return '1970-01-01';
+}
+
+function latestGameDate(history: EngineEvent[]): string | null {
+  let latest: string | null = null;
+  for (const event of history) {
+    const candidate = gameDate(event);
+    if (!candidate) continue;
+    if (!latest || candidate > latest) {
+      latest = candidate;
+    }
+  }
+  return latest;
+}
+
+function gameDate(event: EngineEvent): string | null {
+  if (hasDate(event)) return event.date;
+  if (event.type === 'turn-started') return event.from;
+  if (event.type === 'turn-finished') return event.until;
+  return null;
 }
 
 function hasDate(

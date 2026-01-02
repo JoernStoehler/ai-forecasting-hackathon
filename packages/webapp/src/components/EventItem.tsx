@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { normalizePublishHiddenNews, normalizePublishNews } from '@ai-forecasting/engine';
 import { ScenarioEvent } from '../types';
 import { Icon } from './icons';
 
@@ -6,6 +7,7 @@ interface EventItemProps {
   event: ScenarioEvent;
   searchQuery?: string;
   isLast: boolean;
+  onTelemetry?: (type: 'news-opened' | 'news-closed', targetId: string) => void;
 }
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -32,8 +34,39 @@ const highlightText = (text: string, highlight: string) => {
 };
 
 
-export const EventItem: React.FC<EventItemProps> = ({ event, searchQuery = '', isLast }) => {
+export const EventItem: React.FC<EventItemProps> = ({ event, searchQuery = '', isLast, onTelemetry }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const resolveTargetId = () => {
+    if (event.id) return event.id;
+    if (event.type === 'hidden-news-published') {
+      return normalizePublishHiddenNews({
+        type: 'publish-hidden-news',
+        date: event.date,
+        icon: event.icon,
+        title: event.title,
+        description: event.description,
+      }).id;
+    }
+    return normalizePublishNews({
+      type: 'publish-news',
+      date: event.date,
+      icon: event.icon,
+      title: event.title,
+      description: event.description,
+    }).id;
+  };
+
+  const handleToggle = () => {
+    const nextExpanded = !isExpanded;
+    setIsExpanded(nextExpanded);
+    if (!event || !('date' in event)) return;
+    const targetId = resolveTargetId();
+    if (!targetId) return;
+    if (typeof targetId !== 'string') return;
+    if (!onTelemetry) return;
+    onTelemetry(nextExpanded ? 'news-opened' : 'news-closed', targetId);
+  };
 
   return (
     <div className="flex items-start">
@@ -50,7 +83,7 @@ export const EventItem: React.FC<EventItemProps> = ({ event, searchQuery = '', i
       {/* Event Content */}
       <div 
         className={`flex-grow cursor-pointer ${isLast ? 'pb-4' : 'pb-6'}`}
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={handleToggle}
         aria-expanded={isExpanded}
       >
         <div className="flex items-center gap-2 pt-1">

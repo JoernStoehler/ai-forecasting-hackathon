@@ -1,4 +1,1 @@
-import rawInitialEvents from './initialScenarioEvents.json';
-import { coerceEngineEvents } from '@ai-forecasting/engine';
-
-export const INITIAL_EVENTS = coerceEngineEvents(rawInitialEvents, 'initial scenario seed');
+export { INITIAL_EVENTS } from '@ai-forecasting/engine';

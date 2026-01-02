@@ -12,6 +12,7 @@ const ContentSchema = z.object({
 
 const ICON_VALUES = [...ICON_SET] as [typeof ICON_SET[number], ...typeof ICON_SET[number][]];
 const DateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const TimestampSchema = z.string().min(1);
 
 const NewsPatchSchema = z
   .object({
@@ -91,6 +92,18 @@ export const NewsPatchedEventSchema = z.object({
   patch: NewsPatchSchema,
 });
 
+export const NewsOpenedEventSchema = z.object({
+  type: z.literal('news-opened'),
+  targetId: z.string().min(1),
+  at: TimestampSchema,
+});
+
+export const NewsClosedEventSchema = z.object({
+  type: z.literal('news-closed'),
+  targetId: z.string().min(1),
+  at: TimestampSchema,
+});
+
 export const ScenarioHeadCompletedEventSchema = z.object({
   type: z.literal('scenario-head-completed'),
   date: DateSchema,
@@ -120,6 +133,8 @@ export const EngineEventSchema = z.discriminatedUnion('type', [
   NewsPublishedEventSchema,
   HiddenNewsPublishedEventSchema,
   NewsPatchedEventSchema,
+  NewsOpenedEventSchema,
+  NewsClosedEventSchema,
   ScenarioHeadCompletedEventSchema,
   GameOverEventSchema,
   TurnStartedEventSchema,
