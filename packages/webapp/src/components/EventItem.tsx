@@ -6,6 +6,7 @@ interface EventItemProps {
   event: ScenarioEvent;
   searchQuery?: string;
   isLast: boolean;
+  onToggle?: (targetId: string, isExpanded: boolean) => void;
 }
 
 const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -32,8 +33,16 @@ const highlightText = (text: string, highlight: string) => {
 };
 
 
-export const EventItem: React.FC<EventItemProps> = ({ event, searchQuery = '', isLast }) => {
+export const EventItem: React.FC<EventItemProps> = ({ event, searchQuery = '', isLast, onToggle }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleToggle = () => {
+    const nextExpanded = !isExpanded;
+    setIsExpanded(nextExpanded);
+    if (event.id) {
+      onToggle?.(event.id, nextExpanded);
+    }
+  };
 
   return (
     <div className="flex items-start">
@@ -50,7 +59,7 @@ export const EventItem: React.FC<EventItemProps> = ({ event, searchQuery = '', i
       {/* Event Content */}
       <div 
         className={`flex-grow cursor-pointer ${isLast ? 'pb-4' : 'pb-6'}`}
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={handleToggle}
         aria-expanded={isExpanded}
       >
         <div className="flex items-center gap-2 pt-1">

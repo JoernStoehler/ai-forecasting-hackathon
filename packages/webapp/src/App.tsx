@@ -99,6 +99,15 @@ function App() {
     alert('Timeline imported successfully!');
   }, []);
 
+  const handleNewsToggle = useCallback((targetId: string, isExpanded: boolean) => {
+    const telemetryEvent: EngineEvent = {
+      type: isExpanded ? 'news-opened' : 'news-closed',
+      targetId,
+      at: new Date().toISOString(),
+    };
+    setEvents(prevEvents => sortAndDedupEvents([...prevEvents, telemetryEvent]));
+  }, []);
+
   const timelineEvents = useMemo(() => {
     const patched = applyNewsPatches(events);
     return patched.filter(event => event.type === 'news-published');
@@ -140,6 +149,7 @@ function App() {
           events={filteredEvents}
           searchQuery={searchQuery}
           boundaryDate={boundaryDate}
+          onToggleNews={handleNewsToggle}
         />
       </main>
 

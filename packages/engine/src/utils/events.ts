@@ -11,6 +11,8 @@ import type {
   TurnFinishedEvent,
   ScenarioHeadCompletedEvent,
   GameOverEvent,
+  NewsOpenedEvent,
+  NewsClosedEvent,
 } from '../types';
 
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
@@ -92,20 +94,24 @@ export function sortAndDedupEvents<T extends EngineEvent>(events: T[]): T[] {
 }
 
 export function nextDateAfter(history: EngineEvent[]): string {
-  if (history.length === 0) {
-    return new Date().toISOString().split('T')[0];
+  const sorted = sortAndDedupEvents(history);
+  for (let i = sorted.length - 1; i >= 0; i -= 1) {
+    const dateStr = extractGameDate(sorted[i]);
+    if (!dateStr) continue;
+    const date = new Date(`${dateStr}T00:00:00Z`);
+    date.setUTCDate(date.getUTCDate() + 1);
+    return date.toISOString().split('T')[0];
   }
-  const last = history[history.length - 1];
-  const dateStr = eventDate(last);
-  const date = new Date(`${dateStr}T00:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + 1);
-  return date.toISOString().split('T')[0];
+  return new Date().toISOString().split('T')[0];
 }
 
 export function assertChronology(history: EngineEvent[], additions: EngineEvent[]): void {
-  const lastDate = history[history.length - 1] ? eventDate(history[history.length - 1]) : null;
+  const lastDate = latestGameDate(history);
   if (!lastDate) return;
-  const invalid = additions.find(evt => eventDate(evt) < lastDate);
+  const invalid = additions.find(evt => {
+    const date = extractGameDate(evt);
+    return date ? date < lastDate : false;
+  });
   if (invalid) {
     throw new Error(`Model returned an event with a past date: ${eventDate(invalid)}`);
   }
@@ -164,6 +170,8 @@ function normalizeEvent(event: EngineEvent): EngineEvent {
     case 'game-over':
     case 'turn-started':
     case 'turn-finished':
+    case 'news-opened':
+    case 'news-closed':
       return event;
     default:
       return event;
@@ -194,6 +202,10 @@ function eventSortPriority(event: EngineEvent): number {
       return 5;
     case 'game-over':
       return 6;
+    case 'news-opened':
+      return 7;
+    case 'news-closed':
+      return 8;
     default:
       return 9;
   }
@@ -218,6 +230,14 @@ function eventSortTitle(event: EngineEvent): string {
   if (event.type === 'turn-finished') {
     const evt = event as TurnFinishedEvent;
     return `turn-finished-${evt.from}-${evt.until}`;
+  }
+  if (event.type === 'news-opened') {
+    const evt = event as NewsOpenedEvent;
+    return `news-opened-${evt.targetId}-${evt.at}`;
+  }
+  if (event.type === 'news-closed') {
+    const evt = event as NewsClosedEvent;
+    return `news-closed-${evt.targetId}-${evt.at}`;
   }
   return 'event';
 }
@@ -252,16 +272,22 @@ function dedupKey(event: EngineEvent): string {
       const evt = event as TurnFinishedEvent;
       return `turn-finished-${evt.from}-${evt.until}-${evt.actor}`;
     }
+    case 'news-opened': {
+      const evt = event as NewsOpenedEvent;
+      return `news-opened-${evt.targetId}-${evt.at}`;
+    }
+    case 'news-closed': {
+      const evt = event as NewsClosedEvent;
+      return `news-closed-${evt.targetId}-${evt.at}`;
+    }
     default:
       return 'event';
   }
 }
 
 function eventDate(event: EngineEvent): string {
-  if (hasDate(event)) return event.date;
-  if (event.type === 'turn-started') return event.from;
-  if (event.type === 'turn-finished') return event.until;
-  return '1970-01-01';
+  const date = extractGameDate(event);
+  return date ?? '1970-01-01';
 }
 
 function hasDate(
@@ -273,4 +299,19 @@ function hasDate(
   | ScenarioHeadCompletedEvent
   | GameOverEvent {
   return 'date' in event && typeof (event as { date?: string }).date === 'string';
+}
+
+function extractGameDate(event: EngineEvent): string | null {
+  if (hasDate(event)) return event.date;
+  if (event.type === 'turn-started') return event.from;
+  if (event.type === 'turn-finished') return event.until;
+  return null;
+}
+
+function latestGameDate(history: EngineEvent[]): string | null {
+  for (let i = history.length - 1; i >= 0; i -= 1) {
+    const date = extractGameDate(history[i]);
+    if (date) return date;
+  }
+  return null;
 }
