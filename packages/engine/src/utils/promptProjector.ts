@@ -57,6 +57,7 @@ function buildTimeline(history: EngineEvent[]) {
 
 function extractEventDate(event: EngineEvent): string | null {
   if ('date' in event && typeof event.date === 'string') return event.date;
-  if (event.type === 'turn-started' || event.type === 'turn-finished') return event.from;
+  if (event.type === 'turn-started') return event.from;
+  if (event.type === 'turn-finished') return event.until;
   return null;
 }

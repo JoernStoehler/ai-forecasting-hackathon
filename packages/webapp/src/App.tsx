@@ -45,14 +45,49 @@ function App() {
 
   const handleUserSubmit = useCallback(async (newEvent: ScenarioEvent) => {
     const previousEvents = eventsRef.current;
-    const historyWithUserEvent = sortAndDedupEvents([...previousEvents, newEvent]);
+    const playerStartFrom = newEvent.date;
+    const playerUntil = aggregate([...previousEvents, newEvent]).latestDate ?? playerStartFrom;
+    const playerTurnStarted: EngineEvent = {
+      type: 'turn-started',
+      actor: 'player',
+      from: playerStartFrom,
+      until: playerStartFrom,
+    };
+    const playerTurnFinished: EngineEvent = {
+      type: 'turn-finished',
+      actor: 'player',
+      from: playerStartFrom,
+      until: playerUntil,
+    };
+    const historyWithPlayerTurn = sortAndDedupEvents([
+      ...previousEvents,
+      playerTurnStarted,
+      newEvent,
+      playerTurnFinished,
+    ]);
+    const gmStartFrom = aggregate(historyWithPlayerTurn).latestDate ?? playerUntil;
+    const gmTurnStarted: EngineEvent = {
+      type: 'turn-started',
+      actor: 'game_master',
+      from: gmStartFrom,
+      until: gmStartFrom,
+    };
+    const historyWithGmTurn = sortAndDedupEvents([...historyWithPlayerTurn, gmTurnStarted]);
 
     setIsLoading(true);
     setError(null);
-    setEvents(historyWithUserEvent);
+    setEvents(historyWithGmTurn);
     try {
-      const forecastEvents = await getAiForecast(historyWithUserEvent);
-      setEvents(prevEvents => sortAndDedupEvents([...prevEvents, ...forecastEvents]));
+      const forecastEvents = await getAiForecast(historyWithGmTurn);
+      const historyWithForecast = sortAndDedupEvents([...historyWithGmTurn, ...forecastEvents]);
+      const gmUntil = aggregate(historyWithForecast).latestDate ?? gmStartFrom;
+      const gmTurnFinished: EngineEvent = {
+        type: 'turn-finished',
+        actor: 'game_master',
+        from: gmStartFrom,
+        until: gmUntil,
+      };
+      setEvents(sortAndDedupEvents([...historyWithForecast, gmTurnFinished]));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
       setEvents(previousEvents);
