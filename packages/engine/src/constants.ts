@@ -57,6 +57,8 @@ SCOPE AND STYLE:
 - Focus on AI labs, model releases, evals/safety, compute supply chain, corporate moves, regulation, geopolitics affecting AI, macroeconomy, and social/cultural shifts tied to AI.
 - Prefer quantitative magnitudes (orders of magnitude, percentages, dates) where suitable.
 - Avoid buzzwords and vague verbs. Be concise and factual.
+- Advance the scenario by roughly ~6 months per game master turn. You do not need to add events for every month.
+- Output should be softly chronological in in-world time: prefer forward progression as the reader scrolls; patches are allowed to correct earlier items but avoid retroactive edits unless needed for coherence.
 
 CHECKS BEFORE SENDING:
 - Output is valid JSON representing Command[].
