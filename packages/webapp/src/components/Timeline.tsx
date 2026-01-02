@@ -6,6 +6,7 @@ interface TimelineProps {
   events: ScenarioEvent[];
   searchQuery: string;
   boundaryDate?: string;
+  onToggle?: (event: ScenarioEvent, nextExpanded: boolean) => void;
 }
 
 const YearMarker: React.FC<{ year: string }> = ({ year }) => (
@@ -43,7 +44,7 @@ const getMonthName = (dateStr: string) => {
     return date.toLocaleString('en-US', { month: 'short' });
 };
 
-export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery, boundaryDate }) => {
+export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery, boundaryDate, onToggle }) => {
   // Create a nested structure for years and months to scope sticky headers.
   // The original `events` array is pre-sorted, so insertion order is chronological.
   const structuredTimeline: Record<string, Record<string, ScenarioEvent[]>> = {};
@@ -89,6 +90,7 @@ export const Timeline: React.FC<TimelineProps> = ({ events, searchQuery, boundar
                     event={event}
                     searchQuery={searchQuery}
                     isLast={event === lastEvent}
+                    onToggle={onToggle}
                   />
                 );
                 return items;

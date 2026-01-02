@@ -116,6 +116,18 @@ export const TurnFinishedEventSchema = z.object({
   until: DateSchema,
 });
 
+export const NewsOpenedEventSchema = z.object({
+  type: z.literal('news-opened'),
+  targetId: z.string().min(1),
+  at: z.string().min(1),
+});
+
+export const NewsClosedEventSchema = z.object({
+  type: z.literal('news-closed'),
+  targetId: z.string().min(1),
+  at: z.string().min(1),
+});
+
 export const EngineEventSchema = z.discriminatedUnion('type', [
   NewsPublishedEventSchema,
   HiddenNewsPublishedEventSchema,
@@ -124,6 +136,8 @@ export const EngineEventSchema = z.discriminatedUnion('type', [
   GameOverEventSchema,
   TurnStartedEventSchema,
   TurnFinishedEventSchema,
+  NewsOpenedEventSchema,
+  NewsClosedEventSchema,
 ]);
 
 export const ScenarioEventSchema = z.discriminatedUnion('type', [

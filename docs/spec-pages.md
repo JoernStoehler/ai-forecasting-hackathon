@@ -10,7 +10,7 @@ Define how the single-page app should organize its routes and surface UI states.
 ## Route Definitions
 ### `/` — Timeline Workspace
 - **Current behavior**
-  - Loads seed events from `packages/webapp/src/data/initialScenarioEvents.json` (via `packages/webapp/src/data/index.ts`), then overlays persisted localStorage events.
+  - Loads seed events from `@ai-forecasting/engine` (via `packages/webapp/src/data/index.ts`), then overlays persisted localStorage events.
   - Header: sticky search with import/export controls.
   - Main content: scrollable timeline with year/month markers and expandable event cards.
   - Footer: compose panel for new user turns plus AI spinner state while Gemini runs.

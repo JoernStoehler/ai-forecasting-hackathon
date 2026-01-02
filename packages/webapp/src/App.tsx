@@ -126,6 +126,19 @@ function App() {
     return marker.length ? marker[marker.length - 1].date : undefined;
   }, [events]);
 
+  const handleTelemetryToggle = useCallback((event: ScenarioEvent, nextExpanded: boolean) => {
+    if (!event.id) {
+      console.warn('Skipping telemetry for event without id.', event);
+      return;
+    }
+    const telemetryEvent: EngineEvent = {
+      type: nextExpanded ? 'news-opened' : 'news-closed',
+      targetId: event.id,
+      at: new Date().toISOString(),
+    };
+    setEvents(prev => sortAndDedupEvents([...prev, telemetryEvent]));
+  }, []);
+
   return (
     <div className="bg-beige-50 text-stone-800 min-h-screen font-sans">
       <Header 
@@ -140,6 +153,7 @@ function App() {
           events={filteredEvents}
           searchQuery={searchQuery}
           boundaryDate={boundaryDate}
+          onToggle={handleTelemetryToggle}
         />
       </main>
 

@@ -95,6 +95,18 @@ export interface TurnFinishedEvent {
   until: string;
 }
 
+export interface NewsOpenedEvent {
+  type: 'news-opened';
+  targetId: string;
+  at: string;
+}
+
+export interface NewsClosedEvent {
+  type: 'news-closed';
+  targetId: string;
+  at: string;
+}
+
 export type EngineEvent =
   | NewsPublishedEvent
   | HiddenNewsPublishedEvent
@@ -102,7 +114,9 @@ export type EngineEvent =
   | ScenarioHeadCompletedEvent
   | GameOverEvent
   | TurnStartedEvent
-  | TurnFinishedEvent;
+  | TurnFinishedEvent
+  | NewsOpenedEvent
+  | NewsClosedEvent;
 
 // Timeline-friendly events (news items, visible or hidden).
 export type ScenarioEvent = NewsPublishedEvent | HiddenNewsPublishedEvent;
