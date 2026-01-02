@@ -70,6 +70,18 @@ export interface NewsPatchedEvent {
   patch: Partial<Pick<NewsPublishedEvent, 'date' | 'icon' | 'title' | 'description'>>;
 }
 
+export interface NewsOpenedEvent {
+  type: 'news-opened';
+  targetId: string;
+  at: string;
+}
+
+export interface NewsClosedEvent {
+  type: 'news-closed';
+  targetId: string;
+  at: string;
+}
+
 export interface ScenarioHeadCompletedEvent {
   type: 'scenario-head-completed';
   date: string;
@@ -99,6 +111,8 @@ export type EngineEvent =
   | NewsPublishedEvent
   | HiddenNewsPublishedEvent
   | NewsPatchedEvent
+  | NewsOpenedEvent
+  | NewsClosedEvent
   | ScenarioHeadCompletedEvent
   | GameOverEvent
   | TurnStartedEvent
