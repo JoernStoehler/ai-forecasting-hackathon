@@ -97,7 +97,15 @@ export function createEngine(config: Config): EngineApi {
 export function aggregate(history: EngineEvent[]): AggregatedState {
   const events = sortAndDedupEvents(history);
   const dateCandidates = events
-    .map(evt => ('date' in evt ? (evt as { date: string }).date : evt.type === 'turn-started' || evt.type === 'turn-finished' ? evt.from : null))
+    .map(evt =>
+      'date' in evt
+        ? (evt as { date: string }).date
+        : evt.type === 'turn-started'
+          ? evt.from
+          : evt.type === 'turn-finished'
+            ? evt.until
+            : null
+    )
     .filter((d): d is string => !!d)
     .sort();
   const latestDate = dateCandidates.length ? dateCandidates[dateCandidates.length - 1] : null;

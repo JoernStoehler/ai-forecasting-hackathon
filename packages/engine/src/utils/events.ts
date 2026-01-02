@@ -259,7 +259,8 @@ function dedupKey(event: EngineEvent): string {
 
 function eventDate(event: EngineEvent): string {
   if (hasDate(event)) return event.date;
-  if (event.type === 'turn-started' || event.type === 'turn-finished') return event.from;
+  if (event.type === 'turn-started') return event.from;
+  if (event.type === 'turn-finished') return event.until;
   return '1970-01-01';
 }
 
@@ -273,4 +274,3 @@ function hasDate(
   | GameOverEvent {
   return 'date' in event && typeof (event as { date?: string }).date === 'string';
 }
-

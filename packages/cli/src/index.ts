@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 /**
- * CLI dispatcher (fine-grained commands only for now).
- * Commands: aggregate | prepare | call | parse | download-snapshots
- * Convenience wrappers (e.g., turn) intentionally deferred until the base
- * pipeline is confirmed.
+ * CLI dispatcher.
+ * Commands: aggregate | prepare | call | parse | turn | download-snapshots
  */
 import { parseArgs } from 'node:util';
 
@@ -12,6 +10,7 @@ import { runPrepare } from './commands/prepare.js';
 import { runCall } from './commands/call.js';
 import { runParse } from './commands/parse.js';
 import { runDownloadSnapshots } from './commands/downloadSnapshots.js';
+import { runTurn } from './commands/turn.js';
 
 const argv = parseArgs({
   options: {
@@ -34,6 +33,8 @@ const argv = parseArgs({
     // parse
     'input-json': { type: 'string' },
     'output-events': { type: 'string' },
+    // turn
+    mock: { type: 'boolean' },
     // download-snapshots
     'sources': { type: 'string' },
     'output': { type: 'string' },
@@ -103,8 +104,40 @@ async function main() {
       });
       break;
     }
+    case 'turn': {
+      const inputHistory = argv.values['input-history'];
+      const newEvents = argv.values['new-events'];
+      const outputState = argv.values['output-state'];
+      const outputHistory = argv.values['output-history'];
+      const outputPrompt = argv.values['output-prompt'];
+      const outputResponse = argv.values['output-response'];
+      const outputEvents = argv.values['output-events'];
+      if (!inputHistory || !newEvents || !outputState || !outputHistory) {
+        throw new Error('turn requires --input-history, --new-events, --output-state, --output-history');
+      }
+      if (!outputPrompt || !outputResponse || !outputEvents) {
+        throw new Error('turn requires --output-prompt, --output-response, --output-events');
+      }
+      await runTurn({
+        inputHistory,
+        newEvents,
+        outputState,
+        outputHistory,
+        outputPrompt,
+        outputResponse,
+        outputEvents,
+        materials: argv.values['materials'],
+        model: argv.values['model'] || 'gemini-2.5-flash',
+        systemPrompt: argv.values['system-prompt'] || '',
+        apiKey: argv.values['api-key'] || process.env.GEMINI_API_KEY,
+        mock: argv.values['mock'] || false,
+      });
+      break;
+    }
     default:
-      throw new Error('Unknown or missing command. Use aggregate|prepare|call|parse|download-snapshots.');
+      throw new Error(
+        'Unknown or missing command. Use aggregate|prepare|call|parse|turn|download-snapshots.'
+      );
   }
 }
 

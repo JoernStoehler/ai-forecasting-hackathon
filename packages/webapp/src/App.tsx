@@ -45,14 +45,47 @@ function App() {
 
   const handleUserSubmit = useCallback(async (newEvent: ScenarioEvent) => {
     const previousEvents = eventsRef.current;
-    const historyWithUserEvent = sortAndDedupEvents([...previousEvents, newEvent]);
+    const baseSummary = aggregate(previousEvents);
+    const playerTurnStartDate = baseSummary.latestDate ?? newEvent.date;
+    const playerTurnStarted: EngineEvent = {
+      type: 'turn-started',
+      actor: 'player',
+      from: playerTurnStartDate,
+      until: playerTurnStartDate,
+    };
+    const historyAfterPlayerBase = sortAndDedupEvents([...previousEvents, playerTurnStarted, newEvent]);
+    const playerTurnUntil = aggregate(historyAfterPlayerBase).latestDate ?? playerTurnStartDate;
+    const playerTurnFinished: EngineEvent = {
+      type: 'turn-finished',
+      actor: 'player',
+      from: playerTurnStartDate,
+      until: playerTurnUntil,
+    };
+    const historyAfterPlayer = sortAndDedupEvents([...historyAfterPlayerBase, playerTurnFinished]);
+    const gmTurnStartDate = aggregate(historyAfterPlayer).latestDate ?? playerTurnUntil;
+    const gmTurnStarted: EngineEvent = {
+      type: 'turn-started',
+      actor: 'game_master',
+      from: gmTurnStartDate,
+      until: gmTurnStartDate,
+    };
+    const historyWithGmStart = sortAndDedupEvents([...historyAfterPlayer, gmTurnStarted]);
 
     setIsLoading(true);
     setError(null);
-    setEvents(historyWithUserEvent);
+    setEvents(historyAfterPlayer);
     try {
-      const forecastEvents = await getAiForecast(historyWithUserEvent);
-      setEvents(prevEvents => sortAndDedupEvents([...prevEvents, ...forecastEvents]));
+      setEvents(historyWithGmStart);
+      const forecastEvents = await getAiForecast(historyWithGmStart);
+      const historyWithForecast = sortAndDedupEvents([...historyWithGmStart, ...forecastEvents]);
+      const gmTurnUntil = aggregate(historyWithForecast).latestDate ?? gmTurnStartDate;
+      const gmTurnFinished: EngineEvent = {
+        type: 'turn-finished',
+        actor: 'game_master',
+        from: gmTurnStartDate,
+        until: gmTurnUntil,
+      };
+      setEvents(sortAndDedupEvents([...historyWithForecast, gmTurnFinished]));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
       setEvents(previousEvents);
