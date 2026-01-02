@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 /**
- * CLI dispatcher (fine-grained commands only for now).
- * Commands: aggregate | prepare | call | parse | download-snapshots
- * Convenience wrappers (e.g., turn) intentionally deferred until the base
- * pipeline is confirmed.
+ * CLI dispatcher.
+ * Commands: aggregate | prepare | call | parse | turn | download-snapshots
  */
 import { parseArgs } from 'node:util';
 
@@ -11,6 +9,7 @@ import { runAggregate } from './commands/aggregate.js';
 import { runPrepare } from './commands/prepare.js';
 import { runCall } from './commands/call.js';
 import { runParse } from './commands/parse.js';
+import { runTurn } from './commands/turn.js';
 import { runDownloadSnapshots } from './commands/downloadSnapshots.js';
 
 const argv = parseArgs({
@@ -34,6 +33,8 @@ const argv = parseArgs({
     // parse
     'input-json': { type: 'string' },
     'output-events': { type: 'string' },
+    // turn
+    mock: { type: 'boolean' },
     // download-snapshots
     'sources': { type: 'string' },
     'output': { type: 'string' },
@@ -92,6 +93,35 @@ async function main() {
       });
       break;
     }
+    case 'turn': {
+      if (
+        !argv.values['new-events'] ||
+        !argv.values['output-state'] ||
+        !argv.values['output-history'] ||
+        !argv.values['output-prompt'] ||
+        !argv.values['output-response'] ||
+        !argv.values['output-events']
+      ) {
+        throw new Error(
+          'turn requires --new-events, --output-state, --output-history, --output-prompt, --output-response, --output-events'
+        );
+      }
+      await runTurn({
+        inputHistory: argv.values['input-history'],
+        newEvents: argv.values['new-events'],
+        outputState: argv.values['output-state'],
+        outputHistory: argv.values['output-history'],
+        outputPrompt: argv.values['output-prompt'],
+        outputResponse: argv.values['output-response'],
+        outputEvents: argv.values['output-events'],
+        materials: argv.values['materials'],
+        model: argv.values['model'] || 'gemini-2.5-flash',
+        systemPrompt: argv.values['system-prompt'] || '',
+        apiKey: argv.values['api-key'] || process.env.GEMINI_API_KEY,
+        mock: argv.values.mock || false,
+      });
+      break;
+    }
     case 'download-snapshots': {
       if (!argv.values['sources'] || !argv.values['output']) {
         throw new Error('download-snapshots requires --sources and --output');
@@ -104,7 +134,7 @@ async function main() {
       break;
     }
     default:
-      throw new Error('Unknown or missing command. Use aggregate|prepare|call|parse|download-snapshots.');
+      throw new Error('Unknown or missing command. Use aggregate|prepare|call|parse|turn|download-snapshots.');
   }
 }
 

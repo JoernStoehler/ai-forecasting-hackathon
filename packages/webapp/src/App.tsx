@@ -45,14 +45,43 @@ function App() {
 
   const handleUserSubmit = useCallback(async (newEvent: ScenarioEvent) => {
     const previousEvents = eventsRef.current;
-    const historyWithUserEvent = sortAndDedupEvents([...previousEvents, newEvent]);
+    const playerTurnStart = {
+      type: 'turn-started',
+      actor: 'player',
+      from: newEvent.date,
+      until: newEvent.date,
+    } as const;
+    const historyAfterPlayerEvent = sortAndDedupEvents([...previousEvents, playerTurnStart, newEvent]);
+    const playerTurnUntil = aggregate(historyAfterPlayerEvent).latestDate ?? newEvent.date;
+    const playerTurnFinished = {
+      type: 'turn-finished',
+      actor: 'player',
+      from: playerTurnStart.from,
+      until: playerTurnUntil,
+    } as const;
+    const historyAfterPlayerTurn = sortAndDedupEvents([...historyAfterPlayerEvent, playerTurnFinished]);
+    const gmTurnStart = {
+      type: 'turn-started',
+      actor: 'game_master',
+      from: playerTurnUntil,
+      until: playerTurnUntil,
+    } as const;
+    const historyForForecast = sortAndDedupEvents([...historyAfterPlayerTurn, gmTurnStart]);
 
     setIsLoading(true);
     setError(null);
-    setEvents(historyWithUserEvent);
+    setEvents(historyForForecast);
     try {
-      const forecastEvents = await getAiForecast(historyWithUserEvent);
-      setEvents(prevEvents => sortAndDedupEvents([...prevEvents, ...forecastEvents]));
+      const forecastEvents = await getAiForecast(historyForForecast);
+      const historyWithForecast = sortAndDedupEvents([...historyForForecast, ...forecastEvents]);
+      const gmTurnUntil = aggregate(historyWithForecast).latestDate ?? gmTurnStart.from;
+      const gmTurnFinished = {
+        type: 'turn-finished',
+        actor: 'game_master',
+        from: gmTurnStart.from,
+        until: gmTurnUntil,
+      } as const;
+      setEvents(prevEvents => sortAndDedupEvents([...prevEvents, ...forecastEvents, gmTurnFinished]));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred.');
       setEvents(previousEvents);
