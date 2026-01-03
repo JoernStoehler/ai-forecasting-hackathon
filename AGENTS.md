@@ -24,7 +24,7 @@
 ## Roles
 - Project Owner: Jörn Stöhler
   - Has the final say on all project decisions. Owns the onboarding material and the project vision.
-  - Any agent who edits the onboarding material and project vision MUST never be misrepresented as accepted. Only explicit and unambiguous approval of the edits by Jörn counts as accepted.
+  - Agents may propose edits to onboarding material or the project vision, but every unapproved change must be marked in-file with a `[PROPOSED]` tag (e.g., on the section heading or bullet). Proposed changes must not overwrite accepted text until Jörn explicitly and unambiguously approves them, at which point the `[PROPOSED]` markers are removed.
 - PM/orchestrator agents
   - Responsible for project management, issue and PR hygiene, task breakdown and bundling, subagent orchestration, and review/merge support.
   - Do **not** implement product features unless explicitly asked by the project owner.
