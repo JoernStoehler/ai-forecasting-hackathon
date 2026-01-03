@@ -6,12 +6,21 @@
   "workspaces": [
     "packages/*"
   ],
+  "overrides": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
   "scripts": {
     "dev": "npm run dev -w packages/webapp",
     "build": "npm run build -w packages/engine && npm run build -w packages/cli && npm run build -w packages/webapp",
     "lint": "npm run lint -w packages/engine && npm run lint -w packages/cli && npm run lint -w packages/webapp",
     "typecheck": "npm run typecheck -w packages/engine && npm run build -w packages/engine && npm run typecheck -w packages/cli && npm run typecheck -w packages/webapp",
-    "check": "npm run lint && npm run typecheck && npm run build",
+    "smoke:webapp": "npm run test:e2e -w packages/webapp -- --project=firefox --grep \"app loads\"",
+    "check": "npm run lint && npm run typecheck && npm run build && npm run smoke:webapp",
     "hello": "bash scripts/hello.sh"
   }
 }
