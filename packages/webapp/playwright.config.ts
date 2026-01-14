@@ -13,11 +13,15 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'npm run dev -- --host --port 4173',
+    // Use mock forecaster for E2E tests (deterministic, no API key required)
+    command: 'VITE_USE_MOCK_FORECASTER=true npm run dev -- --host --port 4173',
     port: 4173,
     reuseExistingServer: true,
     stdout: 'pipe',
     stderr: 'pipe',
+    env: {
+      VITE_USE_MOCK_FORECASTER: 'true',
+    },
   },
   projects: [
     {

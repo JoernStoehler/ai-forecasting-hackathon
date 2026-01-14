@@ -27,3 +27,14 @@ jobs:
         run: npm test -w packages/cli
       - name: Build all
         run: npm run build
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps firefox
+      - name: E2E Tests
+        run: npm run test:e2e -w packages/webapp -- --project=firefox --grep-invert "UNIMPLEMENTED"
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-test-results
+          path: packages/webapp/test-results/
+          retention-days: 7
