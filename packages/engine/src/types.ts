@@ -1,4 +1,4 @@
-import type { IconName } from './constants';
+import type { IconName } from './constants.js';
 import type { GenerateContentConfig, Content } from '@google/genai';
 
 /**

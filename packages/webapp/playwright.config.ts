@@ -11,13 +11,19 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:4173',
     trace: 'on-first-retry',
+    // Start each test with clean localStorage
+    storageState: { cookies: [], origins: [] },
   },
   webServer: {
-    command: 'npm run dev -- --host --port 4173',
+    // Use mock forecaster for E2E tests (deterministic, no API key required)
+    command: 'VITE_USE_MOCK_FORECASTER=true npm run dev -- --host --port 4173',
     port: 4173,
     reuseExistingServer: true,
     stdout: 'pipe',
     stderr: 'pipe',
+    env: {
+      VITE_USE_MOCK_FORECASTER: 'true',
+    },
   },
   projects: [
     {

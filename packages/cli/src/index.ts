@@ -15,6 +15,7 @@ import { runTurn } from './commands/turn.js';
 const argv = parseArgs({
   options: {
     command: { type: 'string' },
+    help: { type: 'boolean', short: 'h' },
     // aggregate
     'input-history': { type: 'string' },
     'input-state': { type: 'string' },
@@ -43,8 +44,110 @@ const argv = parseArgs({
   allowPositionals: true,
 });
 
+function showHelp(command?: string) {
+  if (command === 'aggregate') {
+    console.log(`Usage: takeoff aggregate [options]
+
+Aggregate events from history and new events into a state file.
+
+Options:
+  --input-history <file>   Input history JSONL file (optional)
+  --input-state <file>     Input state JSON file (optional)
+  --new-events <file>      New events JSONL file to merge (optional)
+  --output-state <file>    Output state JSON file (required)
+  --output-history <file>  Output history JSONL file (optional)`);
+  } else if (command === 'prepare') {
+    console.log(`Usage: takeoff prepare [options]
+
+Prepare a prompt from event history for the forecaster.
+
+Options:
+  --input-history <file>   Input history JSONL file (required)
+  --input-state <file>     Input state JSON file (optional)
+  --output-prompt <file>   Output prompt JSON file (required)
+  --materials <selection>  Material selection: 'all', 'none' (optional)
+  --model <name>           Model name (default: gemini-2.5-flash)
+  --system-prompt <text>   Custom system prompt (optional)`);
+  } else if (command === 'call') {
+    console.log(`Usage: takeoff call [options]
+
+Call the Gemini API with a prepared prompt.
+
+Options:
+  --input-prompt <file>    Input prompt JSON file (required)
+  --output-response <file> Output response JSON file (required)
+  --api-key <key>          Gemini API key (or use GEMINI_API_KEY env var)`);
+  } else if (command === 'parse') {
+    console.log(`Usage: takeoff parse [options]
+
+Parse Gemini API response into events JSONL.
+
+Options:
+  --input-json <file>      Input response JSON file (required)
+  --output-events <file>   Output events JSONL file (required)`);
+  } else if (command === 'turn') {
+    console.log(`Usage: takeoff turn [options]
+
+Execute a full game master turn: prepare → call → parse → aggregate.
+
+Options:
+  --input-history <file>   Input history JSONL file (required)
+  --new-events <file>      New player events JSONL file (required)
+  --output-state <file>    Output state JSON file (required)
+  --output-history <file>  Output history JSONL file (required)
+  --output-prompt <file>   Output prompt JSON file (required)
+  --output-response <file> Output response JSON file (required)
+  --output-events <file>   Output events JSONL file (required)
+  --materials <selection>  Material selection: 'all', 'none' (optional)
+  --model <name>           Model name (default: gemini-2.5-flash)
+  --system-prompt <text>   Custom system prompt (optional)
+  --api-key <key>          Gemini API key (or use GEMINI_API_KEY env var)
+  --mock                   Use mock forecaster instead of real API`);
+  } else if (command === 'download-snapshots') {
+    console.log(`Usage: takeoff download-snapshots [options]
+
+Download HTML snapshots from URLs listed in sources file.
+
+Options:
+  --sources <file>         Input sources JSONL file (required)
+  --output <directory>     Output directory for snapshots (required)
+  --force                  Overwrite existing snapshots (optional)`);
+  } else {
+    console.log(`Usage: takeoff <command> [options]
+
+AI Forecasting CLI - Policy simulation game engine
+
+Commands:
+  aggregate              Merge events and generate state
+  prepare                Generate forecaster prompt from history
+  call                   Call Gemini API with prompt
+  parse                  Parse API response into events
+  turn                   Execute full GM turn (prepare + call + parse + aggregate)
+  download-snapshots     Download HTML snapshots from URLs
+
+Options:
+  --help, -h             Show this help message
+
+Use 'takeoff <command> --help' for command-specific help.
+
+Examples:
+  takeoff aggregate --input-history history.jsonl --output-state state.json
+  takeoff turn --input-history history.jsonl --new-events player.jsonl \\
+    --output-state state.json --output-history history-out.jsonl \\
+    --output-prompt prompt.json --output-response response.json \\
+    --output-events events.jsonl --mock`);
+  }
+}
+
 async function main() {
   const cmd = argv.values.command || argv.positionals[0];
+
+  // Handle help flag
+  if (argv.values.help) {
+    showHelp(cmd);
+    process.exit(0);
+  }
+
   switch (cmd) {
     case 'aggregate': {
       const outputState = argv.values['output-state'];
