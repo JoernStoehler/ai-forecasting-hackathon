@@ -83,13 +83,13 @@ npm run test:e2e -w packages/webapp
 - For manual dev: set `VITE_USE_MOCK_FORECASTER=true` in `.env.local`
 - Mock returns deterministic placeholder events without API calls
 
-**Test Coverage:**
+**Test Coverage:** [PROPOSED update - turn cycle now fixed]
 - ✅ Timeline display and navigation
 - ✅ Search and filtering
 - ✅ Persistence (localStorage + import/export)
 - ✅ UI interactions and validation
-- ⚠️ Turn cycle (mocked, needs debugging)
-- ❌ Unimplemented features (documented as failing tests)
+- ✅ Turn cycle (uses mock forecaster)
+- ❌ Unimplemented features (documented as skipped tests)
 
 ---
 
@@ -150,6 +150,18 @@ See [`packages/webapp/tests/unimplemented-features.spec.ts`](./packages/webapp/t
 - **Feature branches:** For implementing features (create PR)
 - Branch naming: `claude/<description>-<session-id>`
 - Commit messages: Clear, concise, imperative mood
+
+### [PROPOSED] Creating Pull Requests
+Use `gh` CLI to create PRs. If `gh` is not available, install it:
+```bash
+# Check if gh is installed
+which gh || (curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null && sudo apt update && sudo apt install gh -y)
+```
+
+Create PR with explicit repo (required for proxied git remotes):
+```bash
+gh pr create --repo JoernStoehler/ai-forecasting-hackathon --head <branch-name> --title "..." --body "..."
+```
 
 ---
 
