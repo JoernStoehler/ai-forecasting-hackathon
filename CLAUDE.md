@@ -141,6 +141,7 @@ See [`packages/webapp/tests/unimplemented-features.spec.ts`](./packages/webapp/t
 ## Development Environment
 
 [PROPOSED] Environment is pre-configured with dependencies installed via `npm install`.
+If tools are missing (e.g., `gh` CLI), use `/session-start-hook` to configure automatic installation.
 
 ### Git Workflow
 - **Main branch:** For quick fixes and PM work
