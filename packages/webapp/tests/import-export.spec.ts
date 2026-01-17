@@ -221,6 +221,70 @@ test.describe('Import Functionality', () => {
     // Clean up
     fs.unlinkSync(testFilePath);
   });
+
+  test('deduplicates events with duplicate IDs on import', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    // Create events with duplicate IDs (deduplication should happen)
+    const eventsWithDuplicates = [
+      {
+        type: 'news-published',
+        id: 'duplicate-id-1',
+        date: '2025-01-10',
+        icon: 'Globe',
+        title: 'First Version',
+        description: 'This will be replaced',
+      },
+      {
+        type: 'news-published',
+        id: 'duplicate-id-1',
+        date: '2025-01-11',
+        icon: 'Landmark',
+        title: 'Second Version',
+        description: 'This should be kept (last one wins)',
+      },
+      {
+        type: 'news-published',
+        id: 'unique-id',
+        date: '2025-01-12',
+        icon: 'BrainCircuit',
+        title: 'Unique Event',
+        description: 'This should remain',
+      },
+    ];
+
+    const testFilePath = path.join('/tmp', 'test-duplicates.json');
+    fs.writeFileSync(testFilePath, JSON.stringify(eventsWithDuplicates, null, 2));
+
+    // Set up dialog handler
+    page.once('dialog', dialog => {
+      expect(dialog.message()).toContain('Replace current timeline');
+      dialog.accept();
+    });
+
+    const fileChooserPromise = page.waitForEvent('filechooser');
+    const importButton = page.locator('button[title="Import JSON"]');
+    await importButton.click();
+
+    const fileChooser = await fileChooserPromise;
+    await fileChooser.setFiles(testFilePath);
+
+    await page.waitForTimeout(500);
+
+    // Should only show 2 events (duplicate-id-1 deduplicated, unique-id kept)
+    // Plus initial scenario events
+    const secondVersionVisible = await page.locator('text=Second Version').isVisible();
+    const firstVersionVisible = await page.locator('text=First Version').isVisible();
+    const uniqueVisible = await page.locator('text=Unique Event').isVisible();
+
+    expect(secondVersionVisible).toBe(true); // Last one wins
+    expect(firstVersionVisible).toBe(false); // Should be replaced
+    expect(uniqueVisible).toBe(true);
+
+    // Clean up
+    fs.unlinkSync(testFilePath);
+  });
 });
 
 test.describe('Import/Export Round Trip', () => {
