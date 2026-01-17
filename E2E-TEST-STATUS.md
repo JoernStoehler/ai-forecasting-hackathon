@@ -225,20 +225,18 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
 
 ### Immediate (Complete Test Coverage)
 
-1. **Integrate Mock Forecaster into Webapp** (High Priority)
-   - Create env variable to toggle mock mode
-   - Update `geminiService.ts` to use mock when enabled
-   - Un-skip turn-cycle tests and verify they pass
+1. ✅ **~~Integrate Mock Forecaster into Webapp~~** (DONE 2026-01-17)
+   - Fixed Vite envPrefix to expose VITE_USE_MOCK_FORECASTER
+   - Turn-cycle tests now pass with mock forecaster
 
 2. **Add Cassette Replay System** (High Priority)
    - Implement `createRecordingGenAIClient` from design doc
    - Record real API interactions as fixtures
    - Use fixtures in E2E tests for deterministic behavior
 
-3. **Fix Flaky Tests** (Medium Priority)
-   - `falls back to seed events` - Handle timing/order issues
-   - `storage updates reflected in new tabs` - Normalize JSON comparison
-   - `import-export.spec.ts` - Verify file system test support
+3. ✅ **~~Fix Flaky Tests~~** (DONE 2026-01-17)
+   - Fixed multi-tab persistence test (JSON object comparison vs string)
+   - All 83 tests now pass consistently
 
 4. **Add to CI Pipeline** (Medium Priority)
    - Update `.github/workflows/ci.yml` to run passing tests on PR
@@ -315,7 +313,7 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
 - Import/export covered (pending execution)
 - Error handling and edge cases documented
 
-**Next Milestone:** Integrate GM turn mocking to test full gameplay loop end-to-end
+**Next Milestone:** Add cassette replay system for deterministic API testing
 
 ---
 
@@ -328,7 +326,7 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
 
 ---
 
-**Report Generated:** 2026-01-14
+**Report Generated:** 2026-01-17
 **Test Suite Version:** 1.0
 **Playwright Version:** 1.50.1
 **Next Review:** Before next major feature implementation
