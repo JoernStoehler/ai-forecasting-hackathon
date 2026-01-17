@@ -21,12 +21,12 @@ jobs:
         run: npm run lint -w packages/webapp
       - name: Typecheck all
         run: npm run typecheck
+      - name: Build all
+        run: npm run build
       - name: Unit tests (engine)
         run: npm test -w packages/engine
       - name: Unit tests (cli)
         run: npm test -w packages/cli
-      - name: Build all
-        run: npm run build
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps chromium
       - name: E2E Tests
