@@ -1,4 +1,4 @@
-import { ICON_SET } from '../constants';
+import { ICON_SET } from '../constants.js';
 import { slugify } from './strings.js';
 import { EngineEventSchema, ScenarioEventSchema } from '../schemas.js';
 import type {

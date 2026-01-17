@@ -61,16 +61,7 @@ describe('aggregate command', () => {
     expect(state.eventCount).toBe(1);
   });
 
-  it.skip('BUG: output history is not sorted (writes unsorted input)', async () => {
-    // BUG: runAggregate writes the unsorted `history` array to outputHistory
-    // instead of writing state.events (which is sorted).
-    // The state.events are sorted, but the JSONL output is not.
-    //
-    // To fix: Change line 28 in aggregate.ts from:
-    //   await writeEventsJsonl(opts.outputHistory, history);
-    // to:
-    //   await writeEventsJsonl(opts.outputHistory, state.events);
-
+  it('sorts output history chronologically', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'cli-aggregate-sort-'));
     const inputHistory = join(dir, 'history.jsonl');
     const newEvents = join(dir, 'new.jsonl');
@@ -86,7 +77,7 @@ describe('aggregate command', () => {
 
     await runAggregate({ inputHistory, newEvents, outputState, outputHistory });
 
-    // Check events are sorted in output (they should be, but currently aren't)
+    // Verify events are sorted in output
     const lines = (await readFile(outputHistory, 'utf-8')).split(/\r?\n/).filter(Boolean);
     const parsed = lines.map(l => JSON.parse(l));
 

@@ -25,6 +25,6 @@ export async function runAggregate(opts: {
   await writeFile(opts.outputState, JSON.stringify(state, null, 2));
 
   if (opts.outputHistory) {
-    await writeEventsJsonl(opts.outputHistory, history);
+    await writeEventsJsonl(opts.outputHistory, state.events);
   }
 }
