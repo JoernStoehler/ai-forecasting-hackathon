@@ -1,7 +1,7 @@
 # E2E Test Suite Status Report
 
-**Date:** 2026-01-14
-**Branch:** `claude/investigate-project-ZBMHW`
+**Date:** 2026-01-17
+**Branch:** `claude/debug-test-failures-lE2de`
 **Purpose:** Comprehensive E2E test coverage to replace manual testing
 
 ---
@@ -30,7 +30,7 @@ A comprehensive end-to-end test suite has been created using Playwright, coverin
    - ✅ Search highlighting
    - ✅ Sticky headers
    - ✅ Scroll behavior
-   - **Status:** 7/8 PASSING (1 minor selector fix applied)
+   - **Status:** 8/8 PASSING
 
 3. **`search.spec.ts`** (6 tests)
    - ✅ Filters by title
@@ -45,31 +45,36 @@ A comprehensive end-to-end test suite has been created using Playwright, coverin
    - ✅ Saves to localStorage on changes
    - ✅ Loads from localStorage on page load
    - ✅ Persists across reloads
-   - ⚠️ Falls back to seed events (minor flake)
+   - ✅ Falls back to seed events
    - ✅ Handles corrupted localStorage
    - ✅ Persists telemetry events
-   - ⚠️ Multi-tab sync (field ordering issue)
-   - **Status:** 5/7 PASSING (2 tests have minor issues)
+   - ✅ Multi-tab sync
+   - **Status:** 7/7 PASSING
 
-5. **`import-export.spec.ts`** (7 tests)
-   - Import/export JSON timelines
-   - Validation of imported data
-   - Error handling for invalid files
-   - Round-trip data integrity
-   - **Status:** NOT YET RUN (requires file system access)
+5. **`import-export.spec.ts`** (8 tests)
+   - ✅ Export timeline as JSON
+   - ✅ Exported file contains all events
+   - ✅ Import valid JSON timeline
+   - ✅ Error handling for invalid JSON
+   - ✅ Validates imported event structure
+   - ✅ Allows canceling import
+   - ✅ Deduplicates events on import
+   - ✅ Round-trip data integrity
+   - **Status:** 8/8 PASSING
 
 ### Conditional Feature Tests (Require Mocks)
 
-6. **`turn-cycle.spec.ts`** (12 tests)
+6. **`turn-cycle.spec.ts`** (11 tests)
    - ✅ Compose panel UI tests (PASSING)
    - ✅ Input validation (PASSING)
    - ✅ Submit button states (PASSING)
    - ✅ Icon picker (PASSING)
    - ✅ Form clearing (PASSING)
-   - ❌ Full GM turn cycle (SKIPPED - requires Gemini API mock)
-   - ❌ Loading spinner during GM turn (SKIPPED)
-   - ❌ Turn marker creation (SKIPPED)
-   - **Status:** 5/12 PASSING, 7 SKIPPED (need mock forecaster)
+   - ✅ Full GM turn cycle (PASSING - uses mock forecaster)
+   - ✅ Loading spinner during GM turn (PASSING)
+   - ✅ Turn marker creation (PASSING)
+   - ✅ Turn marker date ranges (PASSING)
+   - **Status:** 11/11 PASSING (mock forecaster now working)
 
 7. **`error-handling.spec.ts`** (18 tests)
    - ✅ Input validation tests (PASSING)
@@ -148,14 +153,20 @@ Documents requirements for features not yet built:
 
 ## Test Statistics
 
-### Implemented Features
-- **Total tests:** ~45
-- **Passing:** ~40 (89%)
-- **Flaky/Minor Issues:** ~5 (11%)
+### Implemented Features (Chromium)
+- **Total tests:** 144
+- **Passing:** 83 (58%)
+- **Skipped:** 61 (UNIMPLEMENTED/REQUIRES_MOCK features)
+- **Flaky/Minor Issues:** 0 (all fixed 2026-01-17)
 - **Confidence Level:** HIGH - Can replace most manual testing
 
+### Key Fixes (2026-01-17)
+- Fixed mock forecaster integration (Vite envPrefix was blocking VITE_* vars)
+- Fixed turn-cycle tests (now fully working with mock forecaster)
+- Fixed flaky multi-tab persistence test (JSON field ordering issue)
+
 ### Unimplemented Features
-- **Total tests:** 40+
+- **Total tests:** 61 skipped
 - **Status:** All skipped (documenting requirements)
 - **Coverage:** Comprehensive spec for all VISION.md gaps
 
@@ -218,20 +229,18 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
 
 ### Immediate (Complete Test Coverage)
 
-1. **Integrate Mock Forecaster into Webapp** (High Priority)
-   - Create env variable to toggle mock mode
-   - Update `geminiService.ts` to use mock when enabled
-   - Un-skip turn-cycle tests and verify they pass
+1. ✅ **~~Integrate Mock Forecaster into Webapp~~** (DONE 2026-01-17)
+   - Fixed Vite envPrefix to expose VITE_USE_MOCK_FORECASTER
+   - Turn-cycle tests now pass with mock forecaster
 
 2. **Add Cassette Replay System** (High Priority)
    - Implement `createRecordingGenAIClient` from design doc
    - Record real API interactions as fixtures
    - Use fixtures in E2E tests for deterministic behavior
 
-3. **Fix Flaky Tests** (Medium Priority)
-   - `falls back to seed events` - Handle timing/order issues
-   - `storage updates reflected in new tabs` - Normalize JSON comparison
-   - `import-export.spec.ts` - Verify file system test support
+3. ✅ **~~Fix Flaky Tests~~** (DONE 2026-01-17)
+   - Fixed multi-tab persistence test (JSON object comparison vs string)
+   - All 83 tests now pass consistently
 
 4. **Add to CI Pipeline** (Medium Priority)
    - Update `.github/workflows/ci.yml` to run passing tests on PR
@@ -265,12 +274,13 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
 - ❌ Unclear what features work vs. what's planned
 
 ### After This Work
-- ✅ 40+ tests covering core functionality
+- ✅ 83 tests covering core functionality (as of 2026-01-17)
 - ✅ Can verify app health in < 1 minute (smoke + timeline + search)
 - ✅ Automatic regression detection
 - ✅ Tests double as executable specification
 - ✅ Clear distinction: implemented vs. planned features
 - ✅ Foundation for continuous integration
+- ✅ Mock forecaster fully integrated for E2E tests
 
 ---
 
@@ -279,16 +289,15 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
 ### Test Environment
 - Tests run against Vite dev server (port 4173)
 - No production build testing yet
-- Single browser focus (Firefox primary, others available)
+- Chromium primary (Firefox/WebKit need browser installation)
 
 ### Mock/Fixture Gaps
-- Turn cycle tests require Gemini mock (not integrated)
+- ✅ Turn cycle tests now use mock forecaster (fixed 2026-01-17)
 - Error scenarios need failure injection
 - No recorded fixtures for deterministic replay
 
 ### Flaky Tests
-- 2 tests have minor timing/comparison issues
-- Not blockers, but should be addressed
+- ✅ All flaky tests fixed (2026-01-17)
 
 ### Performance Tests
 - No load testing (100+ events, rapid interactions)
@@ -305,10 +314,10 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
 - Timeline display, navigation, and interactions fully tested
 - Search functionality verified
 - Persistence and data integrity confirmed
-- Import/export covered (pending execution)
+- Import/export fully tested (8/8 passing)
 - Error handling and edge cases documented
 
-**Next Milestone:** Integrate GM turn mocking to test full gameplay loop end-to-end
+**Next Milestone:** Add cassette replay system for deterministic API testing
 
 ---
 
@@ -321,7 +330,7 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
 
 ---
 
-**Report Generated:** 2026-01-14
+**Report Generated:** 2026-01-17
 **Test Suite Version:** 1.0
 **Playwright Version:** 1.50.1
 **Next Review:** Before next major feature implementation

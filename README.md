@@ -2,12 +2,12 @@
 
 Vite + React 18 + TypeScript SPA for immersive scenario forecasting with Gemini 2.5 Flash. Client-only data (localStorage + JSON import/export); deploy as a static bundle.
 
-**Status:** MVP complete, 89% E2E test coverage, ready for feature development.
+**Status:** MVP complete, comprehensive E2E test suite, ready for feature development.
 
 ## Quick Start
 
 ### Development
-1. Open in devcontainer (auto-installs dependencies).
+1. Run `npm install` (dependencies auto-install on session start).
 2. Copy `.env.example` to `.env.local` (optional: set `GEMINI_API_KEY` or use mock).
 3. `npm run dev` - Start webapp (localhost:5173).
 4. `npm run test:e2e -w packages/webapp` - Run E2E tests with mock forecaster.
@@ -66,11 +66,10 @@ node packages/cli/dist/index.js \
 - localStorage persistence + JSON import/export
 - Gemini 2.5 Flash integration with streaming
 - Mock forecaster for testing
-- Comprehensive E2E test suite (89% passing)
+- Comprehensive E2E test suite
 
 ⚠️ **In Progress:**
 - Cassette replay system (designed, partially implemented)
-- Full turn cycle E2E tests (infrastructure ready, tests need debugging)
 
 ❌ **Planned:** (See VISION.md for details)
 - Post-game analysis screen
@@ -82,4 +81,3 @@ node packages/cli/dist/index.js \
 ---
 
 **For full onboarding:** See [CLAUDE.md](./CLAUDE.md)
-**For legacy docs:** See `AGENTS.md` (older codex-cli specific guidance)

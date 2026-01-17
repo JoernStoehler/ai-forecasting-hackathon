@@ -24,7 +24,7 @@ This is a serious policy simulation game where players assume the role of the US
 ### First Steps
 1. **Run hello script:** `bash scripts/hello.sh` - Prints repo map and sanity checks
 2. **Set up environment:** Copy `.env.example` to `.env.local` and optionally set `GEMINI_API_KEY`
-3. **Install dependencies:** `npm install` (handled by devcontainer)
+3. **Install dependencies:** `npm install` (auto-runs on session start)
 4. **Start dev server:** `npm run dev`
 5. **Run tests:** See [Testing](#testing) section below
 
@@ -88,8 +88,8 @@ npm run test:e2e -w packages/webapp
 - ✅ Search and filtering
 - ✅ Persistence (localStorage + import/export)
 - ✅ UI interactions and validation
-- ⚠️ Turn cycle (mocked, needs debugging)
-- ❌ Unimplemented features (documented as failing tests)
+- ✅ Turn cycle (uses mock forecaster)
+- ❌ Unimplemented features (documented as skipped tests)
 
 ---
 
@@ -140,10 +140,7 @@ See [`packages/webapp/tests/unimplemented-features.spec.ts`](./packages/webapp/t
 
 ## Development Environment
 
-### Devcontainer
-- Uses `.devcontainer/` configuration
-- Post-create hook runs `scripts/devcontainer-post-create.sh`
-- Ready-to-use environment with all dependencies
+Environment is pre-configured with dependencies installed via `npm install`.
 
 ### Git Workflow
 - **Main branch:** For quick fixes and PM work
@@ -241,20 +238,18 @@ node packages/cli/dist/index.js \
 
 ---
 
-## Current State (2026-01-14)
+## Current State (2026-01-17)
 
 ### What Works ✅
 - Core gameplay loop (player input → GM response)
 - Timeline display with search and navigation
 - Event sourcing with localStorage persistence
 - Import/export JSON timelines
-- Comprehensive E2E test suite (89% passing for implemented features)
+- Comprehensive E2E test suite
 - Mock forecaster integration for testing
 
 ### What Needs Work ⚠️
 - Cassette replay system (designed, partially implemented)
-- Turn cycle E2E tests (need debugging)
-- Some flaky persistence tests
 
 ### What's Not Built ❌
 - Post-game analysis screen
@@ -269,6 +264,6 @@ See [`E2E-TEST-STATUS.md`](./E2E-TEST-STATUS.md) for comprehensive status and ro
 
 ---
 
-**Last Updated:** 2026-01-14
+**Last Updated:** 2026-01-17
 **Maintained By:** Claude Code developers
 **Owner:** Jörn Stöhler

@@ -136,26 +136,32 @@ test.describe('LocalStorage Persistence', () => {
     }
   });
 
-  test.skip('FLAKY: storage updates are reflected in new tabs (JSON field ordering)', async ({ page, context }) => {
+  test('storage updates are reflected in new tabs', async ({ page, context }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // Get current localStorage value
-    const initialStored = await page.evaluate(() => {
-      return localStorage.getItem('takeoff-timeline-events-v2');
+    // Get current localStorage value (as parsed JSON to avoid field ordering issues)
+    const initialEvents = await page.evaluate(() => {
+      const stored = localStorage.getItem('takeoff-timeline-events-v2');
+      return stored ? JSON.parse(stored) : null;
     });
+
+    expect(initialEvents).toBeTruthy();
+    expect(Array.isArray(initialEvents)).toBe(true);
 
     // Open new tab with same context
     const page2 = await context.newPage();
     await page2.goto('/');
     await page2.waitForLoadState('networkidle');
 
-    // Should have same timeline
-    const page2Stored = await page2.evaluate(() => {
-      return localStorage.getItem('takeoff-timeline-events-v2');
+    // Should have same timeline data (compare parsed objects, not raw strings)
+    const page2Events = await page2.evaluate(() => {
+      const stored = localStorage.getItem('takeoff-timeline-events-v2');
+      return stored ? JSON.parse(stored) : null;
     });
 
-    expect(page2Stored).toBe(initialStored);
+    // Deep equality check - catches all differences
+    expect(page2Events).toEqual(initialEvents);
 
     await page2.close();
   });
