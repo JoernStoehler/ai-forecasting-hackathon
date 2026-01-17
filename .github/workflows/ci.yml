@@ -28,9 +28,9 @@ jobs:
       - name: Build all
         run: npm run build
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps firefox
+        run: npx playwright install --with-deps chromium
       - name: E2E Tests
-        run: npm run test:e2e -w packages/webapp -- --project=firefox --grep-invert "UNIMPLEMENTED"
+        run: npm run test:e2e -w packages/webapp -- --project=chromium --grep-invert "UNIMPLEMENTED"
       - name: Upload test results
         if: failure()
         uses: actions/upload-artifact@v4

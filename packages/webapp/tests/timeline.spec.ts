@@ -9,7 +9,7 @@ test.describe('Timeline Display', () => {
     await page.waitForLoadState('networkidle');
 
     // Should see year markers (use getByRole for specificity)
-    await expect(page.getByRole('heading', { name: '2025' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: '2025', exact: true })).toBeVisible();
 
     // Should see month markers
     await expect(page.locator('text=/Jan|Feb|Mar|Apr|May|Jun/i').first()).toBeVisible();

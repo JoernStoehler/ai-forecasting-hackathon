@@ -11,6 +11,8 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:4173',
     trace: 'on-first-retry',
+    // Start each test with clean localStorage
+    storageState: { cookies: [], origins: [] },
   },
   webServer: {
     // Use mock forecaster for E2E tests (deterministic, no API key required)
