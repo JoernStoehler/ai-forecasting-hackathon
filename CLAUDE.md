@@ -145,7 +145,7 @@ See [`packages/webapp/tests/unimplemented-features.spec.ts`](./packages/webapp/t
 - Post-create hook runs `scripts/devcontainer-post-create.sh`
 - Ready-to-use environment with all dependencies
 
-### Claude Code Web
+### [PROPOSED] Claude Code Web
 - Different runtime from devcontainer (check `CLAUDE_CODE_CONTAINER_ID` env var)
 - Tools like `gh` CLI may not be pre-installed
 - Git uses proxied remote; use `--repo` flag with gh commands
