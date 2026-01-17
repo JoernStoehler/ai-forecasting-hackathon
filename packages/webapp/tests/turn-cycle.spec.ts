@@ -80,8 +80,13 @@ test.describe('Player Turn Creation', () => {
 });
 
 test.describe('GM Turn and Response', () => {
-  test.skip('submitting player event triggers GM turn', async ({ page }) => {
-    // TODO: Fix this test - mock forecaster is integrated but test timing needs adjustment
+  test.skip('TODO: submitting player event triggers GM turn', async ({ page }) => {
+    // ISSUE: Submit button stays disabled after click, test times out waiting for re-enable
+    // - Mock forecaster is configured (VITE_USE_MOCK_FORECASTER=true in playwright.config)
+    // - Smoke test passes, app loads fine
+    // - Form validation may be interfering
+    // - Need to debug: is forecaster being invoked? React state updates completing?
+    // - Related to test below (shows loading state)
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -110,8 +115,9 @@ test.describe('GM Turn and Response', () => {
     // (Can't easily check console from test, but the setup should log it)
   });
 
-  test.skip('shows loading spinner during GM turn', async ({ page }) => {
-    // TODO: Fix this test - form validation might be interfering
+  test.skip('TODO: shows loading state during GM turn', async ({ page }) => {
+    // ISSUE: Same as above - button stays disabled, doesn't re-enable
+    // Verifies button state changes (spinner too fast to reliably check with mock)
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
