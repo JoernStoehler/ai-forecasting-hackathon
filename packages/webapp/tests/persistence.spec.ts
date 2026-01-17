@@ -160,20 +160,8 @@ test.describe('LocalStorage Persistence', () => {
       return stored ? JSON.parse(stored) : null;
     });
 
-    // Compare event counts and key data
-    expect(page2Events).toBeTruthy();
-    expect(page2Events.length).toBe(initialEvents.length);
-
-    // Compare news events specifically (most important for UI)
-    const initialNews = initialEvents.filter((e: any) => e.type === 'news-published');
-    const page2News = page2Events.filter((e: any) => e.type === 'news-published');
-    expect(page2News.length).toBe(initialNews.length);
-
-    // Verify first and last news events match
-    if (initialNews.length > 0) {
-      expect(page2News[0].title).toBe(initialNews[0].title);
-      expect(page2News[page2News.length - 1].title).toBe(initialNews[initialNews.length - 1].title);
-    }
+    // Deep equality check - catches all differences
+    expect(page2Events).toEqual(initialEvents);
 
     await page2.close();
   });
