@@ -140,7 +140,7 @@ See [`packages/webapp/tests/unimplemented-features.spec.ts`](./packages/webapp/t
 
 ## Development Environment
 
-[PROPOSED] Environment is pre-configured with dependencies installed via `npm install`.
+Environment is pre-configured with dependencies installed via `npm install`.
 
 ### Git Workflow
 - **Main branch:** For quick fixes and PM work
