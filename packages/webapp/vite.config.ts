@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react';
 const srcDir = fileURLToPath(new URL('./src', import.meta.url));
 
 export default defineConfig({
-  envPrefix: ['GEMINI_'],
+  envPrefix: ['GEMINI_', 'VITE_'],
   server: {
     port: 3000,
     host: '0.0.0.0',

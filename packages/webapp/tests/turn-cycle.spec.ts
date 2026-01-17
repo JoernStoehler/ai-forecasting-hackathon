@@ -80,13 +80,8 @@ test.describe('Player Turn Creation', () => {
 });
 
 test.describe('GM Turn and Response', () => {
-  test.skip('TODO: submitting player event triggers GM turn', async ({ page }) => {
-    // ISSUE: Submit button stays disabled after click, test times out waiting for re-enable
-    // - Mock forecaster is configured (VITE_USE_MOCK_FORECASTER=true in playwright.config)
-    // - Smoke test passes, app loads fine
-    // - Form validation may be interfering
-    // - Need to debug: is forecaster being invoked? React state updates completing?
-    // - Related to test below (shows loading state)
+  test('submitting player event triggers GM turn', async ({ page }) => {
+    // Verifies the full turn cycle: player submits → GM responds → new events appear
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -99,25 +94,19 @@ test.describe('GM Turn and Response', () => {
     const submitButton = page.locator('button[aria-label="Submit new event"]');
     await submitButton.click();
 
-    // Should show loading state briefly
-    await expect(submitButton).toBeDisabled();
+    // Wait for player event to appear in timeline
+    await expect(page.locator('text=Player Action')).toBeVisible({ timeout: 5000 });
 
-    // Wait for GM response and re-enable (mock is fast, but still async)
-    await expect(submitButton).toBeEnabled({ timeout: 10000 });
+    // Wait for mock GM event to appear (has "DEV forecast event" title from mock forecaster)
+    await expect(page.locator('text=DEV forecast event')).toBeVisible({ timeout: 10000 });
 
-    // Should have new events from GM (mock adds 1 event)
-    // The player event is added first, then GM adds one event
-    // So we should see at least +1 (player) and ideally +2 (player + GM)
+    // Should have new events: +1 player event, +1 GM mock event = at least +2
     const newCount = await page.locator('[aria-expanded]').count();
-    expect(newCount).toBeGreaterThanOrEqual(initialCount + 1);
-
-    // Verify console shows mock is being used
-    // (Can't easily check console from test, but the setup should log it)
+    expect(newCount).toBeGreaterThanOrEqual(initialCount + 2);
   });
 
-  test.skip('TODO: shows loading state during GM turn', async ({ page }) => {
-    // ISSUE: Same as above - button stays disabled, doesn't re-enable
-    // Verifies button state changes (spinner too fast to reliably check with mock)
+  test('shows loading state during GM turn', async ({ page }) => {
+    // Verifies loading spinner appears during GM turn processing
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
@@ -127,19 +116,21 @@ test.describe('GM Turn and Response', () => {
 
     const submitButton = page.locator('button[aria-label="Submit new event"]');
 
-    // Check for spinner immediately after click (mock is very fast, so we might miss it)
-    // This test is flaky with fast mock - the spinner may not be visible long enough
+    // Before click, button should show Send icon (not spinner)
+    await expect(submitButton.locator('svg.lucide-send')).toBeVisible();
+
     await submitButton.click();
 
-    // The spinner appears in the submit button itself when loading
-    // Check that button becomes disabled (loading state)
+    // Button becomes disabled during loading
     await expect(submitButton).toBeDisabled();
 
-    // Eventually re-enabled after GM turn completes
-    await expect(submitButton).toBeEnabled({ timeout: 10000 });
+    // Wait for loading to complete (spinner disappears)
+    // With mock forecaster this is fast, but we verify the state transition completed
+    await expect(submitButton.locator('.animate-spin')).toBeHidden({ timeout: 10000 });
 
-    // Note: With mock forecaster, spinner appears/disappears too quickly to reliably test
-    // This test verifies the button state changes instead
+    // After completion, button shows Send icon again (not spinner)
+    // Button is still disabled because form is empty, but icon should be Send
+    await expect(submitButton.locator('svg.lucide-send')).toBeVisible();
   });
 
   test('GM events appear in timeline chronologically', async ({ page }) => {
@@ -192,7 +183,7 @@ test.describe('GM Turn and Response', () => {
 });
 
 test.describe('Turn Markers', () => {
-  test.skip('REQUIRES_IMPLEMENTATION: turn-started events are created', async ({ page }) => {
+  test('turn-started events are created', async ({ page }) => {
     // This test verifies that turn-started events are properly created
     // They should be in the event log but not necessarily visible in UI
     await page.goto('/');
@@ -203,7 +194,8 @@ test.describe('Turn Markers', () => {
     await page.getByPlaceholder('Description...').fill('Test description');
     await page.locator('button[aria-label="Submit new event"]').click();
 
-    await page.waitForTimeout(1000);
+    // Wait for GM turn to complete (DEV forecast event appears)
+    await expect(page.locator('text=DEV forecast event')).toBeVisible({ timeout: 10000 });
 
     // Check localStorage for turn markers
     const stored = await page.evaluate(() => {
@@ -229,7 +221,7 @@ test.describe('Turn Markers', () => {
     }
   });
 
-  test.skip('REQUIRES_IMPLEMENTATION: turn markers have correct date ranges', async ({ page }) => {
+  test('turn markers have correct date ranges', async ({ page }) => {
     // Verify turn markers properly capture date ranges
     await page.goto('/');
     await page.waitForLoadState('networkidle');
@@ -253,7 +245,8 @@ test.describe('Turn Markers', () => {
     await page.getByPlaceholder('Description...').fill('Test description');
     await page.locator('button[aria-label="Submit new event"]').click();
 
-    await page.waitForTimeout(1000);
+    // Wait for GM turn to complete (DEV forecast event appears)
+    await expect(page.locator('text=DEV forecast event')).toBeVisible({ timeout: 10000 });
 
     // Check turn markers have appropriate date ranges
     const storedAfter = await page.evaluate(() => {
