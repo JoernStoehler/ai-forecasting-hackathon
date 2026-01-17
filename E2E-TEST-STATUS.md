@@ -30,7 +30,7 @@ A comprehensive end-to-end test suite has been created using Playwright, coverin
    - ✅ Search highlighting
    - ✅ Sticky headers
    - ✅ Scroll behavior
-   - **Status:** 7/8 PASSING (1 minor selector fix applied)
+   - **Status:** 8/8 PASSING
 
 3. **`search.spec.ts`** (6 tests)
    - ✅ Filters by title
@@ -51,12 +51,16 @@ A comprehensive end-to-end test suite has been created using Playwright, coverin
    - ✅ Multi-tab sync
    - **Status:** 7/7 PASSING
 
-5. **`import-export.spec.ts`** (7 tests)
-   - Import/export JSON timelines
-   - Validation of imported data
-   - Error handling for invalid files
-   - Round-trip data integrity
-   - **Status:** NOT YET RUN (requires file system access)
+5. **`import-export.spec.ts`** (8 tests)
+   - ✅ Export timeline as JSON
+   - ✅ Exported file contains all events
+   - ✅ Import valid JSON timeline
+   - ✅ Error handling for invalid JSON
+   - ✅ Validates imported event structure
+   - ✅ Allows canceling import
+   - ✅ Deduplicates events on import
+   - ✅ Round-trip data integrity
+   - **Status:** 8/8 PASSING
 
 ### Conditional Feature Tests (Require Mocks)
 
@@ -310,7 +314,7 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
 - Timeline display, navigation, and interactions fully tested
 - Search functionality verified
 - Persistence and data integrity confirmed
-- Import/export covered (pending execution)
+- Import/export fully tested (8/8 passing)
 - Error handling and edge cases documented
 
 **Next Milestone:** Add cassette replay system for deterministic API testing

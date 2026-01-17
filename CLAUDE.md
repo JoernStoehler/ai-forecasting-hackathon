@@ -24,7 +24,7 @@ This is a serious policy simulation game where players assume the role of the US
 ### First Steps
 1. **Run hello script:** `bash scripts/hello.sh` - Prints repo map and sanity checks
 2. **Set up environment:** Copy `.env.example` to `.env.local` and optionally set `GEMINI_API_KEY`
-3. **Install dependencies:** `npm install` (handled by devcontainer)
+3. **Install dependencies:** `npm install` (auto-runs on session start)
 4. **Start dev server:** `npm run dev`
 5. **Run tests:** See [Testing](#testing) section below
 
