@@ -140,10 +140,7 @@ See [`packages/webapp/tests/unimplemented-features.spec.ts`](./packages/webapp/t
 
 ## Development Environment
 
-### Devcontainer
-- Uses `.devcontainer/` configuration
-- Post-create hook runs `scripts/devcontainer-post-create.sh`
-- Ready-to-use environment with all dependencies
+[PROPOSED] Environment is pre-configured with dependencies installed via `npm install`.
 
 ### Git Workflow
 - **Main branch:** For quick fixes and PM work
