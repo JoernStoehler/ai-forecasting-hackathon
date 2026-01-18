@@ -4,14 +4,14 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "cd packages/webapp && vite",
-    "build": "cd packages/webapp && vite build",
-    "preview": "cd packages/webapp && vite preview",
-    "lint": "cd packages/webapp && eslint src --ext .ts,.tsx --ignore-pattern '**/*.test.ts'",
-    "typecheck": "cd packages/webapp && tsc --noEmit",
-    "test": "cd packages/webapp && vitest run",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --ext .ts,.tsx --ignore-pattern '**/*.test.ts'",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
-    "test:e2e": "cd packages/webapp && playwright test",
+    "test:e2e": "playwright test",
     "hello": "bash scripts/hello.sh"
   },
   "dependencies": {

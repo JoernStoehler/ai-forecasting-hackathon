@@ -11,15 +11,15 @@
 This is a serious policy simulation game where players assume the role of the US government and interact with an LLM-based "game master" (powered by Google's Gemini 2.5 Flash) to explore AI governance scenarios through an interactive timeline from 2025 onward.
 
 **Project Structure:**
-Single-package React SPA (consolidated from previous 3-package monorepo):
-- `packages/webapp/` - React SPA (all code consolidated here)
+Flat single-package structure (all code at root level):
+- `src/` - React application source
   - `src/engine/` - Timeline engine (types, validation, forecaster adapters)
   - `src/engine/test/` - Engine unit tests (196 tests)
   - `src/components/` - React components
   - `src/services/` - Business logic and integrations
-  - `tests/` - E2E test suite (Playwright)
+- `tests/` - E2E test suite (Playwright)
 - `docs/` - Specifications and design documents
-- `package.json` (root) - Webapp package.json (no workspace config)
+- Root config files (tsconfig.json, vite.config.ts, playwright.config.ts, etc.)
 
 ---
 
