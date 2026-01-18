@@ -11,6 +11,7 @@ import { Header } from '../components/Header';
 import { Timeline } from '../components/Timeline';
 import { ComposePanel } from '../components/ComposePanel';
 import { Toast } from '../components/Toast';
+import { TutorialModal } from '../components/TutorialModal';
 
 const STORAGE_KEY = 'takeoff-timeline-events-v2';
 
@@ -24,6 +25,7 @@ export const GamePage: React.FC<GamePageProps> = ({ initialEvents }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showTutorial, setShowTutorial] = useState(false);
   const eventsRef = useRef(events);
 
   useEffect(() => {
@@ -149,6 +151,14 @@ export const GamePage: React.FC<GamePageProps> = ({ initialEvents }) => {
     return marker.length ? marker[marker.length - 1].date : undefined;
   }, [events]);
 
+  const handleShowTutorial = () => {
+    setShowTutorial(true);
+  };
+
+  const handleCloseTutorial = () => {
+    setShowTutorial(false);
+  };
+
   return (
     <div className="bg-beige-50 text-stone-800 min-h-screen font-sans">
       <Header
@@ -156,6 +166,7 @@ export const GamePage: React.FC<GamePageProps> = ({ initialEvents }) => {
         onSearchChange={setSearchQuery}
         events={events}
         onImport={handleImport}
+        onShowTutorial={handleShowTutorial}
       />
 
       <main className="max-w-3xl mx-auto px-4 pt-20 pb-56">
@@ -174,6 +185,8 @@ export const GamePage: React.FC<GamePageProps> = ({ initialEvents }) => {
       />
 
       {error && <Toast message={error} onClose={() => setError(null)} />}
+
+      <TutorialModal isOpen={showTutorial} onClose={handleCloseTutorial} />
     </div>
   );
 };

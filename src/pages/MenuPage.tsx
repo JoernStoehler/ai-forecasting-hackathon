@@ -1,9 +1,10 @@
 /**
  * Pre-game menu - scenario selection and game initialization
  */
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '../components/icons';
+import { TutorialModal } from '../components/TutorialModal';
 
 interface MenuPageProps {
   hasExistingGame: boolean;
@@ -11,8 +12,28 @@ interface MenuPageProps {
   onContinueGame: () => void;
 }
 
+const TUTORIAL_KEY = 'takeoff-has-seen-tutorial';
+
 export const MenuPage: React.FC<MenuPageProps> = ({ hasExistingGame, onNewGame, onContinueGame }) => {
   const navigate = useNavigate();
+  const [showTutorial, setShowTutorial] = useState(false);
+
+  useEffect(() => {
+    // Check if user has seen tutorial before
+    const hasSeenTutorial = localStorage.getItem(TUTORIAL_KEY) === 'true';
+    if (!hasSeenTutorial) {
+      setShowTutorial(true);
+    }
+  }, []);
+
+  const handleCloseTutorial = () => {
+    setShowTutorial(false);
+    localStorage.setItem(TUTORIAL_KEY, 'true');
+  };
+
+  const handleShowTutorial = () => {
+    setShowTutorial(true);
+  };
 
   const handleNewGame = () => {
     onNewGame();
@@ -96,7 +117,20 @@ export const MenuPage: React.FC<MenuPageProps> = ({ hasExistingGame, onNewGame, 
             Starting a new game will replace your current progress
           </p>
         )}
+
+        {/* Help Link */}
+        <div className="text-center mt-6">
+          <button
+            onClick={handleShowTutorial}
+            className="text-stone-600 hover:text-amber-700 text-sm font-medium transition-colors flex items-center gap-2 mx-auto"
+          >
+            <Icon name="HelpCircle" className="w-4 h-4" />
+            How to Play
+          </button>
+        </div>
       </div>
+
+      <TutorialModal isOpen={showTutorial} onClose={handleCloseTutorial} />
     </div>
   );
 };
