@@ -96,7 +96,7 @@ This section defines the sequential order for implementing MVP features. Work th
    - Font size for accessibility
    - See: [Settings & Dark Mode](#settings--dark-mode)
 
-7. **Accessibility & Keyboard Navigation** - 🔵 READY, HIGH PRIORITY
+7. **Accessibility & Keyboard Navigation** - 🟢 COMPLETE (2026-01-18)
    - Policy experts may rely on assistive tech
    - Full keyboard support, ARIA labels
    - See: [Keyboard Navigation & Accessibility](#keyboard-navigation--accessibility)
@@ -548,38 +548,47 @@ First-time user experience and game mechanic explanations.
 ---
 
 ### Settings & Dark Mode
-**Stage:** 🔵 READY
+**Stage:** 🟢 COMPLETE (2026-01-18)
 **Tests:** [tests/unimplemented-features.spec.ts:112-150](tests/unimplemented-features.spec.ts)
 
 User preferences and dark mode toggle.
 
-**Implementation Readiness:**
-- ✅ Test specs written (8 tests)
-- ❌ No settings panel
-- ❌ No dark mode CSS
+**Implementation:**
+- ✅ useTheme hook with localStorage persistence
+- ✅ Dark mode toggle in Header (Moon/Sun icon)
+- ✅ Dark mode styles across all pages and components
+- ✅ Tailwind dark mode with class strategy
+- ✅ Theme state managed in App.tsx
 
 **Features:**
 - Dark mode toggle
-- Settings panel
-- Preference persistence (localStorage)
-- Accessibility options
+- Preference persistence (localStorage: 'takeoff-theme')
+- Consistent dark/light theme across all pages
 
 **Dependencies:** None (orthogonal)
 
 ---
 
 ### Keyboard Navigation & Accessibility
-**Stage:** 🔵 READY
+**Stage:** 🟢 COMPLETE (2026-01-18)
 **Tests:** Partially covered in unimplemented features
 
 Full keyboard support and accessibility enhancements.
+
+**Implementation:**
+- ✅ EventItem converted to button (semantic HTML)
+- ✅ Keyboard event handlers (Enter/Space) for expand/collapse
+- ✅ Visible focus indicators with :focus-visible CSS
+- ✅ ARIA labels on all interactive elements
+- ✅ Screen reader support with role attributes
+- ✅ Dark mode support for all interactive components
 
 **Features:**
 - Keyboard-accessible event expand/collapse
 - Focus indicators
 - ARIA labels on interactive elements
 - Screen reader support
-- Keyboard shortcuts
+- Keyboard shortcuts (Enter/Space)
 
 **Dependencies:** Timeline Display
 
