@@ -71,9 +71,9 @@ This section defines the sequential order for implementing MVP features. Work th
    - Telemetry aggregation, hidden news marking
    - See: [Prompt Projection & Telemetry Aggregation](#prompt-projection--telemetry-aggregation)
 
-2. **Pre-Game Menu & Setup UI** - 🔵 READY, ⚠️ ESSENTIAL
-   - Scenario picker, start date, role selection
-   - Required for complete user flow
+2. **Pre-Game Menu & Setup UI** - 🟢 COMPLETE (2026-01-18)
+   - Routing structure, menu page, game initialization
+   - MVP: Single scenario, Continue/New Game flow
    - See: [Pre-Game Menu & Setup UI](#pre-game-menu--setup-ui)
 
 3. **Post-Game Screen + Hidden News Completion** - 🔵 READY, ⚠️ ESSENTIAL
@@ -433,16 +433,10 @@ Transform chatty event log into calm, focused prompt for GM. Filters/compresses 
 ## Unimplemented Features
 
 ### Pre-Game Menu & Setup UI
-**Stage:** 🔵 READY
-**Priority:** ⚠️ **ESSENTIAL** - MVP user flow requirement
-**Tests:** Not yet written (needs test specs)
+**Stage:** 🟢 COMPLETE (2026-01-18)
+**Files:** [src/pages/MenuPage.tsx](src/pages/MenuPage.tsx), [src/App.tsx](src/App.tsx)
 
-Pre-game menu for scenario selection, start date picking, and role selection before gameplay begins.
-
-**Implementation Readiness:**
-- ✅ Design clarified (2026-01-18)
-- ❌ No routing structure (`/` → menu, `/game` → gameplay)
-- ❌ No UI components
+Pre-game menu with routing, game initialization, and Continue/New Game flow.
 
 **Features:**
 - Main menu screen (Continue vs New Game)
