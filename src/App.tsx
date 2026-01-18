@@ -1,19 +1,16 @@
 /**
- * Top-level timeline experience: loads seed events, persists user edits,
- * calls Gemini for forecasts, and renders the search/timeline/compose stack.
+ * Main app router - handles navigation between menu and game
  */
-import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { EngineEvent, ScenarioEvent } from './types';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { EngineEvent } from './types';
 import { INITIAL_EVENTS } from './data';
-import { applyNewsPatches, coerceEngineEvents, sortAndDedupEvents, aggregate } from '@/engine';
-import { dateFromISO } from '@/engine/utils/strings';
-import { getAiForecast } from './services/geminiService';
-import { Header } from './components/Header';
-import { Timeline } from './components/Timeline';
-import { ComposePanel } from './components/ComposePanel';
-import { Toast } from './components/Toast';
+import { coerceEngineEvents } from '@/engine';
+import { MenuPage } from './pages/MenuPage';
+import { GamePage } from './pages/GamePage';
 
 const STORAGE_KEY = 'takeoff-timeline-events-v2';
+const HAS_GAME_KEY = 'takeoff-has-game';
 
 const loadEventsFromStorage = (): EngineEvent[] => {
   if (typeof window === 'undefined') {
@@ -33,153 +30,51 @@ const loadEventsFromStorage = (): EngineEvent[] => {
 };
 
 function App() {
-  const [events, setEvents] = useState<EngineEvent[]>(loadEventsFromStorage);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const eventsRef = useRef(events);
+  const [gameEvents, setGameEvents] = useState<EngineEvent[]>(loadEventsFromStorage);
+  const [hasExistingGame, setHasExistingGame] = useState<boolean>(() => {
+    return localStorage.getItem(HAS_GAME_KEY) === 'true';
+  });
 
   useEffect(() => {
-    eventsRef.current = events;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
-  }, [events]);
+    // Update hasExistingGame flag when game events change
+    const hasGame = gameEvents.length > 0 && JSON.stringify(gameEvents) !== JSON.stringify(INITIAL_EVENTS);
+    setHasExistingGame(hasGame);
+    localStorage.setItem(HAS_GAME_KEY, hasGame.toString());
+  }, [gameEvents]);
 
-  const handleUserSubmit = useCallback(async (newEvent: ScenarioEvent) => {
-    const previousEvents = eventsRef.current;
-    const baseSummary = aggregate(previousEvents);
-    const playerTurnStartDate = baseSummary.latestDate ?? newEvent.date;
-    const playerTurnStarted: EngineEvent = {
-      type: 'turn-started',
-      actor: 'player',
-      from: playerTurnStartDate,
-      until: playerTurnStartDate,
-    };
-    const historyAfterPlayerBase = sortAndDedupEvents([...previousEvents, playerTurnStarted, newEvent]);
-    const playerTurnUntil = aggregate(historyAfterPlayerBase).latestDate ?? playerTurnStartDate;
-    const playerTurnFinished: EngineEvent = {
-      type: 'turn-finished',
-      actor: 'player',
-      from: playerTurnStartDate,
-      until: playerTurnUntil,
-    };
-    const historyAfterPlayer = sortAndDedupEvents([...historyAfterPlayerBase, playerTurnFinished]);
-    const gmTurnStartDate = aggregate(historyAfterPlayer).latestDate ?? playerTurnUntil;
-    const gmTurnStarted: EngineEvent = {
-      type: 'turn-started',
-      actor: 'game_master',
-      from: gmTurnStartDate,
-      until: gmTurnStartDate,
-    };
-    const historyWithGmStart = sortAndDedupEvents([...historyAfterPlayer, gmTurnStarted]);
+  const handleNewGame = () => {
+    // Reset to initial events
+    setGameEvents(INITIAL_EVENTS);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_EVENTS));
+    localStorage.setItem(HAS_GAME_KEY, 'true');
+  };
 
-    setIsLoading(true);
-    setError(null);
-    setEvents(historyAfterPlayer);
-    try {
-      setEvents(historyWithGmStart);
-      const forecastEvents = await getAiForecast(historyWithGmStart);
-      const historyWithForecast = sortAndDedupEvents([...historyWithGmStart, ...forecastEvents]);
-      const gmTurnUntil = aggregate(historyWithForecast).latestDate ?? gmTurnStartDate;
-      const gmTurnFinished: EngineEvent = {
-        type: 'turn-finished',
-        actor: 'game_master',
-        from: gmTurnStartDate,
-        until: gmTurnUntil,
-      };
-      setEvents(sortAndDedupEvents([...historyWithForecast, gmTurnFinished]));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred.');
-      setEvents(previousEvents);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const handleImport = useCallback((newEvents: EngineEvent[]) => {
-    setEvents(sortAndDedupEvents(newEvents));
-    alert('Timeline imported successfully!');
-  }, []);
-
-  const handleTelemetry = useCallback((type: 'news-opened' | 'news-closed', targetId: string) => {
-    const telemetryEvent: EngineEvent = {
-      type,
-      targetId,
-      at: new Date().toISOString(),
-    };
-    setEvents(prev => sortAndDedupEvents([...prev, telemetryEvent]));
-  }, []);
-
-  const timelineEvents = useMemo(() => {
-    // Get patched news events
-    const patchedNews = applyNewsPatches(events);
-
-    // Get turn markers from original events
-    const turnMarkers = events.filter(event =>
-      event.type === 'turn-started' || event.type === 'turn-finished'
-    );
-
-    // Merge and sort (news + turn markers)
-    return sortAndDedupEvents([...patchedNews, ...turnMarkers]);
-  }, [events]);
-
-  const filteredEvents = useMemo(() => {
-    if (!searchQuery.trim()) {
-      return timelineEvents;
-    }
-    const lowercasedQuery = searchQuery.toLowerCase();
-    return timelineEvents.filter(event => {
-      // Turn markers don't have searchable content, always include them
-      if (event.type === 'turn-started' || event.type === 'turn-finished') {
-        return true;
-      }
-      // Filter news events by title/description
-      if ('title' in event && 'description' in event) {
-        return (
-          event.title.toLowerCase().includes(lowercasedQuery) ||
-          event.description.toLowerCase().includes(lowercasedQuery)
-        );
-      }
-      return false;
-    });
-  }, [timelineEvents, searchQuery]);
-
-  const latestEventDate = useMemo(() => {
-    const summary = aggregate(events);
-    if (!summary.latestDate) return dateFromISO(new Date().toISOString());
-    return summary.latestDate;
-  }, [events]);
-
-  const boundaryDate = useMemo(() => {
-    const marker = events.filter(event => event.type === 'scenario-head-completed');
-    return marker.length ? marker[marker.length - 1].date : undefined;
-  }, [events]);
+  const handleContinueGame = () => {
+    // Load from storage (already loaded in state)
+    const loaded = loadEventsFromStorage();
+    setGameEvents(loaded);
+  };
 
   return (
-    <div className="bg-beige-50 text-stone-800 min-h-screen font-sans">
-      <Header 
-        searchQuery={searchQuery} 
-        onSearchChange={setSearchQuery} 
-        events={events}
-        onImport={handleImport}
-      />
-      
-      <main className="max-w-3xl mx-auto px-4 pt-20 pb-56">
-        <Timeline
-          events={filteredEvents}
-          searchQuery={searchQuery}
-          boundaryDate={boundaryDate}
-          onTelemetry={handleTelemetry}
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <MenuPage
+              hasExistingGame={hasExistingGame}
+              onNewGame={handleNewGame}
+              onContinueGame={handleContinueGame}
+            />
+          }
         />
-      </main>
-
-      <ComposePanel
-        latestDate={latestEventDate}
-        onSubmit={handleUserSubmit}
-        isLoading={isLoading}
-      />
-
-      {error && <Toast message={error} onClose={() => setError(null)} />}
-    </div>
+        <Route
+          path="/game"
+          element={<GamePage initialEvents={gameEvents} />}
+        />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
