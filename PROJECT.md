@@ -91,7 +91,7 @@ This section defines the sequential order for implementing MVP features. Work th
    - GM requests percentile rolls for variability
    - See: [PRNG & Dice Rolling](#prng--dice-rolling)
 
-6. **Dark Mode & Settings** - 🔵 READY, HIGH PRIORITY
+6. **Dark Mode & Settings** - 🟢 COMPLETE (2026-01-18)
    - Professional polish for expert audience
    - Font size for accessibility
    - See: [Settings & Dark Mode](#settings--dark-mode)
@@ -848,7 +848,7 @@ MVP Critical Path (sequential, blocks deployment)
 │  └─ depends on: Pre-Game Menu (for context-sensitive hints)
 ├─ 5. PRNG Integration ✅ COMPLETE (2026-01-18)
 │  └─ depends on: Prompt Projection (to include PRNG in GM context)
-├─ 6. Dark Mode & Settings 🔵 READY (HIGH PRIORITY)
+├─ 6. Dark Mode & Settings ✅ COMPLETE (2026-01-18)
 │  └─ depends on: Nothing (orthogonal)
 ├─ 7. Accessibility 🔵 READY (HIGH PRIORITY)
 │  └─ depends on: Nothing (orthogonal)
