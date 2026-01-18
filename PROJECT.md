@@ -76,7 +76,7 @@ This section defines the sequential order for implementing MVP features. Work th
    - MVP: Single scenario, Continue/New Game flow
    - See: [Pre-Game Menu & Setup UI](#pre-game-menu--setup-ui)
 
-3. **Post-Game Screen + Hidden News Completion** - 🔵 READY, ⚠️ ESSENTIAL
+3. **Post-Game Screen + Hidden News Completion** - 🟢 COMPLETE (2026-01-18)
    - Core pedagogical mechanic (teaches forecasting under uncertainty)
    - Tightly coupled features (implement together)
    - See: [Post-Game Analysis Screen](#post-game-analysis-screen) + [Hidden News System](#hidden-news-system)
@@ -838,15 +838,15 @@ Testing Infrastructure (complete ✅)
 └─ Cassette Replay ✅
 
 MVP Critical Path (sequential, blocks deployment)
-├─ 1. Prompt Projection 🔵 READY ⚠️ ESSENTIAL
+├─ 1. Prompt Projection ✅ COMPLETE (2026-01-18)
 │  └─ depends on: Basic Telemetry ✅, Event Sourcing ✅
-├─ 2. Pre-Game Menu & Setup 🔵 READY ⚠️ ESSENTIAL
+├─ 2. Pre-Game Menu & Setup ✅ COMPLETE (2026-01-18)
 │  └─ depends on: Event Sourcing ✅
-├─ 3. Post-Game Screen + Hidden News 🔵 READY ⚠️ ESSENTIAL
+├─ 3. Post-Game Screen + Hidden News ✅ COMPLETE (2026-01-18)
 │  └─ depends on: Prompt Projection (for hidden news filtering)
 ├─ 4. Tutorial/Onboarding 🔵 READY ⚠️ ESSENTIAL
 │  └─ depends on: Pre-Game Menu (for context-sensitive hints)
-├─ 5. PRNG Integration 🔵 READY ⚠️ ESSENTIAL
+├─ 5. PRNG Integration ✅ COMPLETE (2026-01-18)
 │  └─ depends on: Prompt Projection (to include PRNG in GM context)
 ├─ 6. Dark Mode & Settings 🔵 READY (HIGH PRIORITY)
 │  └─ depends on: Nothing (orthogonal)
