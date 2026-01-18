@@ -56,6 +56,30 @@ If multiple PRs update PROJECT.md simultaneously:
 - Conflict resolution: keep correct status for each feature
 - Rare occurrence due to independent features
 
+### Task Classification: Agent vs Domain Expert
+
+**🤖 Agent/Developer Tasks** (technical/engineering):
+- UI/UX implementation
+- State management and data flow
+- API integration and service layer
+- Testing infrastructure
+- Build and deployment configuration
+- Accessibility and keyboard navigation
+- Dark mode and theming
+- Performance optimization
+
+**👤 Domain Expert Tasks** (requires specialized knowledge):
+- ⚠️ **AI x-risk material content**: Requires deep understanding of AI safety, alignment research, governance proposals, threat models (e.g., List of Lethalities, technical alignment proposals, policy frameworks)
+- ⚠️ **Scenario event authoring**: Creating realistic, expert-vetted timeline events that reflect actual AI governance dynamics
+- ⚠️ **Material bundle curation**: Selecting and organizing background materials that inform the GM's forecasting
+
+**🔀 Hybrid Tasks** (collaboration required):
+- Initial scenario design (expert provides content, agent implements structure)
+- GM prompt engineering (expert provides domain framing, agent implements technical integration)
+- Post-game analysis features (expert defines pedagogical goals, agent builds UI)
+
+**CRITICAL**: Agents should NOT attempt to create substantive AI x-risk content. The current materials are infrastructure placeholders only. Real content requires someone who has deeply studied the field.
+
 ---
 
 ## Development Backlog (Sequential MVP Roadmap)
@@ -122,9 +146,10 @@ This section defines the sequential order for implementing MVP features. Work th
     - Audio feedback and ambiance
     - See: [Sound Design](#sound-design)
 
-12. **Materials Expansion** - ⚪ IDEA
-    - Additional material bundles
+12. **Materials Expansion** - ⚪ IDEA, 👤 **REQUIRES DOMAIN EXPERT**
+    - Additional material bundles with substantive content
     - Variations on X-risk models
+    - **This is content work, not engineering**
     - See: [Materials Dynamic Selection](#materials-dynamic-selection)
 
 ### Ongoing Polish Work
@@ -132,6 +157,39 @@ This section defines the sequential order for implementing MVP features. Work th
 - **Visual Aesthetics** - Iterative improvements (focus on content, modern/serious tone)
 - **Writing Style** - Content editing for clarity and tone
 - **Performance** - Only if issues arise with large timelines
+
+---
+
+## MVP Status Summary
+
+**Technical Development**: ✅ **COMPLETE** (7/7 MVP features)
+- All core gameplay features implemented
+- Full keyboard navigation and accessibility
+- Dark mode with persistence
+- Tutorial/onboarding system
+- E2E test suite with 234 unit tests passing
+
+**Remaining for Launch**: ⚠️ **2 BLOCKERS**
+
+### 1. Deployment (Infrastructure Task)
+**Status**: 🔵 READY - Technical but not coding
+- Deploy to AI Studio Build platform
+- Verify per-user API key injection
+- Test in production environment
+- **Owner**: Can be done by technical person with deployment access
+
+### 2. Material Content (Domain Expert Task)
+**Status**: ⚠️ **CONTENT GAP** - Requires domain expertise
+- Current: ~500 bytes of placeholder guidance
+- Needed: Substantive expert-curated AI x-risk materials
+- Topics: Threat models, alignment proposals, governance frameworks, historical precedents
+- **Owner**: Must be done by someone with deep AI safety/governance expertise
+- **Note**: App is technically functional but GM responses will lack expert grounding without this content
+
+**Launch Options**:
+1. **Soft launch** with placeholder materials (GM relies on base model knowledge)
+2. **Full launch** after materials authored by domain expert
+3. **Hybrid** - Deploy for testing, gather feedback, improve materials iteratively
 
 ---
 
@@ -274,17 +332,23 @@ Records `news-opened` and `news-closed` events when users expand/collapse events
 ---
 
 ### Materials System (Minimal)
-**Stage:** 🟢 COMPLETE
+**Stage:** 🟡 INFRASTRUCTURE COMPLETE, ⚠️ CONTENT PLACEHOLDER
 **Tests:** [src/engine/test/materials.test.ts](src/engine/test/materials.test.ts)
 **Docs:** Materials loaded in [src/engine/data/materials.ts](src/engine/data/materials.ts)
 
-Single static material bundle providing context for the GM.
+Material bundle infrastructure with minimal placeholder content.
 
 **Implementation:**
 - ✅ Material bundle type definition
-- ✅ Single bundle: "Expert Model of X-Risk from Artificial Superintelligence" (17KB)
 - ✅ Materials injection into GM prompt
-- ✅ Provenance metadata
+- ✅ Provenance metadata system
+- ✅ HTML comment stripping
+- ⚠️ **CONTENT GAP**: Current material is ~500 bytes of lightweight guidance, NOT substantive expert content
+- ⚠️ **REQUIRES DOMAIN EXPERT**: Substantial AI x-risk materials need to be authored by someone with deep expertise in the field
+
+**Current Content:** Minimal checklist with 4 axes (Capability Growth, Control & Alignment, Deployment Surface, Crisis Dynamics) and scenario tips
+
+**What's Missing:** Substantive expert-curated background material on AI x-risk (e.g., detailed threat models, technical alignment proposals, governance frameworks, historical precedents)
 
 **Dependencies:** None (orthogonal to gameplay)
 
