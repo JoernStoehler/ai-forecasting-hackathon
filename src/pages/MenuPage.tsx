@@ -46,42 +46,42 @@ export const MenuPage: React.FC<MenuPageProps> = ({ hasExistingGame, onNewGame, 
   };
 
   return (
-    <div className="bg-beige-50 text-stone-800 min-h-screen font-sans flex items-center justify-center px-4">
+    <div className="bg-beige-50 dark:bg-stone-900 text-stone-800 dark:text-stone-200 min-h-screen font-sans flex items-center justify-center px-4">
       <div className="max-w-2xl w-full">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-stone-900 mb-3">AI Forecasting Simulation</h1>
-          <p className="text-lg text-stone-600">
+          <h1 className="text-4xl font-bold text-stone-900 dark:text-stone-100 mb-3">AI Forecasting Simulation</h1>
+          <p className="text-lg text-stone-600 dark:text-stone-400">
             Serious policy simulation for AI x-risk scenarios
           </p>
         </div>
 
         {/* Scenario Card */}
-        <div className="bg-white rounded-lg shadow-sm border border-stone-200 p-8 mb-8">
+        <div className="bg-white dark:bg-stone-800 rounded-lg shadow-sm border border-stone-200 dark:border-stone-700 p-8 mb-8">
           <div className="flex items-start gap-4 mb-6">
-            <div className="p-3 bg-amber-50 rounded-lg">
-              <Icon name="BrainCircuit" className="w-8 h-8 text-amber-700" />
+            <div className="p-3 bg-amber-50 dark:bg-amber-900/30 rounded-lg">
+              <Icon name="BrainCircuit" className="w-8 h-8 text-amber-700 dark:text-amber-400" />
             </div>
             <div>
-              <h2 className="text-2xl font-semibold text-stone-900 mb-2">
+              <h2 className="text-2xl font-semibold text-stone-900 dark:text-stone-100 mb-2">
                 AI X-Risk 2025-2035
               </h2>
-              <p className="text-stone-600">
+              <p className="text-stone-600 dark:text-stone-400">
                 Navigate AI governance scenarios as the US government. Explore policy decisions
                 and their consequences in an interactive timeline simulation.
               </p>
             </div>
           </div>
 
-          <div className="border-t border-stone-200 pt-6">
+          <div className="border-t border-stone-200 dark:border-stone-700 pt-6">
             <div className="grid grid-cols-2 gap-6 text-sm">
               <div>
-                <span className="font-medium text-stone-700">Your Role:</span>
-                <p className="text-stone-600 mt-1">US Government Strategist</p>
+                <span className="font-medium text-stone-700 dark:text-stone-300">Your Role:</span>
+                <p className="text-stone-600 dark:text-stone-400 mt-1">US Government Strategist</p>
               </div>
               <div>
-                <span className="font-medium text-stone-700">Start Date:</span>
-                <p className="text-stone-600 mt-1">January 2025</p>
+                <span className="font-medium text-stone-700 dark:text-stone-300">Start Date:</span>
+                <p className="text-stone-600 dark:text-stone-400 mt-1">January 2025</p>
               </div>
             </div>
           </div>
@@ -103,7 +103,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ hasExistingGame, onNewGame, 
             onClick={handleNewGame}
             className={`w-full font-medium py-4 px-6 rounded-lg transition-colors shadow-sm flex items-center justify-center gap-3 ${
               hasExistingGame
-                ? 'bg-white hover:bg-stone-50 text-stone-700 border border-stone-300'
+                ? 'bg-white dark:bg-stone-800 hover:bg-stone-50 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 border border-stone-300 dark:border-stone-600'
                 : 'bg-amber-600 hover:bg-amber-700 text-white'
             }`}
           >
@@ -113,7 +113,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ hasExistingGame, onNewGame, 
         </div>
 
         {hasExistingGame && (
-          <p className="text-center text-sm text-stone-500 mt-4">
+          <p className="text-center text-sm text-stone-500 dark:text-stone-400 mt-4">
             Starting a new game will replace your current progress
           </p>
         )}
@@ -122,7 +122,7 @@ export const MenuPage: React.FC<MenuPageProps> = ({ hasExistingGame, onNewGame, 
         <div className="text-center mt-6">
           <button
             onClick={handleShowTutorial}
-            className="text-stone-600 hover:text-amber-700 text-sm font-medium transition-colors flex items-center gap-2 mx-auto"
+            className="text-stone-600 dark:text-stone-400 hover:text-amber-700 dark:hover:text-amber-500 text-sm font-medium transition-colors flex items-center gap-2 mx-auto"
           >
             <Icon name="HelpCircle" className="w-4 h-4" />
             How to Play

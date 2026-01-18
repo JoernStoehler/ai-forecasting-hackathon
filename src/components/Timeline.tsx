@@ -12,17 +12,17 @@ interface TimelineProps {
 }
 
 const YearMarker: React.FC<{ year: string }> = ({ year }) => (
-    <div className="sticky top-16 bg-beige-50 z-10 py-2 flex">
+    <div className="sticky top-16 bg-beige-50 dark:bg-stone-900 z-10 py-2 flex">
       <div className="w-12 flex-shrink-0 flex justify-center">
-        <h2 className="text-2xl font-bold text-amber-800 tracking-tight">{year}</h2>
+        <h2 className="text-2xl font-bold text-amber-800 dark:text-amber-500 tracking-tight">{year}</h2>
       </div>
     </div>
 );
 
 const MonthMarker: React.FC<{ month: string }> = ({ month }) => (
-    <div className="sticky top-24 bg-beige-50 z-10 pt-4 pb-2 flex">
+    <div className="sticky top-24 bg-beige-50 dark:bg-stone-900 z-10 pt-4 pb-2 flex">
       <div className="w-12 flex-shrink-0 flex justify-center">
-        <h3 className="text-sm font-medium text-stone-500 uppercase tracking-wider">{month}</h3>
+        <h3 className="text-sm font-medium text-stone-500 dark:text-stone-400 uppercase tracking-wider">{month}</h3>
       </div>
     </div>
 );
@@ -30,13 +30,13 @@ const MonthMarker: React.FC<{ month: string }> = ({ month }) => (
 const ForecastMarker: React.FC<{ date: string }> = ({ date }) => (
   <div className="flex items-center py-3" role="separator" aria-label="Scenario body begins">
     <div className="w-12 flex-shrink-0 flex justify-center">
-      <div className="h-5 w-5 rounded-full border-2 border-dashed border-amber-400 bg-beige-50" />
+      <div className="h-5 w-5 rounded-full border-2 border-dashed border-amber-400 dark:border-amber-500 bg-beige-50 dark:bg-stone-900" />
     </div>
-    <div className="flex-1 border-t border-amber-300/70">
-      <span className="ml-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-700 bg-beige-50 px-2 py-1 rounded">
+    <div className="flex-1 border-t border-amber-300/70 dark:border-amber-600/50">
+      <span className="ml-3 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-amber-700 dark:text-amber-400 bg-beige-50 dark:bg-stone-800 px-2 py-1 rounded">
         Scenario body begins
       </span>
-      <span className="ml-2 text-xs text-stone-500">Scenario head ends {date}</span>
+      <span className="ml-2 text-xs text-stone-500 dark:text-stone-400">Scenario head ends {date}</span>
     </div>
   </div>
 );
@@ -51,13 +51,13 @@ const TurnMarker: React.FC<{ actor: 'player' | 'game_master'; from: string; unti
   return (
     <div className="flex items-center py-2" role="separator" aria-label={label}>
       <div className="w-12 flex-shrink-0 flex justify-center">
-        <div className={`h-4 w-4 rounded-full border-2 ${isPlayer ? 'border-blue-500 bg-blue-100' : 'border-amber-500 bg-amber-100'}`} />
+        <div className={`h-4 w-4 rounded-full border-2 ${isPlayer ? 'border-blue-500 dark:border-blue-400 bg-blue-100 dark:bg-blue-900/50' : 'border-amber-500 dark:border-amber-400 bg-amber-100 dark:bg-amber-900/50'}`} />
       </div>
-      <div className="flex-1 border-t border-stone-300">
-        <span className={`ml-3 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider ${isPlayer ? 'text-blue-700' : 'text-amber-700'} bg-beige-50 px-2 py-1 rounded`}>
+      <div className="flex-1 border-t border-stone-300 dark:border-stone-700">
+        <span className={`ml-3 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider ${isPlayer ? 'text-blue-700 dark:text-blue-400' : 'text-amber-700 dark:text-amber-400'} bg-beige-50 dark:bg-stone-800 px-2 py-1 rounded`}>
           {isPlayer ? '👤' : '🎲'} {isPlayer ? 'Player' : 'GM'} {isStarted ? '▸' : '▪'}
         </span>
-        <span className="ml-2 text-xs text-stone-500">{from} → {until}</span>
+        <span className="ml-2 text-xs text-stone-500 dark:text-stone-400">{from} → {until}</span>
       </div>
     </div>
   );

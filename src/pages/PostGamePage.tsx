@@ -49,7 +49,7 @@ export const PostGamePage: React.FC<PostGamePageProps> = ({ events, theme, onTog
           <div className="flex gap-2">
             <button
               onClick={() => navigate('/game')}
-              className="text-stone-600 hover:text-stone-900 font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+              className="text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
             >
               <Icon name="Clock" className="w-4 h-4" />
               View Timeline
@@ -67,20 +67,20 @@ export const PostGamePage: React.FC<PostGamePageProps> = ({ events, theme, onTog
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         {/* GM Summary */}
-        <section className="bg-white rounded-lg shadow-sm border border-stone-200 p-8 mb-8">
+        <section className="bg-white dark:bg-stone-800 rounded-lg shadow-sm border border-stone-200 dark:border-stone-700 p-8 mb-8">
           <div className="flex items-start gap-4 mb-6">
-            <div className="p-3 bg-amber-50 rounded-lg">
-              <Icon name="ScrollText" className="w-8 h-8 text-amber-700" />
+            <div className="p-3 bg-amber-50 dark:bg-amber-900/30 rounded-lg">
+              <Icon name="ScrollText" className="w-8 h-8 text-amber-700 dark:text-amber-400" />
             </div>
             <div>
-              <h2 className="text-2xl font-semibold text-stone-900 mb-2">
+              <h2 className="text-2xl font-semibold text-stone-900 dark:text-stone-100 mb-2">
                 Game Master's Analysis
               </h2>
-              <p className="text-sm text-stone-500">Final date: {gameOverEvent.date}</p>
+              <p className="text-sm text-stone-500 dark:text-stone-400">Final date: {gameOverEvent.date}</p>
             </div>
           </div>
-          <div className="prose prose-stone max-w-none">
-            <p className="text-stone-700 leading-relaxed whitespace-pre-wrap">
+          <div className="prose prose-stone dark:prose-invert max-w-none">
+            <p className="text-stone-700 dark:text-stone-300 leading-relaxed whitespace-pre-wrap">
               {gameOverEvent.summary}
             </p>
           </div>
@@ -88,16 +88,16 @@ export const PostGamePage: React.FC<PostGamePageProps> = ({ events, theme, onTog
 
         {/* Hidden News Reveal */}
         {hiddenNewsEvents.length > 0 && (
-          <section className="bg-white rounded-lg shadow-sm border border-stone-200 p-8">
+          <section className="bg-white dark:bg-stone-800 rounded-lg shadow-sm border border-stone-200 dark:border-stone-700 p-8">
             <div className="flex items-start gap-4 mb-6">
-              <div className="p-3 bg-purple-50 rounded-lg">
-                <Icon name="Eye" className="w-8 h-8 text-purple-700" />
+              <div className="p-3 bg-purple-50 dark:bg-purple-900/30 rounded-lg">
+                <Icon name="Eye" className="w-8 h-8 text-purple-700 dark:text-purple-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-semibold text-stone-900 mb-2">
+                <h2 className="text-2xl font-semibold text-stone-900 dark:text-stone-100 mb-2">
                   Hidden Events Revealed
                 </h2>
-                <p className="text-stone-600">
+                <p className="text-stone-600 dark:text-stone-400">
                   These events occurred behind the scenes during your simulation.
                 </p>
               </div>
@@ -106,16 +106,16 @@ export const PostGamePage: React.FC<PostGamePageProps> = ({ events, theme, onTog
               {hiddenNewsEvents.map((event, index) => (
                 <div
                   key={index}
-                  className="border-l-4 border-purple-300 bg-purple-50/50 p-4 rounded-r-lg"
+                  className="border-l-4 border-purple-300 dark:border-purple-600 bg-purple-50/50 dark:bg-purple-900/20 p-4 rounded-r-lg"
                 >
                   <div className="flex items-start gap-3">
-                    <Icon name={event.icon} className="w-5 h-5 text-purple-700 flex-shrink-0 mt-0.5" />
+                    <Icon name={event.icon} className="w-5 h-5 text-purple-700 dark:text-purple-400 flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
                       <div className="flex items-baseline gap-2 mb-1">
-                        <h3 className="font-semibold text-stone-900">{event.title}</h3>
-                        <span className="text-xs text-stone-500">{event.date}</span>
+                        <h3 className="font-semibold text-stone-900 dark:text-stone-100">{event.title}</h3>
+                        <span className="text-xs text-stone-500 dark:text-stone-400">{event.date}</span>
                       </div>
-                      <p className="text-stone-700 leading-relaxed">{event.description}</p>
+                      <p className="text-stone-700 dark:text-stone-300 leading-relaxed">{event.description}</p>
                     </div>
                   </div>
                 </div>

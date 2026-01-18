@@ -22,7 +22,7 @@ const highlightText = (text: string, highlight: string) => {
     <span>
       {parts.map((part, i) =>
         part.toLowerCase() === highlight.toLowerCase() ? (
-          <mark key={i} className="bg-amber-200 text-stone-800 px-0.5 rounded-sm">
+          <mark key={i} className="bg-amber-200 dark:bg-amber-700 text-stone-800 dark:text-stone-100 px-0.5 rounded-sm">
             {part}
           </mark>
         ) : (
