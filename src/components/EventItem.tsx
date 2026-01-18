@@ -55,31 +55,38 @@ export const EventItem: React.FC<EventItemProps> = ({ event, searchQuery = '', i
     <div className="flex items-start">
       {/* Icon Gutter */}
       <div className="w-12 flex-shrink-0 flex justify-center pt-1">
-        <div className="p-1 rounded-full bg-beige-50">
+        <div className="p-1 rounded-full bg-beige-50 dark:bg-stone-800">
           <Icon
             name={event.icon}
-            className="w-5 h-5 text-stone-600"
+            className="w-5 h-5 text-stone-600 dark:text-stone-400"
           />
         </div>
       </div>
       
       {/* Event Content */}
-      <div 
-        className={`flex-grow cursor-pointer ${isLast ? 'pb-4' : 'pb-6'}`}
+      <button
+        className={`flex-grow text-left cursor-pointer ${isLast ? 'pb-4' : 'pb-6'} focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-lg px-2 -mx-2`}
         onClick={handleToggle}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleToggle();
+          }
+        }}
         aria-expanded={isExpanded}
+        aria-label={`${isExpanded ? 'Collapse' : 'Expand'} event: ${event.title}`}
       >
         <div className="flex items-center gap-2 pt-1">
-          <h3 className="font-medium leading-tight text-stone-800">
+          <h3 className="font-medium leading-tight text-stone-800 dark:text-stone-200">
             {highlightText(event.title, searchQuery)}
           </h3>
         </div>
         {isExpanded && (
-          <div className="mt-2 leading-relaxed text-stone-600">
+          <div className="mt-2 leading-relaxed text-stone-600 dark:text-stone-400">
             {highlightText(event.description, searchQuery)}
           </div>
         )}
-      </div>
+      </button>
     </div>
   );
 };

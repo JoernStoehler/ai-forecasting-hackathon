@@ -34,3 +34,30 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #d8c4a9;
 }
+
+/* Accessibility: Ensure focus indicators are always visible */
+*:focus-visible {
+  outline: 2px solid #d97706;
+  outline-offset: 2px;
+}
+
+/* Dark mode focus indicator */
+.dark *:focus-visible {
+  outline-color: #fbbf24;
+}
+
+/* Skip to main content link (for screen readers) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: #d97706;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 0;
+}

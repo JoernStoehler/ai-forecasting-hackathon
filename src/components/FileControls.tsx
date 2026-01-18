@@ -57,12 +57,23 @@ export const FileControls: React.FC<FileControlsProps> = ({ events, onImport }) 
                 className="hidden"
                 accept=".json"
                 onChange={handleFileChange}
+                aria-label="Import timeline file"
             />
-            <button onClick={handleImportClick} className="p-2 text-stone-600 hover:bg-beige-200 rounded-full transition" title="Import JSON">
-                <Icon name="Upload" className="w-6 h-6" />
+            <button
+                onClick={handleImportClick}
+                className="p-2 text-stone-600 dark:text-stone-400 hover:text-amber-700 dark:hover:text-amber-500 hover:bg-beige-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
+                title="Import JSON"
+                aria-label="Import timeline from JSON file"
+            >
+                <Icon name="Upload" className="w-5 h-5" />
             </button>
-            <button onClick={handleExport} className="p-2 text-stone-600 hover:bg-beige-200 rounded-full transition" title="Export JSON">
-                <Icon name="Download" className="w-6 h-6" />
+            <button
+                onClick={handleExport}
+                className="p-2 text-stone-600 dark:text-stone-400 hover:text-amber-700 dark:hover:text-amber-500 hover:bg-beige-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
+                title="Export JSON"
+                aria-label="Export timeline as JSON file"
+            >
+                <Icon name="Download" className="w-5 h-5" />
             </button>
         </div>
     );
