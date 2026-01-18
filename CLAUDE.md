@@ -196,6 +196,32 @@ Environment is pre-configured with dependencies installed via `npm install`.
 3. Update test README if patterns change
 4. Mark unimplemented features as `.skip()` with clear comments
 
+### Visual QA and Screenshots
+Playwright includes a built-in screenshot command for visual inspection:
+
+```bash
+# Start dev server
+npm run dev
+
+# Take screenshot (adjust port if needed - check dev server output)
+npx playwright screenshot http://localhost:3001/ scratch/screenshot.png
+
+# Options:
+npx playwright screenshot \
+  --viewport-size=1280,720 \
+  --full-page \
+  --color-scheme=dark \
+  http://localhost:3001/game scratch/game-dark.png
+```
+
+**Common use cases:**
+- Visual design review before/after CSS changes
+- Dark mode verification
+- Responsive design checks
+- Accessibility visual inspection
+
+**Note:** Playwright uses its own bundled browsers, so this works even without Chrome/Chromium installed.
+
 ---
 
 ## Technical Details
