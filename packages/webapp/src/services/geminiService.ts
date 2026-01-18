@@ -1,6 +1,6 @@
 
-import { createBrowserForecaster, createMockForecaster, createEngine, MATERIALS, SYSTEM_PROMPT, stripCommentsFromMaterials } from '@ai-forecasting/engine';
-import type { ForecasterOptions } from '@ai-forecasting/engine';
+import { createBrowserForecaster, createMockForecaster, createEngine, MATERIALS, SYSTEM_PROMPT, stripCommentsFromMaterials } from '@/engine';
+import type { ForecasterOptions } from '@/engine';
 import type { EngineEvent } from '../types';
 
 // Use mock forecaster when VITE_USE_MOCK_FORECASTER is set (for testing/development)

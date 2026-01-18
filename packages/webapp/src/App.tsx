@@ -5,7 +5,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { EngineEvent, ScenarioEvent } from './types';
 import { INITIAL_EVENTS } from './data';
-import { applyNewsPatches, coerceEngineEvents, sortAndDedupEvents, aggregate } from '@ai-forecasting/engine';
+import { applyNewsPatches, coerceEngineEvents, sortAndDedupEvents, aggregate } from '@/engine';
 import { getAiForecast } from './services/geminiService';
 import { Header } from './components/Header';
 import { Timeline } from './components/Timeline';

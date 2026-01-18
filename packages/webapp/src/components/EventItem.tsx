@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { normalizePublishHiddenNews, normalizePublishNews } from '@ai-forecasting/engine';
+import { normalizePublishHiddenNews, normalizePublishNews } from '@/engine';
 import { ScenarioEvent } from '../types';
 import { Icon } from './icons';
 

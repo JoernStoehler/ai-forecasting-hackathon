@@ -14,7 +14,7 @@ dist-ssr
 *.local
 
 # Local scratch space; may contain secrets
-tmp/
+scratch/
 
 # Editor directories and files
 .vscode/*

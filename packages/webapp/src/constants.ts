@@ -1,2 +1,2 @@
-export { ICON_SET, SYSTEM_PROMPT } from '@ai-forecasting/engine';
-export type { IconName } from '@ai-forecasting/engine';
+export { ICON_SET, SYSTEM_PROMPT } from '@/engine';
+export type { IconName } from '@/engine';

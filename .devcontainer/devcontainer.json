@@ -15,7 +15,7 @@
     "PLAYWRIGHT_BROWSERS_PATH": "/home/vscode/.cache/ms-playwright"
   },
   "mounts": [
-    "source=/srv/devhome/.codex,target=/home/vscode/.codex,type=bind,consistency=cached",
+    "source=/srv/devhome/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
     "source=/srv/devhome/.config/gh,target=/home/vscode/.config/gh,type=bind,consistency=cached",
     "source=/srv/devhome/.bash_history_dir,target=/home/vscode/.bash_history_dir,type=bind,consistency=cached",
     "source=/srv/devhome/.cache/npm,target=/home/vscode/.cache/npm,type=bind,consistency=cached",

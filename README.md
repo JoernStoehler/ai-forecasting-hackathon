@@ -23,9 +23,10 @@ npm run test:e2e -w packages/webapp -- --grep-invert "UNIMPLEMENTED"
 
 ## Project Structure
 
-- **`packages/engine/`** - Isomorphic timeline engine (shared types, validation, forecaster adapters)
-- **`packages/webapp/`** - React SPA (Vite + Tailwind) with comprehensive E2E tests
-- **`packages/cli/`** - CLI for testing and engine development
+- **`packages/webapp/`** - React SPA (Vite + Tailwind + TypeScript)
+  - `src/engine/` - Timeline engine (types, validation, forecaster adapters)
+  - `src/components/` - React UI components
+  - `tests/` - Comprehensive E2E test suite
 - **`docs/`** - Design specifications and technical docs
 - **`E2E-TEST-STATUS.md`** - Test coverage status and roadmap
 
@@ -34,29 +35,7 @@ npm run test:e2e -w packages/webapp -- --grep-invert "UNIMPLEMENTED"
 - **[CLAUDE.md](./CLAUDE.md)** - Full developer guide (start here!)
 - **[VISION.md](./VISION.md)** - Product goals, constraints, feature roadmap
 - **[E2E-TEST-STATUS.md](./E2E-TEST-STATUS.md)** - Webapp test infrastructure and status
-- **[CLI-TEST-STATUS.md](./CLI-TEST-STATUS.md)** - CLI test infrastructure and status
 - **[packages/webapp/tests/README.md](./packages/webapp/tests/README.md)** - Webapp test authoring guide
-- **[packages/cli/test/README.md](./packages/cli/test/README.md)** - CLI test authoring guide
-
-## CLI Usage
-
-```bash
-# Build first
-npm run build
-
-# One-turn run with mock forecaster
-node packages/cli/dist/index.js \
-  --input-player player.jsonl \
-  --output-game-master gm.jsonl \
-  --output-state state.jsonl \
-  --mock
-
-# With real Gemini API (requires GEMINI_API_KEY in env)
-node packages/cli/dist/index.js \
-  --input-player player.jsonl \
-  --output-game-master gm.jsonl \
-  --output-state state.jsonl
-```
 
 ## Key Features
 

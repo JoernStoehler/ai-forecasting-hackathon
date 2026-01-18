@@ -1,126 +1,33 @@
-import type { IconName } from './constants.js';
 import type { GenerateContentConfig, Content } from '@google/genai';
 
 /**
- * COMMANDS (intent)
- * These are produced by the LLM or player/UI, validated, then turned into events.
+ * Commands and Events - now defined via Zod schemas in schemas.ts
+ * Re-exported here for backward compatibility and cleaner imports
  */
-export interface PublishNewsCommand {
-  type: 'publish-news';
-  id?: string;
-  date: string; // YYYY-MM-DD
-  icon: IconName;
-  title: string;
-  description: string;
-}
-
-export interface PublishHiddenNewsCommand {
-  type: 'publish-hidden-news';
-  id?: string;
-  date: string; // YYYY-MM-DD
-  icon: IconName;
-  title: string;
-  description: string;
-}
-
-export interface PatchNewsCommand {
-  type: 'patch-news';
-  targetId: string;
-  date: string; // YYYY-MM-DD
-  patch: Partial<Pick<PublishNewsCommand, 'date' | 'icon' | 'title' | 'description'>>;
-}
-
-export interface GameOverCommand {
-  type: 'game-over';
-  date: string; // YYYY-MM-DD
-  summary: string;
-}
-
-export type Command =
-  | PublishNewsCommand
-  | PublishHiddenNewsCommand
-  | PatchNewsCommand
-  | GameOverCommand;
+export type {
+  PublishNewsCommand,
+  PublishHiddenNewsCommand,
+  PatchNewsCommand,
+  GameOverCommand,
+  Command,
+  NewsPublishedEvent,
+  HiddenNewsPublishedEvent,
+  NewsPatchedEvent,
+  NewsOpenedEvent,
+  NewsClosedEvent,
+  ScenarioHeadCompletedEvent,
+  GameOverEvent,
+  TurnStartedEvent,
+  TurnFinishedEvent,
+  EngineEvent,
+  ScenarioEvent,
+  PreparedPrompt,
+} from './schemas.js';
 
 /**
- * EVENTS (facts, appended to the event log)
+ * CONTEXT & CONFIGURATION
+ * These are runtime interfaces that cannot be reduced to Zod schemas
  */
-export interface NewsPublishedEvent {
-  type: 'news-published';
-  id?: string;
-  date: string;
-  icon: IconName;
-  title: string;
-  description: string;
-}
-
-export interface HiddenNewsPublishedEvent {
-  type: 'hidden-news-published';
-  id?: string;
-  date: string;
-  icon: IconName;
-  title: string;
-  description: string;
-}
-
-export interface NewsPatchedEvent {
-  type: 'news-patched';
-  targetId: string;
-  date: string;
-  patch: Partial<Pick<NewsPublishedEvent, 'date' | 'icon' | 'title' | 'description'>>;
-}
-
-export interface NewsOpenedEvent {
-  type: 'news-opened';
-  targetId: string;
-  at: string;
-}
-
-export interface NewsClosedEvent {
-  type: 'news-closed';
-  targetId: string;
-  at: string;
-}
-
-export interface ScenarioHeadCompletedEvent {
-  type: 'scenario-head-completed';
-  date: string;
-}
-
-export interface GameOverEvent {
-  type: 'game-over';
-  date: string;
-  summary: string;
-}
-
-export interface TurnStartedEvent {
-  type: 'turn-started';
-  actor: 'player' | 'game_master';
-  from: string; // YYYY-MM-DD
-  until: string; // YYYY-MM-DD
-}
-
-export interface TurnFinishedEvent {
-  type: 'turn-finished';
-  actor: 'player' | 'game_master';
-  from: string;
-  until: string;
-}
-
-export type EngineEvent =
-  | NewsPublishedEvent
-  | HiddenNewsPublishedEvent
-  | NewsPatchedEvent
-  | NewsOpenedEvent
-  | NewsClosedEvent
-  | ScenarioHeadCompletedEvent
-  | GameOverEvent
-  | TurnStartedEvent
-  | TurnFinishedEvent;
-
-// Timeline-friendly events (news items, visible or hidden).
-export type ScenarioEvent = NewsPublishedEvent | HiddenNewsPublishedEvent;
-
 export interface ForecasterContext {
   history: EngineEvent[];
   systemPrompt: string;
@@ -161,20 +68,5 @@ export interface AggregatedState {
   eventCount: number;
 }
 
-/**
- * Prepared prompt saved to disk for replay/call steps.
- * OPEN QUESTION (awaiting owner confirmation):
- * - Should `contents` stay stringified JSON (current) or be the SDK `Content[]`
- *   structure to be fully curl-ready without casting?
- * - `config` currently only carries systemInstruction + responseMimeType; add
- *   more fields once the prompt contract is locked.
- */
-export interface PreparedPrompt {
-  model: string;
-  request: {
-    model: string;
-    contents: Content[]; // sendable as-is to generateContent/Stream
-    config: GenerateContentConfig;
-  };
-  materialsUsed: string[];
-}
+// Import EngineEvent type for use in the interfaces above
+import type { EngineEvent } from './schemas.js';

@@ -21,7 +21,8 @@
       "openai.chatgpt",
       "dbaeumer.vscode-eslint",
       "esbenp.prettier-vscode",
-      "vitest.explorer"
+      "vitest.explorer",
+      "anthropic.claude-code"
     ]
   }
 }

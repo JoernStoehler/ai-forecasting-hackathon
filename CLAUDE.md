@@ -10,10 +10,11 @@
 
 This is a serious policy simulation game where players assume the role of the US government and interact with an LLM-based "game master" (powered by Google's Gemini 2.5 Flash) to explore AI governance scenarios through an interactive timeline from 2025 onward.
 
-**Monorepo Structure:**
-- `packages/engine/` - Isomorphic timeline engine (shared types, validation, forecaster adapters)
-- `packages/webapp/` - React SPA frontend using the engine
-- `packages/cli/` - CLI frontend for testing and engine development
+**Project Structure:**
+- `packages/webapp/` - React SPA with integrated timeline engine
+  - `src/engine/` - Timeline engine (types, validation, forecaster adapters)
+  - `src/components/` - React components
+  - `src/services/` - Business logic and integrations
 - `docs/` - Specifications and design documents
 - `E2E-TEST-STATUS.md` - Comprehensive test suite status and roadmap
 
@@ -51,11 +52,11 @@ npm test -w @ai-forecasting/engine
 
 ### Type Safety
 - **Strict TypeScript** throughout
-- **Runtime validation** with Zod at all boundaries
-- **Shared types** between CLI and webapp via engine package
+- **Runtime validation** with Zod as single source of truth for all types
+- **Zod schema inference** - types derived automatically from validation schemas
 
 ### Isomorphic Engine
-- Engine runs in browser (webapp) and Node.js (CLI)
+- Engine runs in browser (webapp) and can be used in Node.js
 - Forecaster adapters: browser (Gemini), Node (Gemini), mock, replay
 - Same event log format everywhere
 
@@ -209,16 +210,6 @@ npm run build          # Build all packages
 npm run lint           # Lint all packages
 npm run typecheck      # Type check all packages
 npm run dev            # Start dev server (webapp)
-```
-
-### CLI Usage
-```bash
-# One-turn run with mock
-node packages/cli/dist/index.js \
-  --input-player player.jsonl \
-  --output-game-master gm.jsonl \
-  --output-state state.jsonl \
-  --mock
 ```
 
 ---

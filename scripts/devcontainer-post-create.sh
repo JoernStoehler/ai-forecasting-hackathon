@@ -26,13 +26,9 @@ if ! mountpoint -q "$WORKTREES_DIR" >/dev/null 2>&1; then
   exit 1
 fi
 
-# Install or update Codex CLI via npm (config and cache are in mounted dirs).
-if command -v npm >/dev/null 2>&1; then
-  mkdir -p "${HOME}/.local/bin" "${HOME}/.cache/npm"
-  npm config set prefix "${HOME}/.local"
-  npm config set cache "${HOME}/.cache/npm"
-  npm i -g @openai/codex || true
-fi
+# Claude Code CLI is assumed to be available in the environment.
+# For local devcontainers, no additional setup is needed.
+# For Claude Code web sessions, the CLI is provided by the platform.
 
 # Preinstall Playwright browsers into mounted cache for e2e runs.
 # OS-level Playwright deps are baked into the devcontainer image

@@ -1,1 +1,1 @@
-export { INITIAL_EVENTS } from '@ai-forecasting/engine';
+export { INITIAL_EVENTS } from '@/engine';

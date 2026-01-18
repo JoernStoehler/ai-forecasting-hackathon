@@ -7,5 +7,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src", "vite.config.ts", "tailwind.config.js", "postcss.config.js", "index.html"]
+  "include": ["src", "vite.config.ts", "vitest.config.ts", "tailwind.config.js", "postcss.config.js", "index.html"],
+  "exclude": ["src/engine/test/**/*.test.ts", "tests/**/*"]
 }
