@@ -9,6 +9,7 @@ import { coerceEngineEvents } from '@/engine';
 import { MenuPage } from './pages/MenuPage';
 import { GamePage } from './pages/GamePage';
 import { PostGamePage } from './pages/PostGamePage';
+import { useTheme } from './hooks/useTheme';
 
 const STORAGE_KEY = 'takeoff-timeline-events-v2';
 const HAS_GAME_KEY = 'takeoff-has-game';
@@ -31,6 +32,7 @@ const loadEventsFromStorage = (): EngineEvent[] => {
 };
 
 function App() {
+  const { theme, toggleTheme } = useTheme();
   const [gameEvents, setGameEvents] = useState<EngineEvent[]>(loadEventsFromStorage);
   const [hasExistingGame, setHasExistingGame] = useState<boolean>(() => {
     return localStorage.getItem(HAS_GAME_KEY) === 'true';
@@ -71,11 +73,11 @@ function App() {
         />
         <Route
           path="/game"
-          element={<GamePage initialEvents={gameEvents} />}
+          element={<GamePage initialEvents={gameEvents} theme={theme} onToggleTheme={toggleTheme} />}
         />
         <Route
           path="/post-game"
-          element={<PostGamePage events={gameEvents} />}
+          element={<PostGamePage events={gameEvents} theme={theme} onToggleTheme={toggleTheme} />}
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

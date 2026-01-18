@@ -8,9 +8,11 @@ import { Icon } from '../components/icons';
 
 interface PostGamePageProps {
   events: EngineEvent[];
+  theme: 'light' | 'dark';
+  onToggleTheme: () => void;
 }
 
-export const PostGamePage: React.FC<PostGamePageProps> = ({ events }) => {
+export const PostGamePage: React.FC<PostGamePageProps> = ({ events, theme, onToggleTheme }) => {
   const navigate = useNavigate();
 
   const gameOverEvent = useMemo(() => {
@@ -24,10 +26,10 @@ export const PostGamePage: React.FC<PostGamePageProps> = ({ events }) => {
   if (!gameOverEvent) {
     // Fallback if no game-over event exists (shouldn't happen)
     return (
-      <div className="bg-beige-50 text-stone-800 min-h-screen font-sans flex items-center justify-center px-4">
+      <div className="bg-beige-50 dark:bg-stone-900 text-stone-800 dark:text-stone-200 min-h-screen font-sans flex items-center justify-center px-4">
         <div className="max-w-2xl w-full text-center">
-          <h1 className="text-2xl font-bold text-stone-900 mb-4">Game Not Complete</h1>
-          <p className="text-stone-600 mb-6">The game has not reached its conclusion yet.</p>
+          <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-100 mb-4">Game Not Complete</h1>
+          <p className="text-stone-600 dark:text-stone-400 mb-6">The game has not reached its conclusion yet.</p>
           <button
             onClick={() => navigate('/game')}
             className="bg-amber-600 hover:bg-amber-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
@@ -40,10 +42,10 @@ export const PostGamePage: React.FC<PostGamePageProps> = ({ events }) => {
   }
 
   return (
-    <div className="bg-beige-50 text-stone-800 min-h-screen font-sans">
-      <header className="sticky top-0 z-20 bg-white border-b border-stone-200 shadow-sm">
+    <div className="bg-beige-50 dark:bg-stone-900 text-stone-800 dark:text-stone-200 min-h-screen font-sans">
+      <header className="sticky top-0 z-20 bg-white dark:bg-stone-800 border-b border-stone-200 dark:border-stone-700 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
-          <h1 className="text-xl font-bold text-stone-900">Game Over</h1>
+          <h1 className="text-xl font-bold text-stone-900 dark:text-stone-100">Game Over</h1>
           <div className="flex gap-2">
             <button
               onClick={() => navigate('/game')}

@@ -17,9 +17,11 @@ const STORAGE_KEY = 'takeoff-timeline-events-v2';
 
 interface GamePageProps {
   initialEvents: EngineEvent[];
+  theme: 'light' | 'dark';
+  onToggleTheme: () => void;
 }
 
-export const GamePage: React.FC<GamePageProps> = ({ initialEvents }) => {
+export const GamePage: React.FC<GamePageProps> = ({ initialEvents, theme, onToggleTheme }) => {
   const navigate = useNavigate();
   const [events, setEvents] = useState<EngineEvent[]>(initialEvents);
   const [isLoading, setIsLoading] = useState(false);
@@ -160,13 +162,15 @@ export const GamePage: React.FC<GamePageProps> = ({ initialEvents }) => {
   };
 
   return (
-    <div className="bg-beige-50 text-stone-800 min-h-screen font-sans">
+    <div className="bg-beige-50 dark:bg-stone-900 text-stone-800 dark:text-stone-200 min-h-screen font-sans">
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
         events={events}
         onImport={handleImport}
         onShowTutorial={handleShowTutorial}
+        theme={theme}
+        onToggleTheme={onToggleTheme}
       />
 
       <main className="max-w-3xl mx-auto px-4 pt-20 pb-56">
