@@ -9,33 +9,35 @@ Vite + React 18 + TypeScript SPA for immersive scenario forecasting with Gemini 
 ### Development
 1. Run `npm install` (dependencies auto-install on session start).
 2. Copy `.env.example` to `.env.local` (optional: set `GEMINI_API_KEY` or use mock).
-3. `npm run dev` - Start webapp (localhost:5173).
-4. `npm run test:e2e -w packages/webapp` - Run E2E tests with mock forecaster.
+3. `npm run dev` - Start webapp (localhost:3000).
+4. `npm run test:e2e` - Run E2E tests with mock forecaster.
 
 ### Testing Without API Key
 Set `VITE_USE_MOCK_FORECASTER=true` in `.env.local` to test full gameplay loop without Gemini API.
 
 ### Before Committing
 ```bash
-npm run lint && npm run typecheck && npm run build
-npm run test:e2e -w packages/webapp -- --grep-invert "UNIMPLEMENTED"
+npm run check
+npm run test:e2e -- --grep-invert "UNIMPLEMENTED"
 ```
 
 ## Project Structure
 
-- **`packages/webapp/`** - React SPA (Vite + Tailwind + TypeScript)
+Single-package React SPA (simplified from previous monorepo structure):
+
+- **`src/`** - React application
   - `src/engine/` - Timeline engine (types, validation, forecaster adapters)
   - `src/components/` - React UI components
-  - `tests/` - Comprehensive E2E test suite
+  - `src/engine/test/` - Engine unit tests (196 tests)
+- **`tests/`** - E2E test suite (Playwright)
 - **`docs/`** - Design specifications and technical docs
-- **`E2E-TEST-STATUS.md`** - Test coverage status and roadmap
 
 ## Documentation
 
 - **[CLAUDE.md](./CLAUDE.md)** - Full developer guide (start here!)
 - **[VISION.md](./VISION.md)** - Product goals, constraints, feature roadmap
-- **[E2E-TEST-STATUS.md](./E2E-TEST-STATUS.md)** - Webapp test infrastructure and status
-- **[packages/webapp/tests/README.md](./packages/webapp/tests/README.md)** - Webapp test authoring guide
+- **[E2E-TEST-STATUS.md](./E2E-TEST-STATUS.md)** - Test infrastructure and status
+- **[tests/README.md](./tests/README.md)** - Test authoring guide
 
 ## Key Features
 
@@ -45,7 +47,8 @@ npm run test:e2e -w packages/webapp -- --grep-invert "UNIMPLEMENTED"
 - localStorage persistence + JSON import/export
 - Gemini 2.5 Flash integration with streaming
 - Mock forecaster for testing
-- Comprehensive E2E test suite
+- Comprehensive test suite (196 unit tests + E2E tests)
+- Zod-based type system (single source of truth)
 
 ⚠️ **In Progress:**
 - Cassette replay system (designed, partially implemented)
