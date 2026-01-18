@@ -81,7 +81,7 @@ This section defines the sequential order for implementing MVP features. Work th
    - Tightly coupled features (implement together)
    - See: [Post-Game Analysis Screen](#post-game-analysis-screen) + [Hidden News System](#hidden-news-system)
 
-4. **Tutorial/Onboarding** - 🔵 READY, ⚠️ ESSENTIAL
+4. **Tutorial/Onboarding** - 🟢 COMPLETE (2026-01-18)
    - Policy experts need guidance
    - Explains game mechanics, terminology, player role
    - See: [Tutorial/Onboarding](#tutorialonboarding)
@@ -844,7 +844,7 @@ MVP Critical Path (sequential, blocks deployment)
 │  └─ depends on: Event Sourcing ✅
 ├─ 3. Post-Game Screen + Hidden News ✅ COMPLETE (2026-01-18)
 │  └─ depends on: Prompt Projection (for hidden news filtering)
-├─ 4. Tutorial/Onboarding 🔵 READY ⚠️ ESSENTIAL
+├─ 4. Tutorial/Onboarding ✅ COMPLETE (2026-01-18)
 │  └─ depends on: Pre-Game Menu (for context-sensitive hints)
 ├─ 5. PRNG Integration ✅ COMPLETE (2026-01-18)
 │  └─ depends on: Prompt Projection (to include PRNG in GM context)
