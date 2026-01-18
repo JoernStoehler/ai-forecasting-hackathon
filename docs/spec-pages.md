@@ -4,7 +4,7 @@
 Define how the single-page app should organize its routes and surface UI states. Keep this file aligned with the running code so owners can see which pages ship today versus what remains on the roadmap.
 
 ## Router Status
-- **Current** — The webapp runs without React Router. `packages/webapp/src/App.tsx` renders the full experience on `/`.
+- **Current** — The webapp runs without React Router. `src/App.tsx` renders the full experience on `/`.
 - **Future** — Only add routing when a second page truly exists. Keep the fixed header + compose footer as shared layout primitives.
 
 ## Route Definitions
@@ -37,5 +37,5 @@ Document each route once it lands in code; until then, do not speculate here.
 3. Preserve browser history semantics (back/forward). All modal-like flows (imports, confirmations) should stay in-page rather than hijacking navigation.
 
 ## Implementation References
-- `packages/webapp/src/App.tsx` — authoritative source for the current layout and data plumbing.
-- `packages/webapp/src/components/Header.tsx` — home for navigation if/when routes exist.
+- `src/App.tsx` — authoritative source for the current layout and data plumbing.
+- `src/components/Header.tsx` — home for navigation if/when routes exist.

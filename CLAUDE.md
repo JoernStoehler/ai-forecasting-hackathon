@@ -131,7 +131,7 @@ npm run test:e2e
 - [`VISION.md`](./VISION.md) - Product goals, constraints, progress checklist
 - [`E2E-TEST-STATUS.md`](./E2E-TEST-STATUS.md) - Test coverage and next steps
 - [`README.md`](./README.md) - Quick start guide
-- [`packages/webapp/tests/README.md`](./packages/webapp/tests/README.md) - Test authoring guide
+- [`tests/README.md`](./tests/README.md) - Test authoring guide
 
 ### Design Documents (`docs/`)
 - `cassette-replay.md` - Replay system design (partially implemented)
@@ -141,7 +141,7 @@ npm run test:e2e
 - `spec-design.md` - Overall architecture
 
 ### Specs for Unimplemented Features
-See [`packages/webapp/tests/unimplemented-features.spec.ts`](./packages/webapp/tests/unimplemented-features.spec.ts) for executable specifications of features not yet built.
+See [`tests/unimplemented-features.spec.ts`](./tests/unimplemented-features.spec.ts) for executable specifications of features not yet built.
 
 ---
 

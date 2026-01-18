@@ -15,7 +15,7 @@ This document targets the current `main` branch only.
 
 ## Where Gemini Is Called
 - **Engine (shared)**: `packages/engine/src/adapters/geminiBrowserForecaster.ts` and `packages/engine/src/adapters/geminiNodeForecaster.ts`.
-- **Webapp**: `packages/webapp/src/services/geminiService.ts` constructs an engine with `createBrowserForecaster` and delegates to `engine.forecast(...)`.
+- **Webapp**: `src/services/geminiService.ts` constructs an engine with `createBrowserForecaster` and delegates to `engine.forecast(...)`.
 - **CLI**: uses the engine adapters for live calls and uses `preparePrompt(...)` + replay tooling for deterministic tests.
 
 ## Request / Prompt Shape
@@ -28,7 +28,7 @@ This document targets the current `main` branch only.
   - `packages/engine/src/utils/promptProjector.ts` renders a JSONL timeline plus a small dynamic block.
 
 ## API Keys (current)
-- Browser/webapp: `GEMINI_API_KEY` is provided via Vite env (`packages/webapp/vite.config.ts` sets `envPrefix: ["GEMINI_"]`).
+- Browser/webapp: `GEMINI_API_KEY` is provided via Vite env (`vite.config.ts` sets `envPrefix: ["GEMINI_"]`).
 - Node/CLI: `GEMINI_API_KEY` is read from `process.env.GEMINI_API_KEY` by default.
 
 ## Deterministic Replay (cassette)

@@ -10,17 +10,7 @@ export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ['packages/engine/src/**/*.ts', 'packages/cli/src/**/*.ts'],
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module'
-    },
-    rules: {
-      // Keep base TS recommendations; add overrides here if engine/cli need them.
-    }
-  },
-  {
-    files: ['packages/webapp/src/**/*.{ts,tsx}'],
+    files: ['src/**/*.{ts,tsx}'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module'

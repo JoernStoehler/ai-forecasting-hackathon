@@ -177,24 +177,24 @@ Documents requirements for features not yet built:
 ### Run All Passing Tests
 ```bash
 # All implemented features (excluding skipped)
-npm run test:e2e -w packages/webapp -- --grep-invert "UNIMPLEMENTED|REQUIRES_MOCK|REQUIRES_IMPLEMENTATION"
+npm run test:e2e -- --grep-invert "UNIMPLEMENTED|REQUIRES_MOCK|REQUIRES_IMPLEMENTATION"
 
 # Or specific suites
-npm run test:e2e -w packages/webapp -- --project=firefox smoke.spec.ts timeline.spec.ts search.spec.ts
+npm run test:e2e -- --project=firefox smoke.spec.ts timeline.spec.ts search.spec.ts
 ```
 
 ### Run All Tests (Including Skipped)
 ```bash
-npm run test:e2e -w packages/webapp
+npm run test:e2e
 ```
 
 ### Debug Failing Test
 ```bash
-npm run test:e2e -w packages/webapp -- --debug timeline.spec.ts
+npm run test:e2e -- --debug timeline.spec.ts
 ```
 
 ### Full Documentation
-See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for complete guide.
+See [`tests/README.md`](tests/README.md) for complete guide.
 
 ---
 
@@ -210,17 +210,17 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
 
 1. **On Every Push:**
    ```bash
-   npm run test:e2e -w packages/webapp -- --project=firefox smoke.spec.ts
+   npm run test:e2e -- --project=firefox smoke.spec.ts
    ```
 
 2. **On Pull Request:**
    ```bash
-   npm run test:e2e -w packages/webapp -- --grep-invert "UNIMPLEMENTED|REQUIRES_MOCK"
+   npm run test:e2e -- --grep-invert "UNIMPLEMENTED|REQUIRES_MOCK"
    ```
 
 3. **Nightly / Before Release:**
    ```bash
-   npm run test:e2e -w packages/webapp -- --project=chromium --project=firefox --project=webkit
+   npm run test:e2e -- --project=chromium --project=firefox --project=webkit
    ```
 
 ---
@@ -260,7 +260,7 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
    - Add new tests for edge cases discovered during implementation
 
 3. **Maintain Test Documentation**
-   - Keep `packages/webapp/tests/README.md` current
+   - Keep `tests/README.md` current
    - Update this status document quarterly or on major changes
 
 ---
@@ -323,7 +323,7 @@ See [`packages/webapp/tests/README.md`](packages/webapp/tests/README.md) for com
 
 ## Questions or Issues?
 
-- See `packages/webapp/tests/README.md` for test authoring guide
+- See `tests/README.md` for test authoring guide
 - Check existing test files for patterns and examples
 - Review `docs/cassette-replay.md` for planned mock system
 - Consult VISION.md for feature roadmap alignment
