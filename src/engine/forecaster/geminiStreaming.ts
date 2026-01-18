@@ -37,7 +37,7 @@ export function buildGenerateContentRequest(params: Omit<StreamParams, 'client'>
           properties: {
             type: {
               type: Type.STRING,
-              enum: ['publish-news', 'publish-hidden-news', 'patch-news', 'game-over'],
+              enum: ['publish-news', 'publish-hidden-news', 'patch-news', 'game-over', 'roll-dice'],
             },
             id: { type: Type.STRING },
             targetId: { type: Type.STRING },
@@ -46,6 +46,7 @@ export function buildGenerateContentRequest(params: Omit<StreamParams, 'client'>
             title: { type: Type.STRING },
             description: { type: Type.STRING },
             summary: { type: Type.STRING },
+            label: { type: Type.STRING },
             patch: {
               type: Type.OBJECT,
               properties: {
@@ -56,7 +57,7 @@ export function buildGenerateContentRequest(params: Omit<StreamParams, 'client'>
               },
             },
           },
-          required: ['type', 'date'],
+          required: ['type'],
         },
       },
       ...normalizeOptions(options),

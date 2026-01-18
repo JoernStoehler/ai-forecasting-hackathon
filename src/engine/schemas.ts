@@ -56,11 +56,18 @@ export const GameOverCommandSchema = z.object({
 });
 export type GameOverCommand = z.infer<typeof GameOverCommandSchema>;
 
+export const RollDiceCommandSchema = z.object({
+  type: z.literal('roll-dice'),
+  label: z.string().min(1).optional(),
+});
+export type RollDiceCommand = z.infer<typeof RollDiceCommandSchema>;
+
 export const CommandSchema = z.discriminatedUnion('type', [
   PublishNewsCommandSchema,
   PublishHiddenNewsCommandSchema,
   PatchNewsCommandSchema,
   GameOverCommandSchema,
+  RollDiceCommandSchema,
 ]);
 export type Command = z.infer<typeof CommandSchema>;
 
@@ -138,6 +145,14 @@ export const TurnFinishedEventSchema = z.object({
 });
 export type TurnFinishedEvent = z.infer<typeof TurnFinishedEventSchema>;
 
+export const DiceRolledEventSchema = z.object({
+  type: z.literal('dice-rolled'),
+  roll: z.number().int().min(1).max(100),
+  at: TimestampSchema,
+  label: z.string().min(1).optional(),
+});
+export type DiceRolledEvent = z.infer<typeof DiceRolledEventSchema>;
+
 export const EngineEventSchema = z.discriminatedUnion('type', [
   NewsPublishedEventSchema,
   HiddenNewsPublishedEventSchema,
@@ -148,6 +163,7 @@ export const EngineEventSchema = z.discriminatedUnion('type', [
   GameOverEventSchema,
   TurnStartedEventSchema,
   TurnFinishedEventSchema,
+  DiceRolledEventSchema,
 ]);
 export type EngineEvent = z.infer<typeof EngineEventSchema>;
 

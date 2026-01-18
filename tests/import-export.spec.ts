@@ -92,6 +92,9 @@ test.describe('Import Functionality', () => {
     const testFilePath = path.join('/tmp', 'test-import.json');
     fs.writeFileSync(testFilePath, JSON.stringify(testEvents, null, 2));
 
+    // Set up dialog handler BEFORE triggering the file upload
+    const dialogPromise = page.waitForEvent('dialog');
+
     // Set up file chooser listener
     const fileChooserPromise = page.waitForEvent('filechooser');
 
@@ -104,11 +107,11 @@ test.describe('Import Functionality', () => {
     await fileChooser.setFiles(testFilePath);
 
     // Handle confirmation dialog
-    page.once('dialog', dialog => {
-      expect(dialog.message()).toContain('Replace current timeline');
-      dialog.accept();
-    });
+    const dialog = await dialogPromise;
+    expect(dialog.message()).toContain('Replace current timeline');
+    await dialog.accept();
 
+    // Wait for the import to complete and timeline to update
     await page.waitForTimeout(500);
 
     // Verify import success

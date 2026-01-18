@@ -1,6 +1,6 @@
 # AI Forecasting Web Game - Project Overview
 
-**Last Updated:** 2026-01-18
+**Last Updated:** 2026-01-18 (Roadmap updated with MVP backlog)
 
 **Quick Summary:** Serious policy simulation game where players assume the role of the US government and interact with an LLM-based "game master" (Gemini 2.5 Flash) to explore AI governance scenarios through an interactive timeline from 2025 onward.
 
@@ -55,6 +55,83 @@ If multiple PRs update PROJECT.md simultaneously:
 - Features are in separate sections → clean merge
 - Conflict resolution: keep correct status for each feature
 - Rare occurrence due to independent features
+
+---
+
+## Development Backlog (Sequential MVP Roadmap)
+
+**Status:** 🎯 **MVP DEVELOPMENT IN PROGRESS**
+
+This section defines the sequential order for implementing MVP features. Work through these in order, marking each complete before moving to the next.
+
+### MVP Must-Haves (Launch Blockers)
+
+1. **Prompt Projection Logic** - 🟢 COMPLETE (2026-01-18)
+   - Filter/compress event log for GM prompt
+   - Telemetry aggregation, hidden news marking
+   - See: [Prompt Projection & Telemetry Aggregation](#prompt-projection--telemetry-aggregation)
+
+2. **Pre-Game Menu & Setup UI** - 🔵 READY, ⚠️ ESSENTIAL
+   - Scenario picker, start date, role selection
+   - Required for complete user flow
+   - See: [Pre-Game Menu & Setup UI](#pre-game-menu--setup-ui)
+
+3. **Post-Game Screen + Hidden News Completion** - 🔵 READY, ⚠️ ESSENTIAL
+   - Core pedagogical mechanic (teaches forecasting under uncertainty)
+   - Tightly coupled features (implement together)
+   - See: [Post-Game Analysis Screen](#post-game-analysis-screen) + [Hidden News System](#hidden-news-system)
+
+4. **Tutorial/Onboarding** - 🔵 READY, ⚠️ ESSENTIAL
+   - Policy experts need guidance
+   - Explains game mechanics, terminology, player role
+   - See: [Tutorial/Onboarding](#tutorialonboarding)
+
+5. **PRNG Integration** - 🟢 COMPLETE (2026-01-18)
+   - Deterministic dice rolls via commands
+   - GM requests percentile rolls for variability
+   - See: [PRNG & Dice Rolling](#prng--dice-rolling)
+
+6. **Dark Mode & Settings** - 🔵 READY, HIGH PRIORITY
+   - Professional polish for expert audience
+   - Font size for accessibility
+   - See: [Settings & Dark Mode](#settings--dark-mode)
+
+7. **Accessibility & Keyboard Navigation** - 🔵 READY, HIGH PRIORITY
+   - Policy experts may rely on assistive tech
+   - Full keyboard support, ARIA labels
+   - See: [Keyboard Navigation & Accessibility](#keyboard-navigation--accessibility)
+
+8. **Deployment to AI Studio Build** - 🔵 READY, ⚠️ ESSENTIAL
+   - Deploy path for public access
+   - Local static server setup for PO/agents
+   - See: [AI Studio Build Deployment](#ai-studio-build-deployment)
+
+### Post-MVP Nice-to-Haves
+
+9. **Dashboard/LineChart System** - ⚪ IDEA
+   - Visual charts (GDP, AI capabilities)
+   - GM generates LineChart commands
+   - See: [Dashboard & Visualizations](#dashboard--visualizations)
+
+10. **LLM Assistant** - ⚪ IDEA
+    - Player-facing AI helper
+    - Chat overlay, sees public info only
+    - See: [LLM Assistant](#llm-assistant)
+
+11. **Sound Design** - ⚪ IDEA
+    - Audio feedback and ambiance
+    - See: [Sound Design](#sound-design)
+
+12. **Materials Expansion** - ⚪ IDEA
+    - Additional material bundles
+    - Variations on X-risk models
+    - See: [Materials Dynamic Selection](#materials-dynamic-selection)
+
+### Ongoing Polish Work
+
+- **Visual Aesthetics** - Iterative improvements (focus on content, modern/serious tone)
+- **Writing Style** - Content editing for clarity and tone
+- **Performance** - Only if issues arise with large timelines
 
 ---
 
@@ -319,30 +396,79 @@ GM can publish hidden events revealed only after game ends. Teaches forecasting 
 
 ---
 
-### Telemetry Aggregation
-**Stage:** 🟡 IN PROGRESS (Raw events only)
-**Blockers:** Need aggregation logic and GM prompt integration
+### Prompt Projection & Telemetry Aggregation
+**Stage:** 🟢 COMPLETE (2026-01-18)
+**Tests:** [src/engine/test/prompt-projection.test.ts](src/engine/test/prompt-projection.test.ts) (21 tests passing)
 
-Aggregate telemetry data to inform GM pacing and content generation.
+Transform chatty event log into calm, focused prompt for GM. Filters/compresses events, aggregates telemetry, marks hidden news for GM visibility.
 
-**Implementation Status:**
-- ✅ `news-opened` and `news-closed` events recorded
-- ✅ Events stored in event log
-- ❌ No aggregation/compression
-- ❌ No "attention metrics" calculation (e.g., which events player read)
-- ❌ No prompt projection filtering
-- ❌ No GM pacing based on telemetry
+**Implementation:**
+- ✅ Enhanced timeline projection with `isHidden` marking for hidden news
+- ✅ Telemetry aggregation (tracks `viewedFirstTime`, `notViewed` per turn)
+- ✅ Raw telemetry events (`news-opened`, `news-closed`) filtered from projection
+- ✅ Player attention summary included when in active turn
+- ✅ Turn-aware tracking (clears between turns)
+- ✅ ID generation for news items without explicit IDs
+- ✅ Comprehensive unit test coverage (21 tests)
 
-**Next Steps:**
-1. Aggregate telemetry into attention metrics
-2. Filter/summarize for GM prompt
-3. Adjust GM pacing based on player engagement
+**Projection Structure:**
+```
+# TIMELINE (JSONL)
+{enhanced news events with isHidden field}
+{turn markers and structural events}
 
-**Dependencies:** Basic Telemetry (complete ✅)
+# PLAYER ATTENTION
+{"viewedFirstTime": [...], "notViewed": [...]}
+
+# CURRENT STATE
+{"latestDate": "...", "currentTurn": {...}}
+```
+
+**Note:** PRNG state integration will be added when PRNG feature (#5 in MVP backlog) is implemented.
+
+**Dependencies:** Basic Telemetry (complete ✅), Event Sourcing (complete ✅)
 
 ---
 
 ## Unimplemented Features
+
+### Pre-Game Menu & Setup UI
+**Stage:** 🔵 READY
+**Priority:** ⚠️ **ESSENTIAL** - MVP user flow requirement
+**Tests:** Not yet written (needs test specs)
+
+Pre-game menu for scenario selection, start date picking, and role selection before gameplay begins.
+
+**Implementation Readiness:**
+- ✅ Design clarified (2026-01-18)
+- ❌ No routing structure (`/` → menu, `/game` → gameplay)
+- ❌ No UI components
+
+**Features:**
+- Main menu screen (Continue vs New Game)
+- Scenario picker (initially: "AI X-Risk 2025-2035")
+- Start date picker (discrete options per scenario)
+- Role picker with descriptions:
+  - "US Government Strategist" (set agendas, GM executes details)
+  - Potentially other roles in future
+- "Start Game" button → initialize event log with chosen setup
+- Seed events updated to be scenario-aware
+
+**MVP Scope:**
+- Single scenario to start ("AI X-Risk 2025-2035")
+- One active game at a time (or persist "last played")
+- Simple, clean UI (focus on getting into game quickly)
+
+**Implementation Plan:**
+1. Add routing (React Router or similar)
+2. Create menu page components
+3. Update seed events to accept scenario/date/role parameters
+4. Wire up game initialization
+5. Write E2E tests for setup flow
+
+**Dependencies:** Event Sourcing (complete ✅)
+
+---
 
 ### Post-Game Analysis Screen
 **Stage:** 🔵 READY
@@ -370,29 +496,38 @@ After `game-over` event, show GM analysis with interactive Q&A and hidden news r
 ---
 
 ### PRNG & Dice Rolling
-**Stage:** 🔵 READY
-**Tests:** [tests/unimplemented-features.spec.ts:52-80](tests/unimplemented-features.spec.ts)
+**Stage:** 🟢 COMPLETE (2026-01-18)
+**Tests:** [src/engine/test/prng.test.ts](src/engine/test/prng.test.ts) (17 tests passing)
 
-Deterministic randomness for GM decision-making.
+Deterministic randomness for GM decision-making via roll-dice commands.
 
-**Implementation Readiness:**
-- ✅ Test specs written (4 tests)
-- ❌ PRNG state not in event log yet
-- ❌ System prompt doesn't enforce dice rolls
-- ❌ No UI for viewing rolls (advanced mode)
+**Implementation:**
+- ✅ `roll-dice` command type (LLM requests rolls)
+- ✅ `dice-rolled` event type (records roll results)
+- ✅ Deterministic PRNG (Mulberry32 algorithm)
+- ✅ Seeded rolls based on event log context
+- ✅ Percentile rolls (1-100) with optional labels
+- ✅ System prompt documentation for GM usage
+- ✅ Prompt projection includes dice rolls
+- ✅ Streaming pipeline handles roll-dice commands
+- ✅ Comprehensive unit test coverage (17 tests)
 
-**Features:**
-- PRNG state in event log
-- Percentile rolls for GM turns
-- Roll visibility in advanced view
-- Initial scenario randomization
+**How It Works:**
+1. GM requests dice roll via `{"type": "roll-dice", "label": "AI capability growth"}`
+2. Engine generates deterministic roll based on history + timestamp
+3. `dice-rolled` event added to log with roll value (1-100)
+4. Subsequent GM prompts include roll results for reference
 
-**Next Steps:**
-1. Add PRNG state to event schema
-2. Update system prompt to use dice rolls
-3. Add UI toggle for advanced view
+**PRNG Algorithm:**
+- Uses Mulberry32 for fast, deterministic generation
+- Seed = hash(eventCount + timestamp + label)
+- Ensures reproducibility from same event log state
 
-**Dependencies:** Event Sourcing (schema update needed)
+**Future Enhancements (not implemented):**
+- UI toggle for viewing rolls (advanced/debug mode)
+- Initial scenario randomization via pre-seeded rolls
+
+**Dependencies:** Event Sourcing (complete ✅), Prompt Projection (complete ✅)
 
 ---
 
@@ -527,6 +662,151 @@ Optional telemetry upload and cloud save/sync.
 
 ---
 
+### Dashboard & Visualizations
+**Stage:** ⚪ IDEA (Post-MVP)
+**Priority:** Nice-to-have
+**Tests:** Not yet written
+
+GM-generated data visualizations (line charts, metrics) displayed in a dedicated dashboard tab.
+
+**Design Philosophy:**
+- KISS: Simple LineChart command type, avoid complicated syntax
+- GM decides what to visualize based on player interest
+- Client-side rendering, not image generation
+- Charts are editable/replaceable by GM via new commands
+
+**Implementation Readiness:**
+- ✅ Design clarified (2026-01-18)
+- ❌ No chart command types defined
+- ❌ No chart rendering infrastructure
+- ❌ No dashboard UI tab
+
+**Features:**
+- `LineChart` command type with structure:
+  ```typescript
+  LineChart {
+    xlabel: string
+    ylabel: string
+    title: string
+    isLogX: boolean
+    isLogY: boolean
+    data: Array<{
+      color: string
+      label: string
+      x: number[]
+      y: number[]
+    }>
+  }
+  ```
+- Chart aggregation in prompt projection (show current charts to GM, not as images)
+- Dashboard tab UI with search function
+- LineChart rendering (recharts or similar library)
+- Chart edit commands (LineChartMerge, replace, delete)
+
+**Use Cases:**
+- Global GDP trends
+- AI capability scores (US vs China on METR benchmark)
+- Geopolitical tension metrics
+- Research investment over time
+
+**Implementation Plan:**
+1. Define LineChart event/command schema
+2. Add chart aggregation to prompt projection
+3. Build dashboard tab UI
+4. Integrate chart rendering library
+5. Update GM system prompt to use charts
+6. E2E tests for chart creation/display
+
+**Dependencies:** Prompt Projection (for chart metadata in GM context)
+
+---
+
+### LLM Assistant
+**Stage:** ⚪ IDEA (Post-MVP)
+**Priority:** Nice-to-have
+**Tests:** Not yet written
+
+Second AI agent that helps players understand the game, provides recommendations, and explains terminology.
+
+**Design Philosophy:**
+- Player-facing helper (sees public info only, no hidden news)
+- Moveable/hideable chat overlay (doesn't obstruct gameplay)
+- Always available for consultation
+- Uses same Gemini API key as GM
+
+**Implementation Readiness:**
+- ✅ Design clarified (2026-01-18)
+- ❌ No chat UI components
+- ❌ No second forecaster integration
+- ❌ No assistant prompt projection
+
+**Features:**
+- Chat overlay UI (draggable, collapsible)
+- Second Gemini agent with separate context
+- Prompt projection imitating player's UI (text-only)
+- Chat history with in-game and wall-time timestamps
+- Assistant capabilities:
+  - Answer questions about game mechanics
+  - Explain terminology (AI x-risk, forecasting, etc.)
+  - Provide strategy recommendations if asked
+  - Rephrase/summarize news items
+  - Clarify player options
+
+**Context Restrictions:**
+- Assistant sees: public timeline events, player decisions, game state
+- Assistant does NOT see: hidden news, GM internal reasoning, future events
+
+**Implementation Plan:**
+1. Design assistant system prompt
+2. Create chat overlay UI component
+3. Build assistant prompt projection (player POV)
+4. Integrate second Gemini client
+5. Wire up chat message handling
+6. Add conversation persistence
+7. E2E tests for assistant interactions
+
+**Dependencies:** Prompt Projection (for assistant context), Post-Game Screen (assistant continues in post-game)
+
+---
+
+### Sound Design
+**Stage:** ⚪ IDEA (Post-MVP)
+**Priority:** Polish (nice-to-have)
+**Tests:** Not yet written
+
+Audio feedback and ambient sound to enhance immersion and provide non-visual cues.
+
+**Implementation Readiness:**
+- ✅ Concept approved (2026-01-18)
+- ❌ No audio assets
+- ❌ No audio playback infrastructure
+- ❌ No sound toggle in settings
+
+**Features:**
+- Event notification sounds (subtle, non-intrusive)
+- Turn completion audio cues (player turn end, GM turn end)
+- Optional ambient background audio (serious, policy-sim tone)
+- Audio toggle in settings panel
+- Respect system/browser audio preferences
+
+**Design Considerations:**
+- Default: sounds enabled but subtle
+- Must not distract from content (serious sim, not arcade game)
+- Accessibility: sounds complement visual cues, don't replace them
+- Audio assets: royalty-free or commissioned
+
+**Implementation Plan:**
+1. Source/create audio assets
+2. Build audio playback service
+3. Add sound triggers to key events
+4. Implement audio toggle in settings
+5. Test across browsers
+6. User testing for volume/frequency
+
+**Dependencies:** Settings Panel (for audio toggle)
+
+---
+
 ### Scenario Branching
 **Stage:** 🔴 DEPRIORITIZED
 **Tests:** [tests/unimplemented-features.spec.ts:232-250](tests/unimplemented-features.spec.ts)
@@ -558,33 +838,44 @@ Core Gameplay (all complete ✅)
 ├─ Search & Filter
 └─ Persistence (localStorage + import/export)
 
-Testing Infrastructure (partial ⚠️)
+Testing Infrastructure (complete ✅)
 ├─ E2E Test Suite ✅
 ├─ Mock Forecaster ✅
-└─ Cassette Replay 🟡 (70% done - needs fixtures)
+└─ Cassette Replay ✅
 
-Advanced Features (not started ❌)
-├─ Post-Game Screen 🔵 READY
-│  └─ depends on: Hidden News (reveal)
-├─ Hidden News 🟡 IN PROGRESS
-│  └─ depends on: Post-Game Screen (for reveal UI)
-├─ PRNG/Dice 🔵 READY
-│  └─ depends on: Schema update, GM prompt changes
-├─ Telemetry Aggregation 🟡 IN PROGRESS
-│  └─ depends on: Basic Telemetry ✅
-└─ Materials Dynamic Selection 🔵 READY
-   └─ depends on: Nothing (orthogonal)
+MVP Critical Path (sequential, blocks deployment)
+├─ 1. Prompt Projection 🔵 READY ⚠️ ESSENTIAL
+│  └─ depends on: Basic Telemetry ✅, Event Sourcing ✅
+├─ 2. Pre-Game Menu & Setup 🔵 READY ⚠️ ESSENTIAL
+│  └─ depends on: Event Sourcing ✅
+├─ 3. Post-Game Screen + Hidden News 🔵 READY ⚠️ ESSENTIAL
+│  └─ depends on: Prompt Projection (for hidden news filtering)
+├─ 4. Tutorial/Onboarding 🔵 READY ⚠️ ESSENTIAL
+│  └─ depends on: Pre-Game Menu (for context-sensitive hints)
+├─ 5. PRNG Integration 🔵 READY ⚠️ ESSENTIAL
+│  └─ depends on: Prompt Projection (to include PRNG in GM context)
+├─ 6. Dark Mode & Settings 🔵 READY (HIGH PRIORITY)
+│  └─ depends on: Nothing (orthogonal)
+├─ 7. Accessibility 🔵 READY (HIGH PRIORITY)
+│  └─ depends on: Nothing (orthogonal)
+└─ 8. Deployment 🔵 READY ⚠️ ESSENTIAL
+   └─ depends on: All above features complete
 
-UX/Settings (independent ❌)
-├─ Dark Mode 🔵 READY
-├─ Tutorial/Onboarding 🔵 READY
-├─ Accessibility 🔵 READY
-└─ Keyboard Navigation 🔵 READY
+Post-MVP Nice-to-Haves (not blocking deployment)
+├─ Dashboard/LineChart ⚪ IDEA
+│  └─ depends on: Prompt Projection (for chart metadata in GM context)
+├─ LLM Assistant ⚪ IDEA
+│  └─ depends on: Prompt Projection (for assistant context)
+├─ Sound Design ⚪ IDEA
+│  └─ depends on: Settings Panel (for audio toggle)
+├─ Materials Dynamic Selection 🔵 READY
+│  └─ depends on: Nothing (orthogonal)
+└─ Performance Optimization ⚪ IDEA
+   └─ depends on: Timeline Display (if issues arise)
 
-Deployment & Infrastructure (⚪ ideas)
-├─ AI Studio Build ⚪ IDEA
-├─ Performance Optimization ⚪ IDEA
-└─ Telemetry Server ⚪ IDEA
+Deprioritized
+├─ Scenario Branching 🔴 DEPRIORITIZED
+└─ Telemetry Server ⚪ IDEA (post-launch only)
 ```
 
 ---
@@ -621,6 +912,37 @@ Deployment & Infrastructure (⚪ ideas)
 **Decision Date:** Initial architecture (Nov 2024)
 **Owner:** Jörn Stöhler
 
+### Why Prompt Projection is Essential?
+**Rationale:** Event log can be chatty (verbose, noisy), but GM needs calm (filtered, summarized) context. Must filter hidden news, aggregate telemetry, include PRNG state. Without this, GM cannot work properly at scale.
+**Decision Date:** 2026-01-18 (roadmap planning session)
+**Priority:** Essential foundation work
+
+### Why Pre-Game Setup is MVP?
+**Rationale:** Complete user flow requires scenario selection, start date picking, and role selection. Players need context before starting. Currently drops straight into game with hardcoded scenario.
+**Decision Date:** 2026-01-18 (roadmap planning session)
+**Priority:** MVP requirement for proper UX
+
+### Why Dashboard/LLM Assistant are Post-MVP?
+**Rationale:** Nice-to-have enhancements that improve experience but aren't required for core pedagogical loop. Dashboard adds visual appeal, Assistant helps less experienced players. Both can be added after launch.
+**Decision Date:** 2026-01-18 (roadmap planning session)
+**Priority:** Post-MVP nice-to-haves
+
+### Why Sound Design is Optional?
+**Rationale:** Audio enhances immersion but isn't critical for policy simulation. Can be added post-launch based on user feedback. Must remain subtle and serious (not arcade-game style).
+**Decision Date:** 2026-01-18 (roadmap planning session)
+**Priority:** Polish feature, post-MVP
+
+### Target Audience Considerations
+**Audience:** Policy experts and researchers interested in AI x-risk (not just tech people)
+**Implications:**
+- Tutorial is essential (explain game mechanics, terminology)
+- Accessibility is high priority (assistive tech, keyboard nav)
+- Dark mode important (long reading sessions)
+- Font size options (older professionals)
+- Writing must be clear, jargon-free where possible
+- Serious/professional aesthetic over flashy/gamified
+**Decision Date:** 2026-01-18 (roadmap planning session)
+
 ---
 
 # Test Status
@@ -643,6 +965,8 @@ Deployment & Infrastructure (⚪ ideas)
 6. **`turn-cycle.spec.ts`** (32 tests) - Full GM turn cycle, turn markers with visual UI (multi-browser, 1 flaky timeout)
 7. **`error-handling.spec.ts`** (9/18 passing) - Input validation and error scenarios
 8. **`cassette-replay.spec.ts`** (9 tests) - Cassette replay system (2026-01-18)
+9. **`src/engine/test/prompt-projection.test.ts`** (21 tests) - Prompt projection with hidden news marking and telemetry aggregation (2026-01-18)
+10. **`src/engine/test/prng.test.ts`** (17 tests) - PRNG dice rolling system (2026-01-18)
 
 ### Unimplemented Feature Tests (Skipped)
 
@@ -662,15 +986,15 @@ Documents requirements for features not yet built:
 
 ## Test Statistics
 
-**Total tests:** 174 (E2E) + 196 (unit) = 370
-**Passing:** 113 (E2E) + 196 (unit) = 309 (84%)
+**Total tests:** 174 (E2E) + 234 (unit) = 408
+**Passing:** 113 (E2E) + 234 (unit) = 347 (85%)
 **Skipped:** 61 (E2E unimplemented feature specs)
 **Confidence Level:** HIGH - Can replace most manual testing
 
 ## How to Run Tests
 
 ```bash
-# Unit tests (196 tests, ~1 second)
+# Unit tests (234 tests, ~1 second)
 npm test
 
 # Smoke test (~10 seconds)
@@ -690,16 +1014,18 @@ npm run test:e2e
 - For manual dev: set `VITE_USE_MOCK_FORECASTER=true` in `.env.local`
 - Mock returns deterministic placeholder events without API calls
 
-### Cassette Replay (Partial)
-- Infrastructure exists (70% complete)
-- No fixture recordings yet
+### Cassette Replay
+- Infrastructure complete (100%)
+- Hand-written fixture available for testing
+- Recording script available
 - See [docs/cassette-replay.md](docs/cassette-replay.md) for design
 
-## Next Steps
+## Next Steps (Aligned with MVP Backlog)
 
-1. **Add Cassette Replay Fixtures** - Record real API interactions for deterministic testing
+1. **Follow Development Backlog** - See [Development Backlog](#development-backlog-sequential-mvp-roadmap) for sequential feature order
 2. **Un-skip Tests as Features Land** - Remove `.skip()` when implementing features
-3. **Add to CI Pipeline** - Run passing tests on PR, smoke tests on push
+3. **Write Tests for New Features** - Pre-game menu, prompt projection logic need test specs
+4. **Add to CI Pipeline** - Run passing tests on PR, smoke tests on push
 
 ---
 
@@ -799,15 +1125,36 @@ Materials inclusion is **algorithmic/deterministic**, not a player-facing picker
 - **Maybe**: Google Drive integration
 - **Maybe**: Telemetry server (opt-out, no fingerprinting, used for data analysis)
 
+## Polish & Aesthetics
+
+**Visual Design Philosophy:**
+- Focus attention on content, not chrome
+- Modern, clean, professional aesthetic
+- Serious policy simulation tone (not gamified or flashy)
+- Good ergonomic defaults
+- Iterative refinement as features land
+
+**Writing Style:**
+- Clear, accessible language
+- Explain jargon when necessary
+- Direct and literal (optimize for skimming)
+- Professional but not academic
+- Content editing throughout development
+
+**Ongoing Work:**
+- Visual aesthetics improve with each feature
+- Writing refined as content is added
+- User testing informs both
+
 ## Settings
 
 Minimal settings to avoid overcomplication:
 - Dark/light mode
-- Maybe: audio toggle
-- Maybe: font size toggle
+- Font size toggle (accessibility)
+- Maybe: audio toggle (if sound design added)
 - Focus on good ergonomic defaults
 
-Target audience: anyone interested in policy and AI x-risk (not just tech people)
+Target audience: policy experts and researchers interested in AI x-risk (not just tech people)
 
 ## Hard Constraints
 
@@ -926,6 +1273,6 @@ Flat single-package structure (all code at root level):
 
 ---
 
-**Last Updated:** 2026-01-18
+**Last Updated:** 2026-01-18 (Roadmap updated with MVP backlog)
 **Maintained By:** Claude Code developers
 **Owner:** Jörn Stöhler

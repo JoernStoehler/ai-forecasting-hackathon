@@ -1,11 +1,15 @@
 import { slugify } from './strings.js';
+import { generateDiceRoll } from './prng.js';
 import type {
   PublishNewsCommand,
   PublishHiddenNewsCommand,
   PatchNewsCommand,
+  RollDiceCommand,
   NewsPublishedEvent,
   HiddenNewsPublishedEvent,
   NewsPatchedEvent,
+  DiceRolledEvent,
+  EngineEvent,
 } from '../types.js';
 
 /**
@@ -45,5 +49,20 @@ export function normalizePatchNews(cmd: PatchNewsCommand): NewsPatchedEvent {
     targetId: cmd.targetId,
     date: cmd.date,
     patch: cmd.patch,
+  };
+}
+
+/**
+ * Convert roll-dice command to dice-rolled event
+ * Generates a deterministic roll based on event log context
+ */
+export function normalizeRollDice(cmd: RollDiceCommand, history: EngineEvent[]): DiceRolledEvent {
+  const timestamp = new Date().toISOString();
+  const roll = generateDiceRoll(history.length, timestamp, cmd.label);
+  return {
+    type: 'dice-rolled',
+    roll,
+    at: timestamp,
+    label: cmd.label,
   };
 }

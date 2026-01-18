@@ -1,6 +1,6 @@
 import { CommandArraySchema } from '../schemas.js';
-import type { Command, EngineEvent, PublishNewsCommand, PublishHiddenNewsCommand, PatchNewsCommand } from '../types.js';
-import { normalizePublishNews, normalizePublishHiddenNews, normalizePatchNews } from '../utils/normalize.js';
+import type { Command, EngineEvent, PublishNewsCommand, PublishHiddenNewsCommand, PatchNewsCommand, RollDiceCommand } from '../types.js';
+import { normalizePublishNews, normalizePublishHiddenNews, normalizePatchNews, normalizeRollDice } from '../utils/normalize.js';
 
 export interface ActionBatch {
   actionsJsonl: string; // raw JSONL text chunk containing 1..n actions
@@ -42,8 +42,15 @@ export function parseActionChunk(chunk: ActionBatch, history: EngineEvent[]): Pa
   }
 
   const commands = CommandArraySchema.parse(parsed) as Command[];
-  const events = commands.flatMap(commandToEvents);
-  const nextHistory = [...history, ...events];
+  // Process commands sequentially, updating history as we go
+  const events: EngineEvent[] = [];
+  let currentHistory = history;
+  for (const cmd of commands) {
+    const cmdEvents = commandToEvents(cmd, currentHistory);
+    events.push(...cmdEvents);
+    currentHistory = [...currentHistory, ...cmdEvents];
+  }
+  const nextHistory = currentHistory;
   return {
     events,
     nextHistory,
@@ -51,7 +58,7 @@ export function parseActionChunk(chunk: ActionBatch, history: EngineEvent[]): Pa
   };
 }
 
-function commandToEvents(cmd: Command): EngineEvent[] {
+function commandToEvents(cmd: Command, history: EngineEvent[]): EngineEvent[] {
   if (cmd.type === 'publish-news') {
     const news = normalizePublishNews(cmd as PublishNewsCommand);
     return [news];
@@ -66,6 +73,10 @@ function commandToEvents(cmd: Command): EngineEvent[] {
   }
   if (cmd.type === 'game-over') {
     return [{ type: 'game-over', date: cmd.date, summary: cmd.summary }];
+  }
+  if (cmd.type === 'roll-dice') {
+    const diceRoll = normalizeRollDice(cmd as RollDiceCommand, history);
+    return [diceRoll];
   }
   return [];
 }
