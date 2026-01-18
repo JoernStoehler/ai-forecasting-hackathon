@@ -29,6 +29,33 @@ Single source of truth for all features in the AI Forecasting project.
 - ⚪ **IDEA**: Concept stage, needs design/specification
 - 🔴 **DEPRIORITIZED**: Not planned for near-term
 
+## Feature Tracking Workflow
+
+**We use PROJECT.md (not GitHub Issues) for feature tracking.**
+
+### For Autonomous Agent Work:
+1. Read PROJECT.md to identify next feature (look for 🔵 READY or 🟡 IN PROGRESS)
+2. Check test specs in `tests/unimplemented-features.spec.ts` for requirements
+3. Implement feature following existing patterns
+4. Update PROJECT.md in same PR:
+   - Change status emoji (🟡 → 🟢 or 🔵 → 🟢)
+   - Add completion date
+   - Update implementation checklist
+5. Commit: `"feat: implement X, mark complete in PROJECT.md"`
+
+### Why PROJECT.md instead of GitHub Issues?
+- ✅ Agents can read it directly (no API keys or rate limits)
+- ✅ Single source of truth lives with code
+- ✅ Atomic updates (code + status in same PR)
+- ✅ Version controlled (see feature evolution over time)
+- ✅ Lower overhead for agent-driven development
+
+### Handling Merge Conflicts
+If multiple PRs update PROJECT.md simultaneously:
+- Features are in separate sections → clean merge
+- Conflict resolution: keep correct status for each feature
+- Rare occurrence due to independent features
+
 ---
 
 ## Core Gameplay Features

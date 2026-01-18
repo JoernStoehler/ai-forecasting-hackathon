@@ -222,13 +222,11 @@ npm run dev            # Start dev server (webapp)
 ## Getting Help
 
 ### Resources
-- **VISION.md** - What we're building and why
-- **E2E-TEST-STATUS.md** - What works, what doesn't, what's next
-- **Issue tracker** - GitHub Issues for planned work
+- **PROJECT.md** - Feature registry, test status, product vision, development info
 - **Code itself** - Literate programming, documentation in code
 
 ### Questions?
-- Check documentation first (VISION.md, E2E-TEST-STATUS.md, docs/)
+- Check documentation first (PROJECT.md, docs/)
 - Review existing code for patterns
 - Ask Jörn directly if ambiguous or blocked
 

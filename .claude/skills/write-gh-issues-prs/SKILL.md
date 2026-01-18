@@ -1,10 +1,36 @@
 ---
 name: write-gh-issues-prs
-description: Write GitHub issues and PRs for this repo with the established conventions. Use when drafting issue or PR content or guidance.
+description: "[DEPRECATED] This skill is no longer used. Feature tracking has migrated to PROJECT.md."
+deprecated: true
 ---
 
-## Writing GitHub Issues and PRs
-- We use GitHub issues and PRs to coordinate work between agents and the project owner.
+## DEPRECATED: GitHub Issues Migration
+
+**This skill is deprecated as of 2026-01-18.**
+
+We have migrated from GitHub Issues & Milestones to PROJECT.md-based feature tracking.
+
+### Why the change?
+- Agents can read PROJECT.md directly (no API keys needed)
+- Single source of truth lives with the code
+- Atomic updates (code + status in same PR)
+- Version controlled feature evolution
+- Lower overhead for agent-driven development
+
+### New workflow:
+1. Read PROJECT.md to understand feature status (🟢🟡🔵⚪🔴)
+2. Implement feature
+3. Update PROJECT.md in same PR
+4. Commit: "feat: implement X, mark complete in PROJECT.md"
+
+### For PR descriptions:
+See `.github/PULL_REQUEST_TEMPLATE.md` (still relevant for PR content).
+
+---
+
+## Old Documentation (archived)
+
+~~We use GitHub issues and PRs to coordinate work between agents and the project owner.~~
 - Best practices with regards to content are explained in the templates: `.github/ISSUE_TEMPLATE/task.md`, `.github/PULL_REQUEST_TEMPLATE.md`.
 - Use GitHub CLI with `--body-file` to avoid shell quoting pain.
 - Agents start with zero context about the project before onboarding, and they will focus on onboarding and reference materials relevant to their task. We have to mention required readings explicitly in the github issues so that agents pick them up.
