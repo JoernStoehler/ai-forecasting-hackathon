@@ -1,4 +1,4 @@
-import { slugify } from './strings.js';
+import { generateNewsId, dateFromISO, incrementDateByOne } from './strings.js';
 import {
   EngineEventSchema,
   ScenarioEventSchema,
@@ -69,12 +69,9 @@ export function sortAndDedupEvents<T extends EngineEvent>(events: T[]): T[] {
 export function nextDateAfter(history: EngineEvent[]): string {
   const lastDate = latestGameDate(history);
   if (!lastDate) {
-    return new Date().toISOString().split('T')[0];
+    return dateFromISO(new Date().toISOString());
   }
-  const dateStr = lastDate;
-  const date = new Date(`${dateStr}T00:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + 1);
-  return date.toISOString().split('T')[0];
+  return incrementDateByOne(lastDate);
 }
 
 export function assertChronology(history: EngineEvent[], additions: EngineEvent[]): void {
@@ -120,34 +117,18 @@ export function applyNewsPatches(history: EngineEvent[]): ScenarioEvent[] {
 }
 
 function normalizeEvent(event: EngineEvent): EngineEvent {
-  switch (event.type) {
-    case 'news-published': {
-      const news = event as NewsPublishedEvent;
-      return {
-        ...news,
-        type: 'news-published',
-        id: news.id ?? `news-${news.date}-${slugify(news.title)}`,
-      };
-    }
-    case 'hidden-news-published': {
-      const news = event as HiddenNewsPublishedEvent;
-      return {
-        ...news,
-        type: 'hidden-news-published',
-        id: news.id ?? `hidden-news-${news.date}-${slugify(news.title)}`,
-      };
-    }
-    case 'news-patched':
-    case 'news-opened':
-    case 'news-closed':
-    case 'scenario-head-completed':
-    case 'game-over':
-    case 'turn-started':
-    case 'turn-finished':
-      return event;
-    default:
-      return event;
+  // Only news-published and hidden-news-published need ID generation
+  if (event.type === 'news-published' || event.type === 'hidden-news-published') {
+    return {
+      ...event,
+      id: event.id ?? generateNewsId(
+        event.type === 'hidden-news-published' ? 'hidden-news' : 'news',
+        event.date,
+        event.title
+      ),
+    };
   }
+  return event;
 }
 
 function compareEvents(a: EngineEvent, b: EngineEvent): number {

@@ -108,7 +108,7 @@ test.describe('Network and API Edge Cases', () => {
 
   test.skip('REQUIRES_IMPLEMENTATION: retry logic for failed API calls', async ({ page }) => {
     // Test that failed API calls are retried (once implemented)
-    // VISION.md mentions retry logic as a gap to fill
+    // PROJECT.md mentions retry logic as a gap to fill
   });
 
   test.skip('REQUIRES_IMPLEMENTATION: handles API rate limiting', async ({ page }) => {

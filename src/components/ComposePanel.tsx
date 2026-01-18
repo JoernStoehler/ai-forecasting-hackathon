@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { incrementDateByOne } from '@/engine/utils/strings';
 import { ScenarioEvent } from '../types';
 import { Icon } from './icons';
 import { ICON_SET, type IconName } from '../constants';
@@ -9,14 +10,8 @@ interface ComposePanelProps {
   isLoading: boolean;
 }
 
-const getNextDay = (dateStr: string) => {
-  const date = new Date(dateStr + 'T00:00:00Z');
-  date.setUTCDate(date.getUTCDate() + 1);
-  return date.toISOString().split('T')[0];
-};
-
 export const ComposePanel: React.FC<ComposePanelProps> = ({ latestDate, onSubmit, isLoading }) => {
-  const [date, setDate] = useState(getNextDay(latestDate));
+  const [date, setDate] = useState(incrementDateByOne(latestDate));
   const [icon, setIcon] = useState<IconName>('Landmark');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -24,7 +19,7 @@ export const ComposePanel: React.FC<ComposePanelProps> = ({ latestDate, onSubmit
   const iconPickerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setDate(getNextDay(latestDate));
+    setDate(incrementDateByOne(latestDate));
   }, [latestDate]);
 
   useEffect(() => {

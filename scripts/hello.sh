@@ -57,7 +57,7 @@ CONFIG = SimpleNamespace(
         Path(".github"),
         Path("README.md"),
         Path("AGENTS.md"),
-        Path("VISION.md"),
+        Path("PROJECT.md"),
         Path("package.json"),
         Path("tsconfig.base.json"),
         Path("ai-forecasting-hackathon.code-workspace"),

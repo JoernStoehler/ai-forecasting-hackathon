@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Icon } from './icons';
 import { EngineEvent } from '../types';
 import { coerceEngineEvents } from '../utils/events';
+import { dateFromISO } from '@/engine/utils/strings';
 
 interface FileControlsProps {
     events: EngineEvent[];
@@ -14,7 +15,7 @@ export const FileControls: React.FC<FileControlsProps> = ({ events, onImport }) 
     const handleExport = () => {
         const dataStr = JSON.stringify(events, null, 2);
         const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-        const exportFileDefaultName = `takeoff-timeline-${new Date().toISOString().split('T')[0]}.json`;
+        const exportFileDefaultName = `takeoff-timeline-${dateFromISO(new Date().toISOString())}.json`;
         const linkElement = document.createElement('a');
         linkElement.setAttribute('href', dataUri);
         linkElement.setAttribute('download', exportFileDefaultName);

@@ -6,6 +6,7 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { EngineEvent, ScenarioEvent } from './types';
 import { INITIAL_EVENTS } from './data';
 import { applyNewsPatches, coerceEngineEvents, sortAndDedupEvents, aggregate } from '@/engine';
+import { dateFromISO } from '@/engine/utils/strings';
 import { getAiForecast } from './services/geminiService';
 import { Header } from './components/Header';
 import { Timeline } from './components/Timeline';
@@ -109,8 +110,16 @@ function App() {
   }, []);
 
   const timelineEvents = useMemo(() => {
-    const patched = applyNewsPatches(events);
-    return patched.filter(event => event.type === 'news-published');
+    // Get patched news events
+    const patchedNews = applyNewsPatches(events);
+
+    // Get turn markers from original events
+    const turnMarkers = events.filter(event =>
+      event.type === 'turn-started' || event.type === 'turn-finished'
+    );
+
+    // Merge and sort (news + turn markers)
+    return sortAndDedupEvents([...patchedNews, ...turnMarkers]);
   }, [events]);
 
   const filteredEvents = useMemo(() => {
@@ -118,15 +127,25 @@ function App() {
       return timelineEvents;
     }
     const lowercasedQuery = searchQuery.toLowerCase();
-    return timelineEvents.filter(event =>
-      event.title.toLowerCase().includes(lowercasedQuery) ||
-      event.description.toLowerCase().includes(lowercasedQuery)
-    );
+    return timelineEvents.filter(event => {
+      // Turn markers don't have searchable content, always include them
+      if (event.type === 'turn-started' || event.type === 'turn-finished') {
+        return true;
+      }
+      // Filter news events by title/description
+      if ('title' in event && 'description' in event) {
+        return (
+          event.title.toLowerCase().includes(lowercasedQuery) ||
+          event.description.toLowerCase().includes(lowercasedQuery)
+        );
+      }
+      return false;
+    });
   }, [timelineEvents, searchQuery]);
 
   const latestEventDate = useMemo(() => {
     const summary = aggregate(events);
-    if (!summary.latestDate) return new Date().toISOString().split('T')[0];
+    if (!summary.latestDate) return dateFromISO(new Date().toISOString());
     return summary.latestDate;
   }, [events]);
 

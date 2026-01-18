@@ -90,7 +90,7 @@ Tests use prefixes in their names to indicate status:
 - **`REQUIRES_IMPLEMENTATION:`** - Feature exists but test needs updates
 - **`UNIMPLEMENTED:`** - Feature not yet built, test documents requirements
 - **`FUTURE:`** - Possible future feature, low priority
-- **`DEPRIORITIZED:`** - Explicitly deprioritized in VISION.md
+- **`DEPRIORITIZED:`** - Explicitly deprioritized in PROJECT.md
 
 ### Skipped Tests
 
@@ -199,7 +199,7 @@ Current CI setup (`.github/workflows/ci.yml`):
 ## Resources
 
 - [Playwright Documentation](https://playwright.dev/docs/intro)
-- [Project VISION.md](../../../VISION.md) - Feature roadmap
+- [Project Overview](../PROJECT.md) - Feature roadmap, tests, vision
 - [Engine Package](../../engine/) - Shared types and logic
 - [Cassette Replay Spec](../../../docs/cassette-replay.md)
 

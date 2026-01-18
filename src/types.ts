@@ -1,1 +1,1 @@
-export type { EngineEvent, ScenarioEvent } from '@/engine';
+export type { EngineEvent, ScenarioEvent, TurnStartedEvent, TurnFinishedEvent } from '@/engine';

@@ -49,8 +49,8 @@ export function createRecordingGenAIClient(opts: {
   return {
     models: {
       generateContentStream: (args: { model: string; contents: string; config: GenerateContentConfig }) => {
-        const stream = baseClient.models.generateContentStream(args);
         const run = async function* () {
+          const stream = await baseClient.models.generateContentStream(args);
           const chunks: ReplayChunk[] = [];
           let last = process.hrtime.bigint();
 

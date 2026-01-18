@@ -1,0 +1,31 @@
+{
+  "meta": {
+    "label": "basic-turn",
+    "model": "gemini-2.5-flash",
+    "recordedAt": "2026-01-18T16:00:00Z",
+    "sdk": "@google/genai",
+    "comment": "Hand-written fixture for basic turn cycle test"
+  },
+  "request": {
+    "model": "gemini-2.5-flash",
+    "contents": "[{\"type\":\"news-published\",\"date\":\"2025-01-01\",\"icon\":\"Landmark\",\"title\":\"Seed Event\",\"description\":\"Initial scenario seed event\"}]",
+    "config": {
+      "systemInstruction": "You are a game master for an AI x-risk policy simulation game. The player represents the US government.",
+      "responseMimeType": "application/json"
+    }
+  },
+  "stream": [
+    {
+      "delayNs": 150000000,
+      "text": "[{\"type\":\"publish-news\",\"date\":\"2025-02-15\",\"icon\":\"BrainCircuit\",\"title\":\"Major AI Lab Announces GPT-5\",\"description\":\"A leading AI research lab announces GPT-5, showing significant improvements in reasoning and multi-modal capabilities.\"}]"
+    },
+    {
+      "delayNs": 80000000,
+      "text": ""
+    },
+    {
+      "delayNs": 120000000,
+      "text": "[{\"type\":\"publish-news\",\"date\":\"2025-03-01\",\"icon\":\"Scale\",\"title\":\"Congress Holds AI Safety Hearings\",\"description\":\"Congressional hearings focus on AI safety regulations as capabilities continue to advance rapidly.\"}]"
+    }
+  ]
+}

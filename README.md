@@ -36,9 +36,8 @@ Flat single-package structure (simplified from previous monorepo):
 
 ## Documentation
 
+- **[PROJECT.md](./PROJECT.md)** - Complete project overview (features, tests, vision)
 - **[CLAUDE.md](./CLAUDE.md)** - Full developer guide (start here!)
-- **[VISION.md](./VISION.md)** - Product goals, constraints, feature roadmap
-- **[E2E-TEST-STATUS.md](./E2E-TEST-STATUS.md)** - Test infrastructure and status
 - **[tests/README.md](./tests/README.md)** - Test authoring guide
 
 ## Key Features
@@ -55,7 +54,7 @@ Flat single-package structure (simplified from previous monorepo):
 ⚠️ **In Progress:**
 - Cassette replay system (designed, partially implemented)
 
-❌ **Planned:** (See VISION.md for details)
+❌ **Planned:** (See PROJECT.md for details)
 - Post-game analysis screen
 - Hidden news reveal
 - Tutorial/onboarding

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { normalizePublishHiddenNews, normalizePublishNews } from '@/engine';
+import { generateNewsId } from '@/engine/utils/strings';
 import { ScenarioEvent } from '../types';
 import { Icon } from './icons';
 
@@ -39,32 +39,15 @@ export const EventItem: React.FC<EventItemProps> = ({ event, searchQuery = '', i
 
   const resolveTargetId = () => {
     if (event.id) return event.id;
-    if (event.type === 'hidden-news-published') {
-      return normalizePublishHiddenNews({
-        type: 'publish-hidden-news',
-        date: event.date,
-        icon: event.icon,
-        title: event.title,
-        description: event.description,
-      }).id;
-    }
-    return normalizePublishNews({
-      type: 'publish-news',
-      date: event.date,
-      icon: event.icon,
-      title: event.title,
-      description: event.description,
-    }).id;
+    const type = event.type === 'hidden-news-published' ? 'hidden-news' : 'news';
+    return generateNewsId(type, event.date, event.title);
   };
 
   const handleToggle = () => {
     const nextExpanded = !isExpanded;
     setIsExpanded(nextExpanded);
-    if (!event || !('date' in event)) return;
-    const targetId = resolveTargetId();
-    if (!targetId) return;
-    if (typeof targetId !== 'string') return;
     if (!onTelemetry) return;
+    const targetId = resolveTargetId();
     onTelemetry(nextExpanded ? 'news-opened' : 'news-closed', targetId);
   };
 

@@ -1,10 +1,16 @@
 /**
- * Tests for features not yet implemented
+ * Unimplemented Feature Specifications
  *
- * These tests are INTENTIONALLY FAILING and document the features that need to be built.
- * As each feature is implemented, remove the .skip and the test should pass.
+ * These tests serve as executable specifications for features not yet built.
+ * For feature context, stages, and dependencies, see PROJECT.md.
  *
- * Reference: VISION.md Progress Checklist and project gaps
+ * Each test is marked .skip() and labeled UNIMPLEMENTED: ...
+ * When implementing a feature, un-skip the relevant tests.
+ *
+ * These tests are INTENTIONALLY SKIPPED and document requirements.
+ * As each feature is implemented, remove the .skip() and the test should pass.
+ *
+ * Reference: PROJECT.md for feature registry and implementation status
  */
 import { test, expect } from '@playwright/test';
 
@@ -298,7 +304,7 @@ test.describe('Performance Optimization (NOT IMPLEMENTED)', () => {
 
 test.describe('Telemetry Server (FUTURE CONSIDERATION)', () => {
   test.skip('FUTURE: optional telemetry upload to server', async ({ page }) => {
-    // VISION.md mentions maybe adding telemetry server
+    // PROJECT.md mentions maybe adding telemetry server
     // Players could opt-in to sharing game data
   });
 
@@ -310,13 +316,13 @@ test.describe('Telemetry Server (FUTURE CONSIDERATION)', () => {
 
 test.describe('Scenario Branching (DEPRIORITIZED)', () => {
   test.skip('DEPRIORITIZED: save-point system', async ({ page }) => {
-    // VISION.md says "feels boring" - deprioritized
+    // PROJECT.md says "feels boring" - deprioritized
     // But tests can document the concept:
     // Create save points to explore different timeline branches
   });
 
   test.skip('DEPRIORITIZED: timeline branch visualization', async ({ page }) => {
     // Visual representation of branching timelines
-    // Probably won't be implemented based on VISION.md
+    // Probably won't be implemented based on PROJECT.md
   });
 });

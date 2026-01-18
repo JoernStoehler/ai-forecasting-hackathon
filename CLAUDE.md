@@ -128,8 +128,7 @@ npm run test:e2e
 ## Key Files & Documentation
 
 ### Essential Reading
-- [`VISION.md`](./VISION.md) - Product goals, constraints, progress checklist
-- [`E2E-TEST-STATUS.md`](./E2E-TEST-STATUS.md) - Test coverage and next steps
+- [`PROJECT.md`](./PROJECT.md) - **Complete project overview** (features, tests, vision, development info)
 - [`README.md`](./README.md) - Quick start guide
 - [`tests/README.md`](./tests/README.md) - Test authoring guide
 
