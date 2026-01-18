@@ -12,7 +12,8 @@
     "test": "vitest run",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "test:e2e": "playwright test",
-    "hello": "bash scripts/hello.sh"
+    "hello": "bash scripts/hello.sh",
+    "distill-materials": "tsx scripts/distill-materials.ts"
   },
   "dependencies": {
     "@google/genai": "^1.34.0",
@@ -35,6 +36,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
+    "tsx": "^4.21.0",
     "typescript": "~5.8.2",
     "typescript-eslint": "^8.17.0",
     "vite": "^6.2.0",
