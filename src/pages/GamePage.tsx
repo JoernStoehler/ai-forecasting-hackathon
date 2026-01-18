@@ -2,6 +2,7 @@
  * Main gameplay page - timeline experience with GM interaction
  */
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { EngineEvent, ScenarioEvent } from '../types';
 import { applyNewsPatches, coerceEngineEvents, sortAndDedupEvents, aggregate } from '@/engine';
 import { dateFromISO } from '@/engine/utils/strings';
@@ -18,6 +19,7 @@ interface GamePageProps {
 }
 
 export const GamePage: React.FC<GamePageProps> = ({ initialEvents }) => {
+  const navigate = useNavigate();
   const [events, setEvents] = useState<EngineEvent[]>(initialEvents);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,7 +29,13 @@ export const GamePage: React.FC<GamePageProps> = ({ initialEvents }) => {
   useEffect(() => {
     eventsRef.current = events;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(events));
-  }, [events]);
+
+    // Check if game is over and navigate to post-game screen
+    const hasGameOver = events.some(e => e.type === 'game-over');
+    if (hasGameOver) {
+      navigate('/post-game');
+    }
+  }, [events, navigate]);
 
   const handleUserSubmit = useCallback(async (newEvent: ScenarioEvent) => {
     const previousEvents = eventsRef.current;
@@ -95,15 +103,17 @@ export const GamePage: React.FC<GamePageProps> = ({ initialEvents }) => {
   }, []);
 
   const timelineEvents = useMemo(() => {
-    // Get patched news events
-    const patchedNews = applyNewsPatches(events);
+    // Get patched news events (but filter out hidden news during gameplay)
+    const patchedNews = applyNewsPatches(events).filter(
+      event => event.type !== 'hidden-news-published'
+    );
 
     // Get turn markers from original events
     const turnMarkers = events.filter(event =>
       event.type === 'turn-started' || event.type === 'turn-finished'
     );
 
-    // Merge and sort (news + turn markers)
+    // Merge and sort (news + turn markers, no hidden news)
     return sortAndDedupEvents([...patchedNews, ...turnMarkers]);
   }, [events]);
 

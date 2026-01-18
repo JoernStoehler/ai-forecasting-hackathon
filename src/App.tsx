@@ -8,6 +8,7 @@ import { INITIAL_EVENTS } from './data';
 import { coerceEngineEvents } from '@/engine';
 import { MenuPage } from './pages/MenuPage';
 import { GamePage } from './pages/GamePage';
+import { PostGamePage } from './pages/PostGamePage';
 
 const STORAGE_KEY = 'takeoff-timeline-events-v2';
 const HAS_GAME_KEY = 'takeoff-has-game';
@@ -71,6 +72,10 @@ function App() {
         <Route
           path="/game"
           element={<GamePage initialEvents={gameEvents} />}
+        />
+        <Route
+          path="/post-game"
+          element={<PostGamePage events={gameEvents} />}
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
