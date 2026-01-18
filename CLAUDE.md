@@ -11,12 +11,14 @@
 This is a serious policy simulation game where players assume the role of the US government and interact with an LLM-based "game master" (powered by Google's Gemini 2.5 Flash) to explore AI governance scenarios through an interactive timeline from 2025 onward.
 
 **Project Structure:**
-- `packages/webapp/` - React SPA with integrated timeline engine
+Single-package React SPA (simplified from previous monorepo):
+- `src/` - React application
   - `src/engine/` - Timeline engine (types, validation, forecaster adapters)
   - `src/components/` - React components
   - `src/services/` - Business logic and integrations
+  - `src/engine/test/` - Engine unit tests (196 tests)
+- `tests/` - E2E test suite (Playwright)
 - `docs/` - Specifications and design documents
-- `E2E-TEST-STATUS.md` - Comprehensive test suite status and roadmap
 
 ---
 
@@ -32,13 +34,13 @@ This is a serious policy simulation game where players assume the role of the US
 ### Development Workflow
 ```bash
 # Check everything before committing
-npm run lint && npm run typecheck && npm run build
+npm run check
 
 # Run E2E tests (uses mock forecaster by default)
-npm run test:e2e -w packages/webapp
+npm run test:e2e
 
-# Run unit tests
-npm test -w @ai-forecasting/engine
+# Run unit tests only
+npm test
 ```
 
 ---
@@ -69,14 +71,17 @@ Comprehensive E2E test suite added 2026-01-14. See [`E2E-TEST-STATUS.md`](/E2E-T
 
 **Quick Test Commands:**
 ```bash
+# Unit tests (196 tests, ~1 second)
+npm test
+
 # Smoke test (~10 seconds)
-npm run test:e2e -w packages/webapp -- smoke.spec.ts
+npm run test:e2e -- smoke.spec.ts
 
 # Core features (~30 seconds)
-npm run test:e2e -w packages/webapp -- --grep-invert "UNIMPLEMENTED"
+npm run test:e2e -- --grep-invert "UNIMPLEMENTED"
 
 # Full suite including unimplemented feature specs
-npm run test:e2e -w packages/webapp
+npm run test:e2e
 ```
 
 **Mock Forecaster:**
