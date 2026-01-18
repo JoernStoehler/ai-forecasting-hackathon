@@ -23,21 +23,22 @@ npm run test:e2e -- --grep-invert "UNIMPLEMENTED"
 
 ## Project Structure
 
-Single-package React SPA (simplified from previous monorepo structure):
+Single-package React SPA (consolidated from previous 3-package monorepo):
 
-- **`src/`** - React application
+- **`packages/webapp/`** - React SPA (all code consolidated here)
   - `src/engine/` - Timeline engine (types, validation, forecaster adapters)
-  - `src/components/` - React UI components
   - `src/engine/test/` - Engine unit tests (196 tests)
-- **`tests/`** - E2E test suite (Playwright)
+  - `src/components/` - React UI components
+  - `tests/` - E2E test suite (Playwright)
 - **`docs/`** - Design specifications and technical docs
+- **`package.json`** (root) - Webapp package.json (no workspace config)
 
 ## Documentation
 
 - **[CLAUDE.md](./CLAUDE.md)** - Full developer guide (start here!)
 - **[VISION.md](./VISION.md)** - Product goals, constraints, feature roadmap
 - **[E2E-TEST-STATUS.md](./E2E-TEST-STATUS.md)** - Test infrastructure and status
-- **[tests/README.md](./tests/README.md)** - Test authoring guide
+- **[packages/webapp/tests/README.md](./packages/webapp/tests/README.md)** - Test authoring guide
 
 ## Key Features
 
