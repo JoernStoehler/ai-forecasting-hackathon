@@ -21,9 +21,9 @@ The game uses event sourcing architecture - every action creates an immutable ti
 
 ## Quick Links
 
+- **[Project Vision](vision.md)** - Why this game exists and how to contribute
 - **[Developer Quick Start](quickstart.md)** - Set up a local development environment
 - **[GitHub Repository](https://github.com/JoernStoehler/ai-forecasting-hackathon)** - Source code and full documentation
-- **[PROJECT.md](https://github.com/JoernStoehler/ai-forecasting-hackathon/blob/main/PROJECT.md)** - Complete feature registry and project vision
 
 ---
 
@@ -36,7 +36,7 @@ The game runs in your browser. You'll need a Gemini API key (free tier available
 See the [Quick Start guide](quickstart.md) to run locally. The app is a static React SPA - deploy anywhere that serves static files.
 
 ### Researchers & Funders
-This project explores how interactive simulation can teach AI governance intuition. See [PROJECT.md](https://github.com/JoernStoehler/ai-forecasting-hackathon/blob/main/PROJECT.md) for the full vision, roadmap, and how domain experts can contribute.
+This project explores how interactive simulation can teach AI governance intuition. See the [Vision page](vision.md) for goals, design philosophy, and how to contribute.
 
 ---
 

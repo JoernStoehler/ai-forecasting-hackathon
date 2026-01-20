@@ -17,6 +17,7 @@ exclude:
 # Navigation (shown in minima theme header)
 header_pages:
   - index.md
+  - vision.md
   - quickstart.md
 
 # Optional: Enable table of contents for long pages
