@@ -1,0 +1,25 @@
+# GitHub Pages / Jekyll configuration
+# Minimal setup for AI Forecasting Game documentation
+
+title: AI Forecasting Game
+description: A serious policy simulation for AI x-risk scenarios
+
+# Use GitHub's default theme
+theme: minima
+
+# Exclude files that shouldn't be processed
+exclude:
+  - "*.ts"
+  - "*.tsx"
+  - node_modules
+  - vendor
+
+# Navigation (shown in minima theme header)
+header_pages:
+  - index.md
+  - quickstart.md
+
+# Optional: Enable table of contents for long pages
+markdown: kramdown
+kramdown:
+  toc_levels: 2..3
