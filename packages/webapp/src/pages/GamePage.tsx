@@ -4,7 +4,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EngineEvent, ScenarioEvent } from '../types';
-import { applyNewsPatches, coerceEngineEvents, sortAndDedupEvents, aggregate } from '@/engine';
+import { applyNewsPatches, sortAndDedupEvents, aggregate } from '@/engine';
 import { dateFromISO } from '@/engine/utils/strings';
 import { getAiForecast } from '../services/geminiService';
 import { Header } from '../components/Header';

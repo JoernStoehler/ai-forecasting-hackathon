@@ -1,45 +1,25 @@
 {
-  "name": "@ai-forecasting/webapp",
+  "name": "@ai-forecasting/root",
   "private": true,
   "version": "0.1.0",
-  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint src --ext .ts,.tsx --ignore-pattern '**/*.test.ts'",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run build",
-    "test:e2e": "playwright test",
+    "dev": "npm run dev -w @ai-forecasting/webapp",
+    "build": "npm run build -w @ai-forecasting/webapp",
+    "preview": "npm run preview -w @ai-forecasting/webapp",
+    "lint": "npm run lint -w @ai-forecasting/webapp",
+    "typecheck": "npm run typecheck -w @ai-forecasting/webapp",
+    "test": "npm run test -w @ai-forecasting/webapp",
+    "check": "npm run check -w @ai-forecasting/webapp",
+    "test:e2e": "npm run test:e2e -w @ai-forecasting/webapp",
     "hello": "bash scripts/hello.sh",
-    "distill-materials": "tsx scripts/distill-materials.ts"
-  },
-  "dependencies": {
-    "@google/genai": "^1.34.0",
-    "lucide-react": "^0.552.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^7.12.0",
-    "zod": "^3.24.1"
+    "worker:dev": "npm run dev -w @ai-forecasting/share-worker",
+    "worker:deploy": "npm run deploy -w @ai-forecasting/share-worker",
+    "worker:login": "wrangler login"
   },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
-    "@playwright/test": "^1.50.1",
-    "@types/node": "^22.14.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@vitejs/plugin-react": "^5.0.0",
-    "autoprefixer": "^10.4.20",
-    "eslint": "^9.17.0",
-    "eslint-plugin-react": "^7.37.2",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^3.4.15",
-    "tsx": "^4.21.0",
-    "typescript": "~5.8.2",
-    "typescript-eslint": "^8.17.0",
-    "vite": "^6.2.0",
-    "vitest": "^2.1.3"
+    "wrangler": "^3"
   }
 }

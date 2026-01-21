@@ -14,39 +14,68 @@
  */
 import { test, expect } from '@playwright/test';
 
-test.describe('Post-Game Analysis Screen (NOT IMPLEMENTED)', () => {
-  test.skip('UNIMPLEMENTED: game-over event triggers post-game screen', async ({ page }) => {
+test.describe('Post-Game Analysis Screen', () => {
+  test('game-over event triggers post-game screen navigation', async ({ page }) => {
     // When a game-over event is created, should transition to post-game analysis screen
-    await page.goto('/');
-    await page.waitForLoadState('networkidle');
-
-    // TODO: Trigger game-over somehow (or inject game-over event)
-    // For now, manually inject via localStorage
     const gameOverEvent = {
       type: 'game-over',
       date: '2026-12-31',
-      reason: 'Player chose to end scenario'
+      summary: 'The scenario has concluded.'
     };
 
-    await page.evaluate((event) => {
-      const stored = localStorage.getItem('takeoff-timeline-events-v2');
-      if (stored) {
-        const events = JSON.parse(stored);
-        events.push(event);
-        localStorage.setItem('takeoff-timeline-events-v2', JSON.stringify(events));
-      }
+    await page.addInitScript((gameOver) => {
+      const baseEvents = [
+        {
+          type: 'news-published',
+          date: '2025-01-15',
+          icon: 'Newspaper',
+          title: 'Initial News',
+          description: 'The simulation begins.'
+        }
+      ];
+      const events = [...baseEvents, gameOver];
+      localStorage.setItem('takeoff-timeline-events-v2', JSON.stringify(events));
+      localStorage.setItem('takeoff-has-game', 'true');
+      localStorage.setItem('takeoff-has-seen-tutorial', 'true');
     }, gameOverEvent);
 
-    await page.reload();
+    // Go to game page - it should redirect to post-game due to game-over event
+    await page.goto('/game');
     await page.waitForLoadState('networkidle');
 
-    // Should show post-game screen
-    await expect(page.locator('text=/post-game|analysis|game over/i')).toBeVisible();
+    // Should have redirected to post-game screen
+    await expect(page.getByRole('heading', { name: 'Game Over' })).toBeVisible();
   });
 
-  test.skip('UNIMPLEMENTED: post-game screen shows GM analysis', async ({ page }) => {
-    // Post-game screen should show an AI-generated analysis of the scenario
-    // consulting extra materials and providing insights
+  test('post-game screen shows GM analysis summary', async ({ page }) => {
+    // Post-game screen should show the GM's summary from the game-over event
+    const gameOverEvent = {
+      type: 'game-over',
+      date: '2026-12-31',
+      summary: 'The AI alignment problem was solved through international cooperation.'
+    };
+
+    await page.addInitScript((gameOver) => {
+      const events = [
+        {
+          type: 'news-published',
+          date: '2025-01-15',
+          icon: 'Newspaper',
+          title: 'Initial News',
+          description: 'The simulation begins.'
+        },
+        gameOver
+      ];
+      localStorage.setItem('takeoff-timeline-events-v2', JSON.stringify(events));
+      localStorage.setItem('takeoff-has-game', 'true');
+      localStorage.setItem('takeoff-has-seen-tutorial', 'true');
+    }, gameOverEvent);
+
+    await page.goto('/post-game');
+    await page.waitForLoadState('networkidle');
+
+    // Should show the GM's analysis summary
+    await expect(page.locator('text=The AI alignment problem was solved')).toBeVisible();
   });
 
   test.skip('UNIMPLEMENTED: post-game screen has interactive Q&A', async ({ page }) => {
@@ -54,31 +83,69 @@ test.describe('Post-Game Analysis Screen (NOT IMPLEMENTED)', () => {
     // in a chat-style interface
   });
 
-  test.skip('UNIMPLEMENTED: post-game screen reveals hidden news', async ({ page }) => {
-    // All hidden-news-published events should be revealed post-game
-  });
-
   test.skip('UNIMPLEMENTED: post-game has share/copy functionality', async ({ page }) => {
     // Should have a button to copy result summary to clipboard for sharing
     // e.g., "I completed the Cuban Missile Crisis 1962 scenario. Nuclear war destroyed both sides."
   });
 
-  test.skip('UNIMPLEMENTED: can return to timeline from post-game screen', async ({ page }) => {
+  test('can return to timeline from post-game screen', async ({ page }) => {
     // Should have navigation to go back and review the timeline
+    const gameOverEvent = {
+      type: 'game-over',
+      date: '2026-12-31',
+      summary: 'Game ended.'
+    };
+
+    await page.addInitScript((gameOver) => {
+      const events = [
+        {
+          type: 'news-published',
+          date: '2025-01-15',
+          icon: 'Newspaper',
+          title: 'Initial News',
+          description: 'The simulation begins.'
+        },
+        gameOver
+      ];
+      localStorage.setItem('takeoff-timeline-events-v2', JSON.stringify(events));
+      localStorage.setItem('takeoff-has-game', 'true');
+      localStorage.setItem('takeoff-has-seen-tutorial', 'true');
+    }, gameOverEvent);
+
+    await page.goto('/post-game');
+    await page.waitForLoadState('networkidle');
+
+    // Click "View Timeline" button
+    await page.click('text=View Timeline');
+    await page.waitForLoadState('networkidle');
+
+    // Should now be on the game page showing the timeline
+    await expect(page.getByPlaceholder('Search timeline...')).toBeVisible();
   });
 });
 
-test.describe('Hidden News System (NOT IMPLEMENTED)', () => {
-  test.skip('UNIMPLEMENTED: hidden-news-published events are not visible during game', async ({ page }) => {
+test.describe('Hidden News System', () => {
+  test.beforeEach(async ({ page }) => {
+    // Mark tutorial as seen to avoid modal
+    await page.addInitScript(() => {
+      localStorage.setItem('takeoff-has-seen-tutorial', 'true');
+    });
+  });
+
+  test('hidden-news-published events are not visible during game', async ({ page }) => {
     // GM can create hidden events that players don't see until post-game
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // Inject a hidden news event
+    // Click New Game to navigate to game page
+    await page.click('text=New Game');
+    await page.waitForLoadState('networkidle');
+
+    // Inject a hidden news event (use valid icon from ICON_SET)
     const hiddenEvent = {
       type: 'hidden-news-published',
       date: '2025-06-15',
-      icon: 'Eye',
+      icon: 'ShieldCheck',
       title: 'Secret Development',
       description: 'This is happening behind the scenes'
     };
@@ -99,8 +166,47 @@ test.describe('Hidden News System (NOT IMPLEMENTED)', () => {
     await expect(page.locator('text=Secret Development')).not.toBeVisible();
   });
 
-  test.skip('UNIMPLEMENTED: hidden news appears in post-game reveal', async ({ page }) => {
+  test('hidden news appears in post-game reveal', async ({ page }) => {
     // After game ends, hidden events should be revealed with special styling
+    const hiddenEvent = {
+      type: 'hidden-news-published',
+      date: '2025-06-15',
+      icon: 'ShieldCheck',
+      title: 'Secret Development',
+      description: 'This is happening behind the scenes'
+    };
+
+    const gameOverEvent = {
+      type: 'game-over',
+      date: '2026-12-31',
+      summary: 'The simulation has ended. Here is the GM analysis.'
+    };
+
+    await page.addInitScript(({ hidden, gameOver }) => {
+      const baseEvents = [
+        {
+          type: 'news-published',
+          date: '2025-01-15',
+          icon: 'Newspaper',
+          title: 'Initial News',
+          description: 'The simulation begins.'
+        }
+      ];
+      const events = [...baseEvents, hidden, gameOver];
+      localStorage.setItem('takeoff-timeline-events-v2', JSON.stringify(events));
+      localStorage.setItem('takeoff-has-game', 'true');
+      localStorage.setItem('takeoff-has-seen-tutorial', 'true');
+    }, { hidden: hiddenEvent, gameOver: gameOverEvent });
+
+    await page.goto('/post-game');
+    await page.waitForLoadState('networkidle');
+
+    // Should show the post-game screen
+    await expect(page.getByRole('heading', { name: 'Game Over' })).toBeVisible();
+
+    // Hidden news should now be revealed
+    await expect(page.locator('text=Secret Development')).toBeVisible();
+    await expect(page.locator('text=This is happening behind the scenes')).toBeVisible();
   });
 });
 

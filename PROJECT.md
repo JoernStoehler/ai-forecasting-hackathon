@@ -362,7 +362,7 @@ Material bundle infrastructure with minimal placeholder content.
 Comprehensive Playwright test suite covering core features.
 
 **Implementation:**
-- ✅ 113 passing tests (smoke, timeline, search, persistence, import-export, turn-cycle with turn markers, cassette-replay)
+- ✅ Passing tests (smoke, timeline, search, persistence, import-export, turn-cycle with turn markers, cassette-replay)
 - ✅ 61 skipped tests (unimplemented feature specs)
 - ✅ Mock forecaster integration
 - ✅ Cassette replay system with fixtures
@@ -1016,8 +1016,8 @@ Deprioritized
 
 ## Test Coverage Overview
 
-- ✅ **113 passing tests** - Core gameplay, persistence, UI interactions, turn markers
-- ⚠️ **61 skipped tests** - Unimplemented features (executable specs)
+- ✅ **Passing E2E tests** - Core gameplay, persistence, UI interactions, turn markers
+- ⚠️ **Skipped tests** - Unimplemented features (executable specs)
 - 🧪 **Mock forecaster** - Enables testing without API calls
 
 ## Test Files
@@ -1053,15 +1053,13 @@ Documents requirements for features not yet built:
 
 ## Test Statistics
 
-**Total tests:** 174 (E2E) + 234 (unit) = 408
-**Passing:** 113 (E2E) + 234 (unit) = 347 (85%)
-**Skipped:** 61 (E2E unimplemented feature specs)
+Run `npm test` and `npm run test:e2e` to get current counts.
 **Confidence Level:** HIGH - Can replace most manual testing
 
 ## How to Run Tests
 
 ```bash
-# Unit tests (234 tests, ~1 second)
+# Unit tests (~1 second)
 npm test
 
 # Smoke test (~10 seconds)
@@ -1248,8 +1246,8 @@ npm install
 npm run dev
 
 # Run tests
-npm test                  # Unit tests (196 tests)
-npm run test:e2e         # E2E tests (83 passing)
+npm test                  # Unit tests
+npm run test:e2e         # E2E tests
 npm run check            # Type check + lint + tests
 ```
 
@@ -1270,7 +1268,7 @@ Flat single-package structure (all code at root level):
 /
 ├── src/                    # React application
 │   ├── engine/            # Timeline engine (types, validation, adapters)
-│   ├── engine/test/       # Engine unit tests (196 tests)
+│   ├── engine/test/       # Engine unit tests
 │   ├── components/        # React components
 │   └── services/          # Business logic and integrations
 ├── tests/                 # E2E test suite (Playwright)

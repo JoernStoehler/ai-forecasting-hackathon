@@ -16,7 +16,8 @@ test('app loads without console or page errors', async ({ page }) => {
   await page.goto('/');
   await page.waitForLoadState('networkidle');
 
-  await expect(page.getByPlaceholder('Search timeline...')).toBeVisible();
+  // Menu page is the landing page - verify it loads (use exact match for h1, not tutorial h2)
+  await expect(page.getByRole('heading', { name: 'AI Forecasting Simulation', exact: true })).toBeVisible();
 
   expect(errors, `Console/page errors found:\n${errors.join('\n')}`).toEqual([]);
 });

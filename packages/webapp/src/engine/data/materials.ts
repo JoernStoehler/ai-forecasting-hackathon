@@ -1,6 +1,12 @@
 /**
- * Shared prompt/background materials for all frontends.
- * Keeping the content in TS avoids bundler quirks across environments.
+ * LLM-optimized prompt materials for the GM.
+ *
+ * TWO-PASS WORKFLOW:
+ * 1. Domain expert writes comprehensive materials in materials-source/
+ * 2. Claude reads those and produces this file with LLM-optimized content
+ *
+ * CURRENT STATE: Placeholder content only. Real content requires domain expert input.
+ * See PROJECT.md for details.
  */
 export interface MaterialDoc {
   id: string;

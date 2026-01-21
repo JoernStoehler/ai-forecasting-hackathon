@@ -5,10 +5,16 @@ description: Create, list, and remove git worktrees for parallel agent work. Use
 
 # Git Worktrees
 
+## Canonical path
+
+All worktrees go in `/workspaces/worktrees/`. This is a bind mount configured in devcontainer.json.
+
+Example: `/workspaces/worktrees/materials-authoring`
+
 ## Use the project scripts
 
-- Create: `scripts/worktree-new.sh <path> <branch> [--force]`
-- Remove: `scripts/worktree-remove.sh <path> [--force]`
+- Create: `scripts/worktree-new.sh /workspaces/worktrees/<name> <branch> [--force]`
+- Remove: `scripts/worktree-remove.sh /workspaces/worktrees/<name> [--force]`
 - List: `git worktree list`
 
 ## Notes

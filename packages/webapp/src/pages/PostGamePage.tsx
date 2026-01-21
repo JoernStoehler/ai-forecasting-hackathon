@@ -5,14 +5,13 @@ import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EngineEvent, GameOverEvent, HiddenNewsPublishedEvent } from '../types';
 import { Icon } from '../components/icons';
+import { ShareButton } from '../components/ShareButton';
 
 interface PostGamePageProps {
   events: EngineEvent[];
-  theme: 'light' | 'dark';
-  onToggleTheme: () => void;
 }
 
-export const PostGamePage: React.FC<PostGamePageProps> = ({ events, theme, onToggleTheme }) => {
+export const PostGamePage: React.FC<PostGamePageProps> = ({ events }) => {
   const navigate = useNavigate();
 
   const gameOverEvent = useMemo(() => {
@@ -46,7 +45,8 @@ export const PostGamePage: React.FC<PostGamePageProps> = ({ events, theme, onTog
       <header className="sticky top-0 z-20 bg-white dark:bg-stone-800 border-b border-stone-200 dark:border-stone-700 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
           <h1 className="text-xl font-bold text-stone-900 dark:text-stone-100">Game Over</h1>
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
+            <ShareButton events={events} isGameOver={true} />
             <button
               onClick={() => navigate('/game')}
               className="text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 font-medium py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
@@ -74,7 +74,7 @@ export const PostGamePage: React.FC<PostGamePageProps> = ({ events, theme, onTog
             </div>
             <div>
               <h2 className="text-2xl font-semibold text-stone-900 dark:text-stone-100 mb-2">
-                Game Master's Analysis
+                Game Master&apos;s Analysis
               </h2>
               <p className="text-sm text-stone-500 dark:text-stone-400">Final date: {gameOverEvent.date}</p>
             </div>

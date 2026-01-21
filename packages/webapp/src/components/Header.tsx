@@ -1,6 +1,7 @@
 import React from 'react';
 import { Icon } from './icons';
 import { FileControls } from './FileControls';
+import { ShareButton } from './ShareButton';
 import { EngineEvent } from '../types';
 
 interface HeaderProps {
@@ -50,6 +51,7 @@ export const Header: React.FC<HeaderProps> = ({ searchQuery, onSearchChange, eve
               </button>
             )}
             <FileControls events={events} onImport={onImport} />
+            <ShareButton events={events} isGameOver={events.some(e => e.type === 'game-over')} />
           </div>
         </div>
       </div>
