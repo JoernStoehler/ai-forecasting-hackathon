@@ -67,20 +67,48 @@ This creates a single `packages/webapp/dist/index.html` file (~386 KB) with all 
 
 **Best for:** Users consuming their own Gemini API quota (free for all users)
 
-### Step 1: Open AI Studio Build
+### How It Works
+
+AI Studio Build provides a unique deployment model:
+- Code uses `process.env.API_KEY` which AI Studio injects automatically
+- Each viewer uses **their own** Gemini API quota (not yours)
+- Viewers are authenticated via their Google AI Studio login
+- Scales from 1 to 10,000+ users at zero cost to developer
+
+### Deployment Process
+
+**Step 1: Build AI Studio-compatible ZIP**
+
+```bash
+# Two-step build process:
+npm run build              # 1. Compile CSS with Tailwind/PostCSS
+npm run build:ai-studio    # 2. Package TypeScript source + compiled CSS
+```
+
+This creates `ai-studio-deploy.zip` containing:
+- TypeScript source files (`.ts`, `.tsx`) with transformed imports
+- Compiled CSS from Vite build (`styles.css` - 24 KB)
+- Source code with `process.env.API_KEY` for runtime injection
+- Flat directory structure compatible with AI Studio Build
+- Required files: `index.html`, `index.tsx`, `metadata.json`
+
+**Important:** You must run `npm run build` first. The AI Studio build script copies the compiled CSS from `dist/assets/`. Skipping this step will cause the build to fail.
+
+**Step 2: Upload to AI Studio Build**
+
 1. Navigate to https://aistudio.google.com
 2. Select **Build mode** from the left sidebar
-3. Create a new app
+3. Create a new app (or open existing app)
+4. Click **"Upload zip file"** button
+5. Select `ai-studio-deploy.zip`
+6. Wait for upload to complete (~67 KB)
 
-### Step 2: Upload Single HTML File
-1. In the Build mode file browser, create a new file: `index.html`
-2. Copy the entire contents of `packages/webapp/dist/index.html`
-3. Paste into the AI Studio Build editor
-4. Save the file
+AI Studio Build will:
+- Extract all files to the app workspace
+- Process TypeScript files (execution mechanism unclear - see docs/ai-studio-build-system-prompt.md)
+- Inject `process.env.API_KEY` at runtime with viewer's key
 
-**Alternative:** Upload via file upload button if available in the interface.
-
-### Step 3: Verify Functionality
+**Step 3: Verify Functionality
 1. Switch to **Preview tab**
 2. Test core functionality:
    - App loads without errors
@@ -91,17 +119,25 @@ This creates a single `packages/webapp/dist/index.html` file (~386 KB) with all 
 3. Check browser console for errors
 
 ### Step 4: Share the App
+
 1. Click the **Share** button (top right in Build mode)
-2. Copy the generated share link
-3. Test the link in a **different browser** or **incognito window**
-4. Verify that user authentication works (should use their AI Studio quota)
+2. AI Studio generates a share link (e.g., `https://aistudio.google.com/app/...`)
+3. Copy and distribute the link to users
+
+**What viewers see:**
+- Click link → Opens AI Studio Build → App loads automatically
+- No API key setup needed (AI Studio injects their key)
+- Uses their own Gemini API quota
 
 ### Step 5: Verify User Quota Attribution
+
 Test with a different Google account:
 1. Open share link in different account/browser
-2. Submit several player actions (trigger GM responses)
-3. Verify your own AI Studio quota is **not** consumed
-4. Verify the viewer can make API calls without errors
+2. Submit several player actions to trigger GM responses
+3. Verify your own API quota is **not** consumed (check AI Studio quota page)
+4. Verify viewer can make API calls without errors
+
+**Note:** Users need a Google account with AI Studio access. Free tier provides generous quota.
 
 ---
 
@@ -164,9 +200,15 @@ netlify deploy --dir=packages/webapp/dist --prod
 ## Important Notes
 
 ### API Key Handling
-- ✅ **Do this:** Use `process.env.GEMINI_API_KEY` in code
-- ❌ **Don't do this:** Hardcode any API keys
-- ❌ **Don't do this:** Deploy to Cloud Run for this use case
+
+**For AI Studio Build:**
+- Code automatically uses `process.env.API_KEY` (transformed by build script)
+- AI Studio injects viewer's API key at runtime
+- Each viewer consumes their own quota
+
+**For other deployments:**
+- Single HTML file requires users to enter their own API key in app
+- Traditional hosting requires API key configuration
 
 ### Code Visibility
 - **Built code is visible** to anyone with access to the HTML file
@@ -174,11 +216,22 @@ netlify deploy --dir=packages/webapp/dist --prod
 - Do not include secrets or credentials (use environment variables)
 
 ### Updating Deployed App
+
+**For AI Studio Build:**
+1. Make changes locally and test
+2. Rebuild: `npm run build && npm run build:ai-studio`
+3. Upload new `ai-studio-deploy.zip` (overwrites existing files)
+4. Refresh preview to see changes
+
+**For Claude Artifacts:**
 1. Make changes locally and test
 2. Rebuild: `npm run build:deploy`
-3. For AI Studio Build: Update the index.html file contents
-4. For Claude Artifacts: Create a new artifact with updated HTML
-5. For traditional hosting: Re-upload index.html
+3. Create a new artifact with updated `packages/webapp/dist/index.html` contents
+
+**For traditional hosting:**
+1. Make changes locally and test
+2. Rebuild: `npm run build:deploy`
+3. Re-upload `packages/webapp/dist/index.html`
 
 ### Single-File Build Details
 - All JavaScript (~390 KB minified) inlined in `<script>` tags
@@ -226,9 +279,10 @@ netlify deploy --dir=packages/webapp/dist --prod
 
 ### Community Resources
 - [Is there any way to share an AI studio app?](https://discuss.ai.google.dev/t/is-there-any-way-to-share-an-ai-studio-app-with-someone-for-them-to-use/90695) - User quota confirmation
-- [Building Personal Apps with Google AI Studio](https://atalupadhyay.wordpress.com/2025/10/20/building-personal-apps-with-google-ai-studio/)
 
 ### Related Documentation
+- [AI Studio Build Knowledge Base](./ai-studio-build-knowledge.md) - Complete knowledge with source citations
+- [AI Studio Build System Prompt](./ai-studio-build-system-prompt.md) - Agent instructions (extracted 2026-01-21)
 - [Deployment Options Comparison](./deployment-options.md) - Why we chose AI Studio Build
 - [PROJECT.md](../PROJECT.md) - Feature status and roadmap
 

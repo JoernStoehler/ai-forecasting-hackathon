@@ -2,7 +2,7 @@
  * Main app router - handles navigation between menu and game
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { EngineEvent } from './types';
 import { INITIAL_EVENTS } from './data';
 import { coerceEngineEvents } from '@/engine';
@@ -168,7 +168,7 @@ function App() {
   }, []);
 
   return (
-    <BrowserRouter>
+    <HashRouter>
       <AppContent
         gameEvents={gameEvents}
         setGameEvents={setGameEvents}
@@ -180,7 +180,7 @@ function App() {
         theme={theme}
         toggleTheme={toggleTheme}
       />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 

@@ -199,7 +199,7 @@ This section defines the sequential order for implementing MVP features. Work th
 
 ### Event Sourcing Foundation
 **Stage:** 🟢 COMPLETE
-**Tests:** [src/engine/test/state-consistency.test.ts](src/engine/test/state-consistency.test.ts)
+**Tests:** [packages/webapp/src/engine/test/state-consistency.test.ts](packages/webapp/src/engine/test/state-consistency.test.ts)
 **Docs:** [docs/spec-scenario-logic.md](docs/spec-scenario-logic.md)
 
 Append-only event log with pure function state reduction. All application state derives from events. Enables replay, debugging, and audit trails.
@@ -217,7 +217,7 @@ Append-only event log with pure function state reduction. All application state 
 
 ### Turn Cycle (Player → GM → Timeline)
 **Stage:** 🟢 COMPLETE
-**Tests:** [tests/turn-cycle.spec.ts](tests/turn-cycle.spec.ts)
+**Tests:** [packages/webapp/tests/turn-cycle.spec.ts](packages/webapp/tests/turn-cycle.spec.ts)
 **Docs:** [docs/spec-genai.md](docs/spec-genai.md)
 
 Core gameplay loop: player submits action → LLM forecaster generates events → timeline updates with consequences.
@@ -236,16 +236,23 @@ Core gameplay loop: player submits action → LLM forecaster generates events �
 
 ### Timeline Display & Navigation
 **Stage:** 🟢 COMPLETE
-**Tests:** [tests/timeline.spec.ts](tests/timeline.spec.ts)
+**Tests:** [packages/webapp/tests/timeline.spec.ts](packages/webapp/tests/timeline.spec.ts)
 
 Chronological event rendering with expand/collapse, year/month headers, sticky positioning, and visual organization.
 
 **Implementation:**
-- ✅ Event rendering with icons
+- ✅ Event rendering with icons (dynamic lucide-react lookup, no whitelist)
 - ✅ Expand/collapse per event
 - ✅ Year/month boundary headers (sticky)
 - ✅ Scenario head markers
 - ✅ Timeline virtualization (for performance)
+
+**Icon System Design:**
+- Uses lucide-react library with dynamic lookup (`import * as Icons`)
+- GM can reference ANY lucide-react icon without manual whitelist maintenance
+- Falls back to `FileQuestionMark` for invalid icon names
+- **Critical**: No whitelist pattern - defeats the purpose of using a standard library
+- See: [packages/webapp/src/components/icons.tsx](packages/webapp/src/components/icons.tsx)
 
 **Dependencies:** Event Sourcing
 
@@ -253,7 +260,7 @@ Chronological event rendering with expand/collapse, year/month headers, sticky p
 
 ### Search & Filtering
 **Stage:** 🟢 COMPLETE
-**Tests:** [tests/search.spec.ts](tests/search.spec.ts)
+**Tests:** [packages/webapp/tests/search.spec.ts](packages/webapp/tests/search.spec.ts)
 
 Case-insensitive search by title and description with highlighting.
 
@@ -269,7 +276,7 @@ Case-insensitive search by title and description with highlighting.
 
 ### Data Persistence
 **Stage:** 🟢 COMPLETE
-**Tests:** [tests/persistence.spec.ts](tests/persistence.spec.ts)
+**Tests:** [packages/webapp/tests/persistence.spec.ts](packages/webapp/tests/persistence.spec.ts)
 
 LocalStorage-based persistence with multi-tab sync and corruption handling.
 
@@ -322,7 +329,7 @@ Share game state via URL links and Twitter.
 
 ### Forecaster Adapters
 **Stage:** 🟢 COMPLETE
-**Tests:** [src/engine/test/command-normalization.test.ts](src/engine/test/command-normalization.test.ts)
+**Tests:** [packages/webapp/src/engine/test/command-normalization.test.ts](packages/webapp/src/engine/test/command-normalization.test.ts)
 **Docs:** [docs/spec-genai.md](docs/spec-genai.md)
 
 Multiple forecaster implementations: browser Gemini, Node Gemini, mock, and replay.
@@ -355,8 +362,8 @@ Records `news-opened` and `news-closed` events when users expand/collapse events
 
 ### Materials System (Minimal)
 **Stage:** 🟡 INFRASTRUCTURE COMPLETE, ⚠️ CONTENT PLACEHOLDER
-**Tests:** [src/engine/test/materials.test.ts](src/engine/test/materials.test.ts)
-**Docs:** Materials loaded in [src/engine/data/materials.ts](src/engine/data/materials.ts)
+**Tests:** [packages/webapp/src/engine/test/materials.test.ts](packages/webapp/src/engine/test/materials.test.ts)
+**Docs:** Materials loaded in [packages/webapp/src/engine/data/materials.ts](packages/webapp/src/engine/data/materials.ts)
 
 Material bundle infrastructure with minimal placeholder content.
 
@@ -378,8 +385,8 @@ Material bundle infrastructure with minimal placeholder content.
 
 ### E2E Test Suite
 **Stage:** 🟢 COMPLETE
-**Tests:** [tests/](tests/)
-**Docs:** [tests/README.md](tests/README.md)
+**Tests:** [packages/webapp/tests/](packages/webapp/tests/)
+**Docs:** [packages/webapp/tests/README.md](packages/webapp/tests/README.md)
 
 Comprehensive Playwright test suite covering core features.
 
@@ -397,7 +404,7 @@ Comprehensive Playwright test suite covering core features.
 
 ### Cassette Replay System
 **Stage:** 🟢 COMPLETE (2026-01-18)
-**Tests:** [src/engine/test/replay.test.ts](src/engine/test/replay.test.ts), [tests/cassette-replay.spec.ts](tests/cassette-replay.spec.ts)
+**Tests:** [packages/webapp/src/engine/test/replay.test.ts](packages/webapp/src/engine/test/replay.test.ts), [packages/webapp/tests/cassette-replay.spec.ts](packages/webapp/tests/cassette-replay.spec.ts)
 **Docs:** [docs/cassette-replay.md](docs/cassette-replay.md)
 
 Record/replay LLM API interactions for deterministic testing without API calls.
@@ -409,7 +416,7 @@ Record/replay LLM API interactions for deterministic testing without API calls.
 - ✅ Request matching (method + body)
 - ✅ Unit tests (2/2 passing)
 - ✅ E2E tests (9/9 passing)
-- ✅ Hand-written fixture ([basic-turn.json](tests/fixtures/replays/basic-turn.json))
+- ✅ Hand-written fixture ([basic-turn.json](packages/webapp/tests/fixtures/replays/basic-turn.json))
 - ✅ Recording script ([record-fixture.ts](scripts/record-fixture.ts))
 
 **Usage:**
@@ -427,7 +434,7 @@ npm run test:e2e -- cassette-replay.spec.ts
 
 ### Turn Markers (Visual UI)
 **Stage:** 🟢 COMPLETE (2026-01-18)
-**Tests:** [tests/turn-cycle.spec.ts](tests/turn-cycle.spec.ts)
+**Tests:** [packages/webapp/tests/turn-cycle.spec.ts](packages/webapp/tests/turn-cycle.spec.ts)
 
 Visual boundaries showing player and GM turns in timeline.
 
@@ -458,33 +465,27 @@ Visual boundaries showing player and GM turns in timeline.
 ---
 
 ### Hidden News System
-**Stage:** 🟡 IN PROGRESS (Schema only)
-**Blockers:** Needs Post-Game Screen implementation
-**Tests:** [tests/unimplemented-features.spec.ts:10-40](tests/unimplemented-features.spec.ts)
+**Stage:** 🟢 COMPLETE (2026-01-18)
+**Tests:** Post-game tests verify hidden news reveal functionality
 
 GM can publish hidden events revealed only after game ends. Teaches forecasting under uncertainty.
 
-**Implementation Status:**
+**Implementation:**
 - ✅ Command/event types (`publish-hidden-news`, `hidden-news-published`)
 - ✅ Streaming pipeline support
 - ✅ System prompt documentation
 - ✅ Event normalization
-- ❌ No UI filtering during gameplay
-- ❌ No post-game reveal mechanism
-- ❌ No special styling for revealed events
+- ✅ UI filtering during gameplay (hidden events not shown)
+- ✅ Post-game reveal mechanism
+- ✅ Special styling for revealed events in post-game
 
-**Next Steps:**
-1. Filter hidden events from timeline during gameplay
-2. Implement post-game reveal (depends on Post-Game Screen)
-3. Add visual styling for revealed events
-
-**Dependencies:** Post-Game Screen (for reveal)
+**Dependencies:** Post-Game Screen (complete ✅)
 
 ---
 
 ### Prompt Projection & Telemetry Aggregation
 **Stage:** 🟢 COMPLETE (2026-01-18)
-**Tests:** [src/engine/test/prompt-projection.test.ts](src/engine/test/prompt-projection.test.ts) (21 tests passing)
+**Tests:** [packages/webapp/src/engine/test/prompt-projection.test.ts](packages/webapp/src/engine/test/prompt-projection.test.ts)
 
 Transform chatty event log into calm, focused prompt for GM. Filters/compresses events, aggregates telemetry, marks hidden news for GM visibility.
 
@@ -495,7 +496,7 @@ Transform chatty event log into calm, focused prompt for GM. Filters/compresses 
 - ✅ Player attention summary included when in active turn
 - ✅ Turn-aware tracking (clears between turns)
 - ✅ ID generation for news items without explicit IDs
-- ✅ Comprehensive unit test coverage (21 tests)
+- ✅ Comprehensive unit test coverage
 
 **Projection Structure:**
 ```
@@ -520,64 +521,48 @@ Transform chatty event log into calm, focused prompt for GM. Filters/compresses 
 
 ### Pre-Game Menu & Setup UI
 **Stage:** 🟢 COMPLETE (2026-01-18)
-**Files:** [src/pages/MenuPage.tsx](src/pages/MenuPage.tsx), [src/App.tsx](src/App.tsx)
+**Files:** [packages/webapp/src/pages/MenuPage.tsx](packages/webapp/src/pages/MenuPage.tsx), [packages/webapp/src/App.tsx](packages/webapp/src/App.tsx)
 
 Pre-game menu with routing, game initialization, and Continue/New Game flow.
 
-**Features:**
-- Main menu screen (Continue vs New Game)
-- Scenario picker (initially: "AI X-Risk 2025-2035")
-- Start date picker (discrete options per scenario)
-- Role picker with descriptions:
-  - "US Government Strategist" (set agendas, GM executes details)
-  - Potentially other roles in future
-- "Start Game" button → initialize event log with chosen setup
-- Seed events updated to be scenario-aware
-
-**MVP Scope:**
-- Single scenario to start ("AI X-Risk 2025-2035")
-- One active game at a time (or persist "last played")
-- Simple, clean UI (focus on getting into game quickly)
-
-**Implementation Plan:**
-1. Add routing (React Router or similar)
-2. Create menu page components
-3. Update seed events to accept scenario/date/role parameters
-4. Wire up game initialization
-5. Write E2E tests for setup flow
+**Implementation:**
+- ✅ Main menu screen (Continue vs New Game)
+- ✅ Scenario picker ("AI X-Risk 2025-2035")
+- ✅ Start date picker (discrete options per scenario)
+- ✅ Role picker with descriptions
+- ✅ "Start Game" button → initialize event log with chosen setup
+- ✅ Seed events updated to be scenario-aware
+- ✅ Routing with React Router
+- ✅ Simple, clean UI
 
 **Dependencies:** Event Sourcing (complete ✅)
 
 ---
 
 ### Post-Game Analysis Screen
-**Stage:** 🔵 READY
-**Tests:** [tests/unimplemented-features.spec.ts:10-50](tests/unimplemented-features.spec.ts)
+**Stage:** 🟢 COMPLETE (2026-01-18)
 
 After `game-over` event, show GM analysis with interactive Q&A and hidden news reveal.
 
-**Implementation Readiness:**
-- ✅ Executable test specs written (6 tests)
+**Implementation:**
 - ✅ `game-over` event type defined
-- ✅ Forecaster Q&A pattern known (similar to turn cycle)
-- ❌ Needs route/page structure decision
-- ❌ Needs post-game UI design
+- ✅ Forecaster Q&A pattern (similar to turn cycle)
+- ✅ Route/page structure
+- ✅ Post-game UI design
+- ✅ Game-over event trigger
+- ✅ GM analysis display
+- ✅ Interactive Q&A with forecaster
+- ✅ Hidden news reveal
+- ✅ Share/copy functionality
+- ✅ Return to timeline navigation
 
-**Features:**
-- Game-over event trigger
-- GM analysis display
-- Interactive Q&A with forecaster
-- Hidden news reveal
-- Share/copy functionality
-- Return to timeline navigation
-
-**Dependencies:** Hidden News System (for reveal feature)
+**Dependencies:** Hidden News System (complete ✅)
 
 ---
 
 ### PRNG & Dice Rolling
 **Stage:** 🟢 COMPLETE (2026-01-18)
-**Tests:** [src/engine/test/prng.test.ts](src/engine/test/prng.test.ts) (17 tests passing)
+**Tests:** [packages/webapp/src/engine/test/prng.test.ts](packages/webapp/src/engine/test/prng.test.ts)
 
 Deterministic randomness for GM decision-making via roll-dice commands.
 
@@ -590,7 +575,7 @@ Deterministic randomness for GM decision-making via roll-dice commands.
 - ✅ System prompt documentation for GM usage
 - ✅ Prompt projection includes dice rolls
 - ✅ Streaming pipeline handles roll-dice commands
-- ✅ Comprehensive unit test coverage (17 tests)
+- ✅ Comprehensive unit test coverage
 
 **How It Works:**
 1. GM requests dice roll via `{"type": "roll-dice", "label": "AI capability growth"}`
@@ -612,22 +597,16 @@ Deterministic randomness for GM decision-making via roll-dice commands.
 ---
 
 ### Tutorial/Onboarding
-**Stage:** 🔵 READY
-**Tests:** [tests/unimplemented-features.spec.ts:82-110](tests/unimplemented-features.spec.ts)
+**Stage:** 🟢 COMPLETE (2026-01-18)
 
 First-time user experience and game mechanic explanations.
 
-**Implementation Readiness:**
-- ✅ Test specs written (5 tests)
-- ❌ No first-time detection logic
-- ❌ No tutorial UI components
-
-**Features:**
-- First-time user detection (localStorage flag)
-- Tutorial prompts with dismissal
-- Game mechanic explanations
-- UI hints/tooltips
-- Help menu
+**Implementation:**
+- ✅ First-time user detection (localStorage flag)
+- ✅ Tutorial prompts with dismissal
+- ✅ Game mechanic explanations
+- ✅ UI hints/tooltips
+- ✅ Help menu
 
 **Dependencies:** None (orthogonal)
 
@@ -635,7 +614,6 @@ First-time user experience and game mechanic explanations.
 
 ### Settings & Dark Mode
 **Stage:** 🟢 COMPLETE (2026-01-18)
-**Tests:** [tests/unimplemented-features.spec.ts:112-150](tests/unimplemented-features.spec.ts)
 
 User preferences and dark mode toggle.
 
@@ -657,7 +635,6 @@ User preferences and dark mode toggle.
 
 ### Keyboard Navigation & Accessibility
 **Stage:** 🟢 COMPLETE (2026-01-18)
-**Tests:** Partially covered in unimplemented features
 
 Full keyboard support and accessibility enhancements.
 
@@ -681,18 +658,16 @@ Full keyboard support and accessibility enhancements.
 ---
 
 ### Materials Dynamic Selection
-**Stage:** 🔵 READY
-**Tests:** [tests/unimplemented-features.spec.ts:152-170](tests/unimplemented-features.spec.ts)
+**Stage:** 🔵 READY (Post-MVP)
 
 Algorithmic selection of relevant materials for GM context.
 
-**Implementation Readiness:**
-- ✅ Test specs written (3 tests)
+**Status:**
 - ✅ Material bundle infrastructure exists
 - ❌ Only one static bundle available
 - ❌ No selection algorithm
 
-**Features:**
+**Future Features:**
 - Multiple material bundles
 - Algorithmic relevance filtering
 - Dynamic material injection
@@ -703,8 +678,7 @@ Algorithmic selection of relevant materials for GM context.
 ---
 
 ### AI Studio Build Deployment
-**Stage:** 🔵 READY, ⚠️ ESSENTIAL
-**Tests:** [tests/unimplemented-features.spec.ts:172-190](tests/unimplemented-features.spec.ts)
+**Stage:** 🔵 READY, ⚠️ ESSENTIAL (Infrastructure task, not coding)
 **Docs:** [docs/deployment.md](docs/deployment.md) (step-by-step), [docs/deployment-options.md](docs/deployment-options.md) (research)
 
 Deploy to Google AI Studio Build where viewers use their own Gemini API quota (not developer's).
@@ -725,8 +699,7 @@ AI Studio proxies API calls, injecting viewer's credentials for `process.env.GEM
 ---
 
 ### Performance Optimization
-**Stage:** ⚪ IDEA
-**Tests:** [tests/unimplemented-features.spec.ts:192-210](tests/unimplemented-features.spec.ts)
+**Stage:** ⚪ IDEA (Post-MVP)
 
 Performance enhancements for large timelines.
 
@@ -741,8 +714,7 @@ Performance enhancements for large timelines.
 ---
 
 ### Telemetry Server
-**Stage:** ⚪ IDEA
-**Tests:** [tests/unimplemented-features.spec.ts:212-230](tests/unimplemented-features.spec.ts)
+**Stage:** ⚪ IDEA (Post-MVP)
 
 Optional telemetry upload and cloud save/sync.
 
@@ -903,7 +875,6 @@ Audio feedback and ambient sound to enhance immersion and provide non-visual cue
 
 ### Scenario Branching
 **Stage:** 🔴 DEPRIORITIZED
-**Tests:** [tests/unimplemented-features.spec.ts:232-250](tests/unimplemented-features.spec.ts)
 
 Save points and timeline branching.
 
@@ -1051,32 +1022,26 @@ Deprioritized
 
 ### Core Feature Tests (Passing)
 
-1. **`smoke.spec.ts`** (3 tests) - App loads without errors (multi-browser)
-2. **`timeline.spec.ts`** (24 tests) - Timeline display and navigation (multi-browser)
-3. **`search.spec.ts`** (18 tests) - Search and filtering (multi-browser)
-4. **`persistence.spec.ts`** (21 tests) - LocalStorage persistence and sync (multi-browser)
-5. **`import-export.spec.ts`** (24 tests) - JSON import/export (multi-browser)
-6. **`turn-cycle.spec.ts`** (32 tests) - Full GM turn cycle, turn markers with visual UI (multi-browser, 1 flaky timeout)
-7. **`error-handling.spec.ts`** (9/18 passing) - Input validation and error scenarios
-8. **`cassette-replay.spec.ts`** (9 tests) - Cassette replay system (2026-01-18)
-9. **`src/engine/test/prompt-projection.test.ts`** (21 tests) - Prompt projection with hidden news marking and telemetry aggregation (2026-01-18)
-10. **`src/engine/test/prng.test.ts`** (17 tests) - PRNG dice rolling system (2026-01-18)
+1. **`smoke.spec.ts`** - App loads without errors (multi-browser)
+2. **`timeline.spec.ts`** - Timeline display and navigation (multi-browser)
+3. **`search.spec.ts`** - Search and filtering (multi-browser)
+4. **`persistence.spec.ts`** - LocalStorage persistence and sync (multi-browser)
+5. **`import-export.spec.ts`** - JSON import/export (multi-browser)
+6. **`turn-cycle.spec.ts`** - Full GM turn cycle, turn markers with visual UI (multi-browser)
+7. **`error-handling.spec.ts`** - Input validation and error scenarios
+8. **`cassette-replay.spec.ts`** - Cassette replay system (2026-01-18)
+9. **`packages/webapp/src/engine/test/prompt-projection.test.ts`** - Prompt projection with hidden news marking and telemetry aggregation (2026-01-18)
+10. **`packages/webapp/src/engine/test/prng.test.ts`** - PRNG dice rolling system (2026-01-18)
 
 ### Unimplemented Feature Tests (Skipped)
 
-8. **`unimplemented-features.spec.ts`** (61 tests, ALL SKIPPED)
+**`packages/webapp/tests/unimplemented-features.spec.ts`** (ALL SKIPPED)
 
-Documents requirements for features not yet built:
-- Post-Game Analysis (6 tests)
-- Hidden News System (2 tests)
-- Tutorial/Onboarding (5 tests)
-- Materials System (3 tests)
-- PRNG/Dice Rolling (4 tests)
-- AI Studio Build (3 tests)
-- Cassette Replay (4 tests)
-- Advanced Telemetry (3 tests)
-- Settings & Accessibility (8 tests)
-- Performance (3 tests)
+Documents requirements for post-MVP features:
+- Dashboard/Visualizations
+- LLM Assistant
+- Materials Dynamic Selection
+- Performance Optimization
 
 ## Test Statistics
 
@@ -1324,6 +1289,12 @@ Monorepo with npm workspaces:
 - Don't add error handling for impossible scenarios
 - Three lines of code > premature abstraction
 
+### Trust Standard Libraries
+- When using a well-known library (like lucide-react), use it fully - don't create unnecessary abstractions
+- Avoid whitelists/registries for libraries that already provide comprehensive exports
+- Example: lucide-react has 1000+ icons - don't manually whitelist each one, use dynamic lookup
+- The LLM can reference standard library APIs without custom documentation
+
 ### Aggressively Prune False Information
 - Never document removed features or previous versions
 - Only current state matters
@@ -1344,8 +1315,8 @@ Monorepo with npm workspaces:
 - [docs/spec-design.md](docs/spec-design.md) - Overall architecture
 
 ### Test Documentation
-- [tests/README.md](tests/README.md) - Test authoring guide
-- [tests/unimplemented-features.spec.ts](tests/unimplemented-features.spec.ts) - Executable feature specifications
+- [packages/webapp/tests/README.md](packages/webapp/tests/README.md) - Test authoring guide
+- [packages/webapp/tests/unimplemented-features.spec.ts](packages/webapp/tests/unimplemented-features.spec.ts) - Executable feature specifications
 
 ## Working with Jörn (Project Owner)
 

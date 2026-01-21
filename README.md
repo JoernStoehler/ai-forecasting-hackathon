@@ -23,16 +23,17 @@ npm run test:e2e -- --grep-invert "UNIMPLEMENTED"
 
 ## Project Structure
 
-Flat single-package structure (simplified from previous monorepo):
+Monorepo with npm workspaces:
 
-- **`src/`** - React application source
-  - `src/engine/` - Timeline engine (types, validation, forecaster adapters)
-  - `src/engine/test/` - Engine unit tests (196 tests)
-  - `src/components/` - React UI components
-  - `src/services/` - Business logic and integrations
-- **`tests/`** - E2E test suite (Playwright)
+- **`packages/webapp/`** - React web application
+  - `packages/webapp/src/engine/` - Timeline engine (types, validation, forecaster adapters)
+  - `packages/webapp/src/engine/test/` - Engine unit tests
+  - `packages/webapp/src/components/` - React UI components
+  - `packages/webapp/src/services/` - Business logic and integrations
+  - `packages/webapp/tests/` - E2E test suite (Playwright)
+- **`packages/share-worker/`** - Cloudflare Worker for game sharing
 - **`docs/`** - Design specifications and technical docs
-- **Root config files** - tsconfig.json, vite.config.ts, playwright.config.ts, etc.
+- **Root config files** - package.json with workspace scripts
 
 ## Documentation
 
@@ -48,7 +49,7 @@ Flat single-package structure (simplified from previous monorepo):
 - localStorage persistence + JSON import/export
 - Gemini 2.5 Flash integration with streaming
 - Mock forecaster for testing
-- Comprehensive test suite (196 unit tests + E2E tests)
+- Comprehensive test suite (unit tests + E2E tests)
 - Zod-based type system (single source of truth)
 
 ⚠️ **In Progress:**

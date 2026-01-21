@@ -16,6 +16,10 @@ dist-ssr
 # Local scratch space; may contain secrets
 scratch/
 
+# AI Studio Build output
+ai-studio-build/
+ai-studio-deploy.zip
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

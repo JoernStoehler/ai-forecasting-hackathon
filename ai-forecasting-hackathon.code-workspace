@@ -11,7 +11,7 @@
 		"git.autoRepositoryDetection": "openEditors",
     "files.exclude": {
       "**/node_modules": true,
-      "**/dist": true
+      "**/dist": false
     },
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "terminal.integrated.defaultProfile.linux": "bash"

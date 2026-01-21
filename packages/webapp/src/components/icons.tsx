@@ -1,113 +1,35 @@
 import React from 'react';
-import {
-  Landmark,
-  BrainCircuit,
-  FlaskConical,
-  Scale,
-  Satellite,
-  Globe,
-  Cpu,
-  DollarSign,
-  Smartphone,
-  Newspaper,
-  Power,
-  ShieldCheck,
-  Swords,
-  Code,
-  Database,
-  FileText,
-  MessageSquare,
-  Users,
-  TrendingUp,
-  Factory,
-  Building,
-  Bomb,
-  Ship,
-  Plane,
-  Wallet,
-  Bot,
-  Search,
-  X,
-  Upload,
-  Download,
-  Send,
-  Share2,
-  Copy,
-  Check,
-  ExternalLink,
-  Loader2,
-  Moon,
-  Sun,
-  HelpCircle,
-  Clock,
-  Plus,
-  ScrollText,
-  Eye,
-  FileQuestionMark,
-  type LucideIcon,
-  type LucideProps,
-} from 'lucide-react';
+import * as Icons from 'lucide-react';
+import type { LucideProps } from 'lucide-react';
 
 type IconProps = LucideProps & {
   name: string;
   className?: string;
 };
 
-const ICONS: Record<string, LucideIcon> = {
-  Landmark,
-  BrainCircuit,
-  FlaskConical,
-  Scale,
-  Satellite,
-  Globe,
-  Cpu,
-  DollarSign,
-  Smartphone,
-  Newspaper,
-  Power,
-  ShieldCheck,
-  Swords,
-  Code,
-  Database,
-  FileText,
-  MessageSquare,
-  Users,
-  TrendingUp,
-  Factory,
-  Building,
-  Bomb,
-  Ship,
-  Plane,
-  Wallet,
-  Bot,
-  Search,
-  X,
-  Upload,
-  Download,
-  Send,
-  Share2,
-  Copy,
-  Check,
-  ExternalLink,
-  Loader2,
-  Moon,
-  Sun,
-  HelpCircle,
-  Clock,
-  Plus,
-  ScrollText,
-  Eye,
-};
-
 /**
- * Renders a whitelisted Lucide icon; falls back to FileQuestionMark when missing.
+ * Dynamic icon lookup from lucide-react.
+ *
+ * The GM can reference any icon by name without needing a whitelist.
+ * lucide-react exports all icons as named exports, so we can look them up dynamically.
+ *
+ * Technical note: lucide-react v0.263+ uses React.forwardRef, which creates components
+ * that are objects (with $$typeof: Symbol(react.forward_ref)), not functions. The
+ * validation below handles both function components and forwardRef components.
  */
 export const Icon: React.FC<IconProps> = ({ name, ...props }) => {
-  const LucideIcon = ICONS[name];
+  const LucideIcon = (Icons as any)[name];
 
-  if (!LucideIcon) {
-    console.warn(`Icon '${name}' not found in lucide-react.`);
-    return <FileQuestionMark {...props} />;
+  // Validate that we have a renderable React component
+  // Accept both function components and forwardRef components (objects with $$typeof)
+  const isValidComponent = LucideIcon && (
+    typeof LucideIcon === 'function' ||
+    (typeof LucideIcon === 'object' && LucideIcon.$$typeof)
+  );
+
+  if (!isValidComponent) {
+    console.warn(`Icon '${name}' not found in lucide-react. Showing fallback.`);
+    return <Icons.FileQuestionMark {...props} />;
   }
 
   return <LucideIcon {...props} />;

@@ -11,15 +11,16 @@
 This is a serious policy simulation game where players assume the role of the US government and interact with an LLM-based "game master" (powered by Google's Gemini 2.5 Flash) to explore AI governance scenarios through an interactive timeline from 2025 onward.
 
 **Project Structure:**
-Flat single-package structure (all code at root level):
-- `src/` - React application source
-  - `src/engine/` - Timeline engine (types, validation, forecaster adapters)
-  - `src/engine/test/` - Engine unit tests (196 tests)
-  - `src/components/` - React components
-  - `src/services/` - Business logic and integrations
-- `tests/` - E2E test suite (Playwright)
+Monorepo with npm workspaces:
+- `packages/webapp/` - React web application
+  - `packages/webapp/src/engine/` - Timeline engine (types, validation, forecaster adapters)
+  - `packages/webapp/src/engine/test/` - Engine unit tests
+  - `packages/webapp/src/components/` - React components
+  - `packages/webapp/src/services/` - Business logic and integrations
+  - `packages/webapp/tests/` - E2E test suite (Playwright)
+- `packages/share-worker/` - Cloudflare Worker for game sharing
 - `docs/` - Specifications and design documents
-- Root config files (tsconfig.json, vite.config.ts, playwright.config.ts, etc.)
+- Root config files (package.json with workspace scripts)
 
 ---
 
@@ -68,11 +69,11 @@ npm test
 ## Testing
 
 ### Test Infrastructure (New!)
-Comprehensive E2E test suite added 2026-01-14. See [`E2E-TEST-STATUS.md`](/E2E-TEST-STATUS.md) for details.
+Comprehensive E2E test suite added 2026-01-14.
 
 **Quick Test Commands:**
 ```bash
-# Unit tests (196 tests, ~1 second)
+# Unit tests (~1 second)
 npm test
 
 # Smoke test (~10 seconds)
@@ -191,7 +192,7 @@ Environment is pre-configured with dependencies installed via `npm install`.
 5. Commit with clear message
 
 ### Improving Tests
-1. Review [`E2E-TEST-STATUS.md`](./E2E-TEST-STATUS.md) for gaps
+1. Review test files for gaps
 2. Add tests or un-skip existing tests
 3. Update test README if patterns change
 4. Mark unimplemented features as `.skip()` with clear comments
@@ -204,14 +205,14 @@ Playwright includes a built-in screenshot command for visual inspection:
 npm run dev
 
 # Take screenshot (adjust port if needed - check dev server output)
-npx playwright screenshot http://localhost:3001/ scratch/screenshot.png
+npx playwright screenshot http://localhost:3000/ scratch/screenshot.png
 
 # Options:
 npx playwright screenshot \
   --viewport-size=1280,720 \
   --full-page \
   --color-scheme=dark \
-  http://localhost:3001/game scratch/game-dark.png
+  http://localhost:3000/game scratch/game-dark.png
 ```
 
 **Common use cases:**
@@ -237,11 +238,51 @@ VITE_USE_MOCK_FORECASTER=true
 
 ### Build Commands
 ```bash
-npm run build          # Build all packages
-npm run lint           # Lint all packages
-npm run typecheck      # Type check all packages
-npm run dev            # Start dev server (webapp)
+npm run build              # Build webapp (standard Vite build → dist/)
+npm run build:deploy       # Build single-file HTML (386 KB → dist/)
+npm run build:ai-studio    # Build AI Studio ZIP (67 KB → ai-studio-deploy.zip)
+npm run lint               # Lint all packages
+npm run typecheck          # Type check all packages
+npm run dev                # Start dev server (webapp)
 ```
+
+### Deployment Targets
+
+The project has three separate build outputs:
+
+**1. Standard Build (`npm run build`)**
+- Output: `packages/webapp/dist/`
+- Uses: Vite bundler
+- Produces: Minified JavaScript bundles, processed CSS
+- For: Traditional web hosting (Netlify, Vercel, etc.)
+
+**2. Single-File Deploy (`npm run build:deploy`)**
+- Output: `packages/webapp/dist/index.html` (386 KB)
+- Uses: Vite + vite-plugin-singlefile
+- Produces: Single HTML file with inlined CSS/JS
+- For: Easy distribution, email attachments, offline use
+
+**3. AI Studio Build (`npm run build:ai-studio`)**
+- Output: `ai-studio-deploy.zip` (67 KB)
+- Uses: Custom script ([scripts/build-ai-studio.js](../scripts/build-ai-studio.js))
+- Produces: ZIP with TypeScript source + compiled CSS
+- For: [Google AI Studio Build Mode](https://aistudio.google.com) deployment
+- **Important:** Must run `npm run build` first to generate compiled CSS
+
+**AI Studio Build Process:**
+```bash
+# Two-step process required:
+npm run build              # 1. Generate compiled CSS in dist/assets/
+npm run build:ai-studio    # 2. Package TS source + compiled CSS into ZIP
+
+# The script will error if dist/assets/ doesn't exist
+```
+
+**What is AI Studio Build Mode?**
+- Web-based platform at [aistudio.google.com](https://aistudio.google.com)
+- Allows uploading ZIP files with HTML/TypeScript/React code
+- Runs apps using viewers' Gemini API quota (no backend needed)
+- See [docs/deployment.md](../docs/deployment.md) for deployment guide
 
 ---
 
@@ -258,7 +299,7 @@ npm run dev            # Start dev server (webapp)
 
 ---
 
-## Current State (2026-01-17)
+## Current State (2026-01-21)
 
 ### What Works ✅
 - Core gameplay loop (player input → GM response)
@@ -272,18 +313,10 @@ npm run dev            # Start dev server (webapp)
 - Cassette replay system (designed, partially implemented)
 
 ### What's Not Built ❌
-- Post-game analysis screen
-- Hidden news reveal system
-- Tutorial/onboarding
-- PRNG/dice rolling for unpredictability
-- AI Studio Build deployment path
-- Dark mode and settings
-- Full accessibility support
-
-See [`E2E-TEST-STATUS.md`](./E2E-TEST-STATUS.md) for comprehensive status and roadmap.
+None - all MVP features are complete. See [PROJECT.md](./PROJECT.md) for feature registry and post-MVP roadmap.
 
 ---
 
-**Last Updated:** 2026-01-17
+**Last Updated:** 2026-01-21
 **Maintained By:** Claude Code developers
 **Owner:** Jörn Stöhler

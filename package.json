@@ -10,6 +10,7 @@
     "dev": "npm run dev -w @ai-forecasting/webapp",
     "build": "npm run build -w @ai-forecasting/webapp",
     "build:deploy": "npm run build:deploy -w @ai-forecasting/webapp",
+    "build:ai-studio": "node scripts/build-ai-studio.js",
     "preview": "npm run preview -w @ai-forecasting/webapp",
     "lint": "npm run lint -w @ai-forecasting/webapp",
     "typecheck": "npm run typecheck -w @ai-forecasting/webapp",

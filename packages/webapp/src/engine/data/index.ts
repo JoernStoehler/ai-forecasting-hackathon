@@ -1,4 +1,4 @@
-import rawInitialEvents from './initialScenarioEvents.json' with { type: 'json' };
+import { INITIAL_SCENARIO_EVENTS } from './initialScenarioEvents.js';
 import { coerceEngineEvents } from '../utils/events.js';
 
-export const INITIAL_EVENTS = coerceEngineEvents(rawInitialEvents, 'initial scenario seed');
+export const INITIAL_EVENTS = coerceEngineEvents(INITIAL_SCENARIO_EVENTS, 'initial scenario seed');
