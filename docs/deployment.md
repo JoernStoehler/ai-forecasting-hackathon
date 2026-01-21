@@ -11,3 +11,32 @@ Key takeaways:
 - Apps are pure static frontends; no backend. If exporting outside AI Studio (e.g., Vercel), you must supply a key yourself and it will be exposed client-side—avoid for production unless you add a server proxy.
 - Streaming works with `generateContentStream` and `responseMimeType: 'application/json'`/`responseSchema`; matches what the engine uses.
 - Security: never commit real keys; assume anyone you share the AI Studio app with can read your source but not your key. Restrict keys and rotate if leaked.
+
+---
+
+# Share Worker (Cloudflare)
+
+The game includes a share feature that stores game state in Cloudflare KV.
+
+**Production worker:** https://share-worker.joern-stoehler.workers.dev
+
+**Source:** `packages/share-worker/`
+
+## How it works
+1. User clicks Share → game state POSTed to `/share` → returns 8-char ID
+2. Share URL: `https://your-app.com?share=<id>`
+3. Shared games stored for 30 days in KV
+4. CORS allows all origins (game can run from any host)
+
+## Deploy updates
+```bash
+npm run worker:login   # One-time Cloudflare auth
+npm run worker:deploy  # Deploy changes
+```
+
+## Local development
+```bash
+npm run worker:dev     # Runs on localhost:8787
+```
+
+Set `VITE_SHARE_WORKER_URL=http://localhost:8787` to test locally.

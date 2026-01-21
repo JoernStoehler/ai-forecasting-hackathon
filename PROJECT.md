@@ -1,6 +1,6 @@
 # AI Forecasting Web Game - Project Overview
 
-**Last Updated:** 2026-01-18 (Roadmap updated with MVP backlog)
+**Last Updated:** 2026-01-21 (Share game feature, monorepo restructure)
 
 **Quick Summary:** Serious policy simulation game where players assume the role of the US government and interact with an LLM-based "game master" (Gemini 2.5 Flash) to explore AI governance scenarios through an interactive timeline from 2025 onward.
 
@@ -283,7 +283,7 @@ LocalStorage-based persistence with multi-tab sync and corruption handling.
 
 ### Import/Export
 **Stage:** 🟢 COMPLETE
-**Tests:** [tests/import-export.spec.ts](tests/import-export.spec.ts)
+**Tests:** [tests/import-export.spec.ts](packages/webapp/tests/import-export.spec.ts)
 
 Export timeline as JSON and import with validation and deduplication.
 
@@ -295,6 +295,26 @@ Export timeline as JSON and import with validation and deduplication.
 - ✅ Error handling with user feedback
 
 **Dependencies:** Event Sourcing
+
+---
+
+### Share Game
+**Stage:** 🟢 COMPLETE (2026-01-21)
+**Files:** [ShareButton.tsx](packages/webapp/src/components/ShareButton.tsx), [SharedGameModal.tsx](packages/webapp/src/components/SharedGameModal.tsx), [shareService.ts](packages/webapp/src/services/shareService.ts)
+
+Share game state via URL links and Twitter.
+
+**Implementation:**
+- ✅ Cloudflare Worker for storing shared games (`packages/share-worker/`)
+- ✅ KV storage with 30-day TTL
+- ✅ ShareButton component with copy link and Twitter sharing
+- ✅ SharedGameModal for loading shared games via `?share=<id>` URL
+- ✅ Options to view timeline, continue playing, or start fresh
+- ✅ CORS allows all origins (game can run from any host)
+
+**Worker URL:** https://share-worker.joern-stoehler.workers.dev
+
+**Dependencies:** None (orthogonal)
 
 ---
 
@@ -1259,21 +1279,27 @@ GEMINI_API_KEY=your_key_here
 
 # Optional: use mock forecaster (development/testing)
 VITE_USE_MOCK_FORECASTER=true
+
+# Share worker URL (defaults to production worker)
+VITE_SHARE_WORKER_URL=https://share-worker.joern-stoehler.workers.dev
 ```
 
 ## Project Structure
 
-Flat single-package structure (all code at root level):
+Monorepo with npm workspaces:
 ```
 /
-├── src/                    # React application
-│   ├── engine/            # Timeline engine (types, validation, adapters)
-│   ├── engine/test/       # Engine unit tests
-│   ├── components/        # React components
-│   └── services/          # Business logic and integrations
-├── tests/                 # E2E test suite (Playwright)
-├── docs/                  # Specifications and design documents
-└── [config files]         # tsconfig.json, vite.config.ts, etc.
+├── packages/
+│   ├── webapp/                # React web application
+│   │   ├── src/
+│   │   │   ├── engine/       # Timeline engine (types, validation, adapters)
+│   │   │   ├── components/   # React components
+│   │   │   └── services/     # Business logic and integrations
+│   │   └── tests/            # E2E test suite (Playwright)
+│   └── share-worker/          # Cloudflare Worker for game sharing
+│       └── src/index.ts      # KV-based share storage
+├── docs/                      # Specifications and design documents
+└── [config files]             # Root package.json with workspace scripts
 ```
 
 ## Code Conventions
@@ -1338,6 +1364,6 @@ Flat single-package structure (all code at root level):
 
 ---
 
-**Last Updated:** 2026-01-18 (Roadmap updated with MVP backlog)
+**Last Updated:** 2026-01-21 (Share game feature, monorepo restructure)
 **Maintained By:** Claude Code developers
 **Owner:** Jörn Stöhler
