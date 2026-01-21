@@ -126,8 +126,9 @@ This section defines the sequential order for implementing MVP features. Work th
    - See: [Keyboard Navigation & Accessibility](#keyboard-navigation--accessibility)
 
 8. **Deployment to AI Studio Build** - 🔵 READY, ⚠️ ESSENTIAL
-   - Deploy path for public access
-   - Local static server setup for PO/agents
+   - Primary deployment path using Google AI Studio Build
+   - User quota model (viewers use their own AI Studio quota)
+   - Multi-file project support via ZIP upload to agent
    - See: [AI Studio Build Deployment](#ai-studio-build-deployment)
 
 ### Post-MVP Nice-to-Haves
@@ -173,10 +174,11 @@ This section defines the sequential order for implementing MVP features. Work th
 
 ### 1. Deployment (Infrastructure Task)
 **Status**: 🔵 READY - Technical but not coding
-- Deploy to AI Studio Build platform
-- Verify per-user API key injection
-- Test in production environment
-- **Owner**: Can be done by technical person with deployment access
+- Deploy to AI Studio Build platform (primary path)
+- Verify per-user quota attribution (AI Studio proxy)
+- Test share link in production environment
+- **Owner**: Can be done by technical person with Google AI Studio access
+- **See:** [docs/deployment.md](docs/deployment.md) for step-by-step guide
 
 ### 2. Material Content (Domain Expert Task)
 **Status**: ⚠️ **CONTENT GAP** - Requires domain expertise
@@ -701,17 +703,22 @@ Algorithmic selection of relevant materials for GM context.
 ---
 
 ### AI Studio Build Deployment
-**Stage:** ⚪ IDEA
+**Stage:** 🔵 READY, ⚠️ ESSENTIAL
 **Tests:** [tests/unimplemented-features.spec.ts:172-190](tests/unimplemented-features.spec.ts)
-**Docs:** [docs/deployment.md](docs/deployment.md)
+**Docs:** [docs/deployment.md](docs/deployment.md) (step-by-step), [docs/deployment-options.md](docs/deployment-options.md) (research)
 
-Deploy to Google AI Studio Build with per-user API key injection.
+Deploy to Google AI Studio Build where viewers use their own Gemini API quota (not developer's).
 
-**Features:**
-- Per-user API key injection
-- Deployment smoke checklist
-- Free API budget allocation
-- AI Studio Build integration
+**Why This Path:**
+- Scales to unlimited users without developer cost
+- No API key setup for end users (AI Studio login authentication)
+- Free for all users (AI Studio free tier)
+- Multi-file React/TypeScript projects supported via ZIP upload
+
+**How It Works:**
+AI Studio proxies API calls, injecting viewer's credentials for `process.env.GEMINI_API_KEY`. Upload ZIP of source to Build agent, share link, viewers automatically authenticated.
+
+**Alternative:** Traditional hosting (Vercel/Netlify) where users provide their own API keys.
 
 **Dependencies:** None (deployment infrastructure)
 
@@ -1120,7 +1127,7 @@ npm run test:e2e
 
 Serious policy simulation game where the player alternates turns with an LLM-based forecaster that consults expert-curated and expert-written background material and instructions for the game.
 
-**Deployment:** Static Vite/React SPA, client-only storage, deployable to AI Studio Build for wide audience access.
+**Deployment:** Static Vite/React SPA deployed to Google AI Studio Build where users consume their own AI Studio quota (not developer's quota). Traditional hosting (Vercel/Netlify) available as fallback.
 
 ## Core Player Experience
 
@@ -1200,9 +1207,11 @@ Materials inclusion is **algorithmic/deterministic**, not a player-facing picker
 ## Deployment & Sharing
 
 ### Deployment
-- Deploy via AI Studio Build
+- Primary: Google AI Studio Build (users consume their own quota via AI Studio proxy)
 - Anyone can play in browser without installation
-- Free LLM API budget for all players (no API keys or payment needed)
+- No API key setup required (users authenticated via AI Studio login)
+- Free LLM API budget for all players (AI Studio free tier)
+- Fallback: Traditional hosting where users provide their own API keys
 
 ### Sharing
 - Players can download/upload save files
@@ -1244,8 +1253,8 @@ Target audience: policy experts and researchers interested in AI x-risk (not jus
 ## Hard Constraints
 
 - Static web app first (Vite/React SPA); no mandatory backend
-- Client-only storage by default (local-first); sharing via import/export unless expanded
-- Deployable to AI Studio Build for wide audience access
+- Client-only storage by default (local-first); sharing via import/export
+- Primary deployment: Google AI Studio Build (user quota model)
 - "Serious policy sim" tone: optimize for clarity, interpretability, and consistent rules over novelty
 - Single source of truth for scenario seed events and materials across frontends
 

@@ -16,6 +16,9 @@ dist-ssr
 # Local scratch space; may contain secrets
 scratch/
 
+# Deployment artifacts
+webapp-deployment.zip
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

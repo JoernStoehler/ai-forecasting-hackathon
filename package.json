@@ -2,6 +2,7 @@
   "name": "@ai-forecasting/root",
   "private": true,
   "version": "0.1.0",
+  "type": "module",
   "workspaces": [
     "packages/*"
   ],
@@ -15,11 +16,13 @@
     "check": "npm run check -w @ai-forecasting/webapp",
     "test:e2e": "npm run test:e2e -w @ai-forecasting/webapp",
     "hello": "bash scripts/hello.sh",
+    "deploy:zip": "node scripts/create-deployment-zip.js",
     "worker:dev": "npm run dev -w @ai-forecasting/share-worker",
     "worker:deploy": "npm run deploy -w @ai-forecasting/share-worker",
     "worker:login": "wrangler login"
   },
   "devDependencies": {
+    "archiver": "^7.0.1",
     "wrangler": "^4"
   }
 }
