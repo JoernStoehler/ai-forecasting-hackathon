@@ -39,24 +39,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && rm -rf /var/lib/apt/lists/* \
     && node -v && npm -v
 
-# Playwright runtime dependencies (browsers are cached via mount). `libasound2` renamed on Noble.
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libnss3 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libdrm2 \
-    libxkbcommon0 \
-    libxdamage1 \
-    libpango-1.0-0 \
-    libcairo2 \
-    libasound2t64 \
-    libatspi2.0-0 \
-    libxcomposite1 \
-    libxrandr2 \
-    libgbm1 \
-    libxshmfence1 \
-    && rm -rf /var/lib/apt/lists/*
+# Playwright runtime dependencies (browsers are cached via mount).
+# Use Playwright's install-deps to get all required system libraries.
+RUN npx playwright install-deps
 
 # VS Code tunnel CLI (bake into image to avoid slow install on postCreate)
 RUN set -eux; \

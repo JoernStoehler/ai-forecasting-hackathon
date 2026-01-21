@@ -20,6 +20,6 @@
     "worker:login": "wrangler login"
   },
   "devDependencies": {
-    "wrangler": "^3"
+    "wrangler": "^4"
   }
 }
