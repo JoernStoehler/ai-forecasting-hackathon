@@ -8,7 +8,5 @@ binding = "SHARES"
 id = "4f0b3d10f63640708e2574bcf2bf4a09"
 preview_id = "fe5f2e79b8ba49b9a8eaf5705c5cabc2"
 
-[vars]
-# CORS origins allowed to access this worker
-# Update these when deploying to production
-ALLOWED_ORIGINS = "http://localhost:3000,http://localhost:3001,http://localhost:4173,http://localhost:5173"
+# CORS: Worker allows all origins since it only stores/retrieves game state (no sensitive data)
+# This enables the game to work from any hosting environment (AI Studio, artifacts, localhost, etc.)

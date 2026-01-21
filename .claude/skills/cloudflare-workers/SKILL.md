@@ -44,23 +44,21 @@ Essential pages (always check these for current info):
 - **KV Storage**: https://developers.cloudflare.com/kv/
 - **Environment Variables**: https://developers.cloudflare.com/workers/configuration/environment-variables/
 
+## Production Worker
+
+**URL**: https://share-worker.joern-stoehler.workers.dev
+
+## CORS Policy
+
+The worker allows **all origins** because:
+- It only stores/retrieves game state (no sensitive data)
+- The game may run from various hosts (AI Studio, Claude/ChatGPT artifacts, localhost)
+- Game state has 30-day TTL and is not authentication-protected
+
 ## Common Issues
 
 ### "You need to register a workers.dev subdomain"
-Visit https://dash.cloudflare.com/?to=/:account/workers-and-pages and register your subdomain first.
+Run `npx wrangler deploy` - it will prompt you or auto-register.
 
 ### KV namespace not found
 Create namespaces with `npx wrangler kv namespace create` and update wrangler.toml with the IDs.
-
-### CORS errors
-Update `ALLOWED_ORIGINS` in wrangler.toml `[vars]` section to include your production domain.
-
-## Updating CORS for Production
-
-Edit `packages/share-worker/wrangler.toml`:
-```toml
-[vars]
-ALLOWED_ORIGINS = "https://your-production-domain.com,http://localhost:3000"
-```
-
-Then redeploy: `npm run worker:deploy`

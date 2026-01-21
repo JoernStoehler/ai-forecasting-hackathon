@@ -1,6 +1,5 @@
 interface Env {
   SHARES: KVNamespace;
-  ALLOWED_ORIGINS: string;
 }
 
 function generateId(): string {
@@ -12,11 +11,11 @@ function generateId(): string {
   return id;
 }
 
-function corsHeaders(origin: string, env: Env): HeadersInit {
-  const allowed = env.ALLOWED_ORIGINS.split(',');
-  const allowedOrigin = allowed.includes(origin) ? origin : allowed[0];
+// Allow all origins - this worker only stores/retrieves game state (no sensitive data)
+// This enables the game to work from any hosting environment (AI Studio, artifacts, etc.)
+function corsHeaders(origin: string): HeadersInit {
   return {
-    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Origin': origin || '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   };
@@ -26,7 +25,7 @@ export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
     const origin = request.headers.get('Origin') || '';
-    const headers = corsHeaders(origin, env);
+    const headers = corsHeaders(origin);
 
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
