@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "npm run dev -w @ai-forecasting/webapp",
     "build": "npm run build -w @ai-forecasting/webapp",
+    "build:deploy": "npm run build:deploy -w @ai-forecasting/webapp",
     "preview": "npm run preview -w @ai-forecasting/webapp",
     "lint": "npm run lint -w @ai-forecasting/webapp",
     "typecheck": "npm run typecheck -w @ai-forecasting/webapp",
@@ -16,7 +17,6 @@
     "check": "npm run check -w @ai-forecasting/webapp",
     "test:e2e": "npm run test:e2e -w @ai-forecasting/webapp",
     "hello": "bash scripts/hello.sh",
-    "deploy:zip": "node scripts/create-deployment-zip.js",
     "worker:dev": "npm run dev -w @ai-forecasting/share-worker",
     "worker:deploy": "npm run deploy -w @ai-forecasting/share-worker",
     "worker:login": "wrangler login"

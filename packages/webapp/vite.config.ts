@@ -1,8 +1,12 @@
 import { fileURLToPath } from 'url';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { viteSingleFile } from 'vite-plugin-singlefile';
 
 const srcDir = fileURLToPath(new URL('./src', import.meta.url));
+
+// Use single-file build for AI Studio Build deployment (set VITE_SINGLE_FILE=true)
+const useSingleFile = process.env.VITE_SINGLE_FILE === 'true';
 
 export default defineConfig({
   envPrefix: ['GEMINI_', 'VITE_'],
@@ -10,7 +14,10 @@ export default defineConfig({
     port: 3000,
     host: '0.0.0.0',
   },
-  plugins: [react()],
+  plugins: [
+    react(),
+    ...(useSingleFile ? [viteSingleFile()] : []),
+  ],
   resolve: {
     alias: {
       '@': srcDir,
@@ -18,7 +25,7 @@ export default defineConfig({
   },
   build: {
     rollupOptions: {
-      output: {
+      output: useSingleFile ? {} : {
         manualChunks: {
           react: ['react', 'react-dom'],
           lucide: ['lucide-react'],

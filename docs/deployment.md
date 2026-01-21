@@ -1,17 +1,23 @@
-# Deploying the Webapp to AI Studio Build
+# Deploying the Webapp
 
 **Last Updated:** 2026-01-21
-**Status:** Primary deployment path for public access
+**Status:** Single-file HTML deployment (386 KB)
 
 ---
 
 ## Overview
 
-This project deploys to **Google AI Studio Build** to enable:
-- ✅ Users consume their own Gemini API quota (not developer's quota)
-- ✅ Free access for all users (AI Studio free tier)
-- ✅ No API key management for end users
-- ✅ Share via simple link
+This project builds to a **single self-contained HTML file** (386 KB) that can be deployed to:
+
+1. **Google AI Studio Build** - Users consume their own Gemini API quota
+2. **Claude Artifacts** - Direct paste deployment (under 10 MB limit)
+3. **Traditional Hosting** - Any static file host (Cloudflare Pages, Vercel, Netlify)
+
+**Key Benefits:**
+- ✅ Single file = simple deployment
+- ✅ No build step needed at deployment target
+- ✅ Works offline after first load
+- ✅ Easy to share and distribute
 
 **See also:** [docs/deployment-options.md](./deployment-options.md) for comparison with other platforms.
 
@@ -40,45 +46,41 @@ When you share an app within AI Studio:
 ## Deployment Steps
 
 ### Prerequisites
-- Google account with access to AI Studio (https://aistudio.google.com)
-- This repository cloned locally
+- Repository cloned locally
 - All code tested locally with `npm run dev`
+- (For AI Studio Build) Google account with access to https://aistudio.google.com
 
-### Step 1: Build Production Bundle
+### Step 1: Build Single-File Production Bundle
 ```bash
 # Ensure all tests pass
 npm run check
 
-# Create production build
-npm run build
+# Create single-file build (packages/webapp/dist/index.html)
+npm run build:deploy
 ```
 
-### Step 2: Create ZIP of Source Code
-```bash
-# Create deployment ZIP (automated script)
-npm run deploy:zip
+This creates a single `packages/webapp/dist/index.html` file (~386 KB) with all JavaScript and CSS inlined.
 
-# This creates webapp-deployment.zip in the project root
-# Excludes: test files, test directories, node_modules, dist
-```
+---
 
-### Step 3: Open AI Studio Build
+## Deployment Option A: Google AI Studio Build
+
+**Best for:** Users consuming their own Gemini API quota (free for all users)
+
+### Step 1: Open AI Studio Build
 1. Navigate to https://aistudio.google.com
 2. Select **Build mode** from the left sidebar
-3. Create a new app or open existing project
+3. Create a new app
 
-### Step 4: Upload Source Code
-1. In the Build mode chat interface, **attach the ZIP file** (webapp-deployment.zip)
-2. Send this prompt to the agent:
-   ```
-   Please replace the entire codebase with the contents of this ZIP file.
-   This is a React/TypeScript/Vite application for AI forecasting.
-   Preserve all file structure and configurations.
-   ```
-3. Wait for the agent to process and update the Code tab
-4. Verify in the **Code tab** that your files are present
+### Step 2: Upload Single HTML File
+1. In the Build mode file browser, create a new file: `index.html`
+2. Copy the entire contents of `packages/webapp/dist/index.html`
+3. Paste into the AI Studio Build editor
+4. Save the file
 
-### Step 5: Verify Functionality
+**Alternative:** Upload via file upload button if available in the interface.
+
+### Step 3: Verify Functionality
 1. Switch to **Preview tab**
 2. Test core functionality:
    - App loads without errors
@@ -88,18 +90,74 @@ npm run deploy:zip
    - Search works
 3. Check browser console for errors
 
-### Step 6: Share the App
+### Step 4: Share the App
 1. Click the **Share** button (top right in Build mode)
 2. Copy the generated share link
 3. Test the link in a **different browser** or **incognito window**
 4. Verify that user authentication works (should use their AI Studio quota)
 
-### Step 7: Verify User Quota Attribution
+### Step 5: Verify User Quota Attribution
 Test with a different Google account:
 1. Open share link in different account/browser
 2. Submit several player actions (trigger GM responses)
 3. Verify your own AI Studio quota is **not** consumed
 4. Verify the viewer can make API calls without errors
+
+---
+
+## Deployment Option B: Claude Artifacts
+
+**Best for:** Quick demos and prototypes (10 MB limit, 386 KB actual size)
+
+### Step 1: Prepare HTML Content
+1. Run `npm run build:deploy` to create single-file build
+2. Open `packages/webapp/dist/index.html` in a text editor
+3. Copy the entire contents (Ctrl+A, Ctrl+C)
+
+### Step 2: Create Artifact
+1. Start a conversation with Claude (claude.com)
+2. Ask Claude to create an artifact with your HTML:
+   ```
+   Please create an artifact with this HTML content:
+   [paste the full index.html contents]
+   ```
+3. Claude will render the app in an artifact viewer
+
+### Step 3: Test Functionality
+1. Test the app directly in the artifact viewer
+2. Click the expand button to open in a larger view
+3. Verify core functionality works
+
+**Note:** Users will need their own Gemini API key for Claude Artifacts deployment (Claude can't inject API keys like AI Studio Build does).
+
+---
+
+## Deployment Option C: Traditional Hosting
+
+**Best for:** Custom domain, advanced hosting features
+
+Deploy the single HTML file to any static host:
+
+### Cloudflare Pages
+```bash
+npm run build:deploy
+cd packages/webapp/dist
+# Upload index.html via Cloudflare Pages dashboard
+```
+
+### Vercel
+```bash
+npm run build:deploy
+vercel deploy packages/webapp/dist
+```
+
+### Netlify
+```bash
+npm run build:deploy
+netlify deploy --dir=packages/webapp/dist --prod
+```
+
+**Note:** Users will need their own Gemini API key for traditional hosting.
 
 ---
 
@@ -111,82 +169,51 @@ Test with a different Google account:
 - ❌ **Don't do this:** Deploy to Cloud Run for this use case
 
 ### Code Visibility
-- **Source code is visible** to anyone with the share link
-- Do not include secrets, credentials, or sensitive data
-- Assume viewers can read and fork your code
-
-### GitHub Integration (Optional)
-AI Studio Build can export to GitHub:
-1. Click the GitHub icon in Build mode
-2. Connect your GitHub account
-3. Select repository
-4. AI Studio will create commits when you make changes
+- **Built code is visible** to anyone with access to the HTML file
+- Code is minified but not obfuscated
+- Do not include secrets or credentials (use environment variables)
 
 ### Updating Deployed App
-To update the deployed app:
 1. Make changes locally and test
-2. Create new ZIP with updated code
-3. Upload to AI Studio Build agent
-4. Prompt: "Update the codebase with this new version"
-5. Test in Preview tab
-6. Share link remains the same (no need to re-share)
+2. Rebuild: `npm run build:deploy`
+3. For AI Studio Build: Update the index.html file contents
+4. For Claude Artifacts: Create a new artifact with updated HTML
+5. For traditional hosting: Re-upload index.html
+
+### Single-File Build Details
+- All JavaScript (~390 KB minified) inlined in `<script>` tags
+- All CSS (~24 KB) inlined in `<style>` tags
+- No external dependencies or network requests (except Gemini API)
+- Works offline after first load
+- Gzip size: ~116 KB (what users actually download)
 
 ---
 
 ## Troubleshooting
 
-### Share Link Requires Login When It Shouldn't
-**Known issue:** Some forum reports of public links requiring login.
+### AI Studio Build: Share Link Requires Login
+**Known issue:** Some reports of public links requiring login.
 - **Workaround:** Ensure app is marked as "public" in share settings
 - **Check:** AI Studio share settings (if available)
-- **Alternative:** Use traditional hosting as fallback
+- **Alternative:** Use Claude Artifacts or traditional hosting
 
-### API Calls Failing for Viewers
+### AI Studio Build: API Calls Failing for Viewers
 **Possible causes:**
 1. Viewer doesn't have AI Studio access → Ask them to sign up
 2. Viewer's quota exhausted → They need to wait for quota reset
 3. App not properly shared → Re-check share settings
 
-### Code Not Updating After ZIP Upload
-**Solutions:**
-1. Clear the Code tab manually before uploading new ZIP
-2. Use more explicit prompt: "Delete all existing code first, then..."
-3. Try creating a fresh Build project and uploading there
+### Claude Artifacts: App Not Rendering
+**Possible causes:**
+1. HTML content too large (exceeded 10 MB limit - unlikely with 386 KB)
+2. Syntax error in HTML (verify file is valid)
+3. Browser security restrictions (check console for errors)
 
-### Preview Works But Share Link Doesn't
-**Possible issue:** App might be using absolute paths or localhost references
-- **Check:** All API endpoints use relative paths
-- **Check:** No hardcoded localhost URLs in code
-- **Check:** `VITE_SHARE_WORKER_URL` uses production URL
-
----
-
-## Alternative: Traditional Hosting
-
-If AI Studio Build doesn't meet requirements, deploy to traditional hosting:
-
-### Option A: Cloudflare Pages
-```bash
-npm run build
-# Deploy dist/ folder to Cloudflare Pages
-```
-
-### Option B: Vercel
-```bash
-npm run build
-vercel deploy
-```
-
-### Option C: Netlify
-```bash
-npm run build
-netlify deploy --prod
-```
-
-**Important:** With traditional hosting, users must:
-1. Create their own Gemini API key
-2. Paste key into app settings
-3. Manage key security themselves
+### Traditional Hosting: API Key Not Working
+**Check:**
+1. Users have set their own Gemini API key in app settings
+2. API key has correct permissions
+3. Check browser console for API errors
 
 ---
 
