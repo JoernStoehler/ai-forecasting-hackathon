@@ -5,8 +5,8 @@ compatibility_date = "2024-01-01"
 # KV namespace for storing shared game states
 [[kv_namespaces]]
 binding = "SHARES"
-id = "placeholder-production-id"
-preview_id = "placeholder-preview-id"
+id = "4f0b3d10f63640708e2574bcf2bf4a09"
+preview_id = "fe5f2e79b8ba49b9a8eaf5705c5cabc2"
 
 [vars]
 # CORS origins allowed to access this worker
